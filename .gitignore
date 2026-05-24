@@ -1,0 +1,43 @@
+# === Peculiaridades do Docker e Banco de Dados ===
+postgres_data/
+pgdata/
+.data/
+redis_data/
+*.db
+*.sqlite3
+
+# === Python / Backend ===
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.pytest_cache/
+backend/.venv/
+backend/env/
+backend/venv/
+
+# === Node / React Frontend ===
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+.eslintcache
+
+# === Variáveis de Ambiente (Segurança) ===
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# === IDEs e Editores ===
+.vscode/
+.idea/
+.cursor/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+
+docs/rascunho

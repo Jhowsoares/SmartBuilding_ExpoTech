@@ -1,0 +1,288 @@
+# =============================================================
+# Smart Building — Docker Compose Principal (raiz do projeto)
+# =============================================================
+# Orquestra todos os serviços do ecossistema:
+#   Rede IoT: clock, server (Flask legado), client, scheduler, sensores
+#   Backend:  FastAPI (novo), PostgreSQL, Redis
+#
+# Uso:
+#   docker compose up -d                  # sobe tudo
+#   docker compose up -d backend postgres # sobe só o backend
+#   docker compose logs -f backend        # acompanha logs do FastAPI
+#
+# Migrations (executar uma vez após subir postgres):
+#   docker compose exec backend alembic upgrade head
+# =============================================================
+
+services:
+
+  # ─────────────────────────────────────────────────────────
+  # INFRAESTRUTURA
+  # ─────────────────────────────────────────────────────────
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: sb_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jhonata
+      POSTGRES_PASSWORD: expo_PSW_1
+      POSTGRES_DB: expotech_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Script de inicialização opcional (índices, extensions)
+      # - ./backend/scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"          # exposto para acesso via DBeaver / pgAdmin local
+    networks:
+      - rede
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jhonata -d expotech_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: sb_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - rede
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ─────────────────────────────────────────────────────────
+  # BACKEND FASTAPI  (nova API — Design API-First)
+  # ─────────────────────────────────────────────────────────
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sb_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # ── Ambiente ──────────────────────────────────────────
+      ENVIRONMENT: development
+      DEBUG: "true"
+      # ── Banco de Dados ────────────────────────────────────
+      DATABASE_URL: postgresql+asyncpg://jhonata:expo_PSW_1@postgres:5432/expotech_db
+      # URL síncrona usada pelo Alembic para migrations
+      SYNC_DATABASE_URL: postgresql+psycopg2://jhonata:expo_PSW_1@postgres:5432/expotech_db
+      # ── JWT ───────────────────────────────────────────────
+      JWT_SECRET: smart-building-jwt-secret-dev-troque-em-prod
+      ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+      # ── Redis ─────────────────────────────────────────────
+      REDIS_URL: redis://redis:6379/0
+      # ── MQTT ──────────────────────────────────────────────
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      # ── CORS ──────────────────────────────────────────────
+      # CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
+      CORS_ORIGINS: "*"
+      # ── Token dos sensores IoT ────────────────────────────
+      SENSOR_SERVICE_TOKEN: sensor-service-token-dev
+    volumes:
+      # Hot-reload em desenvolvimento: monta o código da app
+      - ./backend:/app
+    command: >
+      sh -c "cd /app && alembic upgrade head && python -m scripts.seed_db; uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    networks:
+      - rede
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: sb_ngrok
+    environment:
+      NGROK_AUTHTOKEN: 3CJcSlLon4bkPz7a4IDp4Quiptp_2dZuiSRGjCnr4RNh4yMgm
+    command: http backend:8000 --pooling-enabled
+    depends_on:
+      - backend
+    networks:
+      - rede
+
+  # ─────────────────────────────────────────────────────────
+  # MQTT BROKER (Mosquitto)
+  # ─────────────────────────────────────────────────────────
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: sb_mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"    # MQTT padrão
+      - "9001:9001"    # WebSocket (para dashboard futuro)
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mqtt_data:/mosquitto/data
+    networks:
+      - rede
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_pub -h localhost -p 1883 -t health -m ping -q 0 && echo OK"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ─────────────────────────────────────────────────────────
+  # FRONTEND REACT (F01-F09)
+  # ─────────────────────────────────────────────────────────
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sb_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - rede
+
+  # ─────────────────────────────────────────────────────────
+  # SIMULADOR MQTT (I03) — 14 salas publicando telemetria
+  # ─────────────────────────────────────────────────────────
+
+  simulator:
+    build: ./simulator
+    container_name: sb_simulator
+    restart: unless-stopped
+    environment:
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      INTERVAL: "5"
+    depends_on:
+      mqtt:
+        condition: service_started
+      backend:
+        condition: service_started
+    networks:
+      - rede
+
+  # ─────────────────────────────────────────────────────────
+  # REDE IoT — Serviços existentes (preservados)
+  # ─────────────────────────────────────────────────────────
+
+  clock:
+    build: ./Rede/clock
+    container_name: clock
+    ports:
+      - "8001:8000"        # porta host alterada para não colidir com o backend
+    networks:
+      - rede
+
+  # Servidor Flask legado — mantido para compatibilidade
+  server:
+    build: ./Rede/server
+    container_name: server
+    ports:
+      - "5000:5000"
+    networks:
+      - rede
+
+  client:
+    build: ./Rede/client
+    container_name: client
+    depends_on:
+      - server
+    networks:
+      - rede
+
+  scheduler:
+    build: ./Rede/scheduler
+    container_name: scheduler
+    depends_on:
+      - clock
+    networks:
+      - rede
+
+  # ─────────────────────────────────────────────────────────
+  # SENSORES IoT
+  # Variável SERVER_URL aponta para o novo backend FastAPI.
+  # Para usar o Flask legado: SERVER_URL=http://server:5000/data
+  # ─────────────────────────────────────────────────────────
+
+  sensor_temp_01:
+    build: ./Rede/sensor
+    container_name: sensor_temp_01
+    environment:
+      SENSOR_TIPO: temperature
+      SENSOR_INTERVALO: "5"
+      # Aponta para o novo backend FastAPI (migração gradual)
+      # SERVER_URL: http://backend:8000/api/v1/sensors/data
+    depends_on:
+      - clock
+    networks:
+      - rede
+
+  sensor_umid_01:
+    build: ./Rede/sensor
+    container_name: sensor_umid_01
+    environment:
+      SENSOR_TIPO: humidity
+      SENSOR_INTERVALO: "7"
+    depends_on:
+      - clock
+    networks:
+      - rede
+
+  sensor_presenca_01:
+    build: ./Rede/sensor
+    container_name: sensor_presenca_01
+    environment:
+      SENSOR_TIPO: presence
+      SENSOR_INTERVALO: "3"
+    depends_on:
+      - clock
+    networks:
+      - rede
+
+# ─────────────────────────────────────────────────────────
+# VOLUMES PERSISTENTES
+# ─────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    name: smartbuilding_postgres_data
+  redis_data:
+    name: smartbuilding_redis_data
+  mqtt_data:
+    name: smartbuilding_mqtt_data
+
+# ─────────────────────────────────────────────────────────
+# REDES
+# ─────────────────────────────────────────────────────────
+networks:
+  rede:
+    driver: bridge
+    name: smartbuilding_rede
+

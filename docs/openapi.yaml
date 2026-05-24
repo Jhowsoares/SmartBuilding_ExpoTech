@@ -1,0 +1,2048 @@
+openapi: 3.1.0
+info:
+  title: Smart Building API
+  description: Sistema de controle inteligente de ar-condicionado
+  version: 1.0.0
+paths:
+  /api/v1/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      operationId: health_check_api_v1_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Health Check Api V1 Health Get
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Autenticar e obter tokens JWT
+      operationId: login_api_v1_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Renovar access token
+      operationId: refresh_api_v1_auth_refresh_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Revogar token (logout)
+      operationId: logout_api_v1_auth_logout_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Logout Api V1 Auth Logout Post
+      security:
+        - HTTPBearer: []
+  /api/v1/sensors/data:
+    post:
+      tags:
+        - Sensors
+      summary: Ingerir leitura de sensor IoT
+      operationId: ingest_sensor_data_api_v1_sensors_data_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorDataIngest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorDataResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - HTTPBearer: []
+  /api/v1/sensors:
+    get:
+      tags:
+        - Sensors
+      summary: Listar sensores registrados
+      operationId: list_sensors_api_v1_sensors_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            title: Page
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            default: 20
+            title: Size
+        - name: tipo
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/SensorTipo'
+              - type: 'null'
+            title: Tipo
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/sensors/{sensor_id}':
+    get:
+      tags:
+        - Sensors
+      summary: Detalhes de um sensor
+      operationId: get_sensor_api_v1_sensors__sensor_id__get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: sensor_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Sensor Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/sensors/{sensor_id}/data':
+    get:
+      tags:
+        - Sensors
+      summary: Histórico de leituras
+      operationId: get_sensor_history_api_v1_sensors__sensor_id__data_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: sensor_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Sensor Id
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^(1h|24h|7d|30d)$
+            default: 24h
+            title: Period
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            title: Page
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            default: 20
+            title: Size
+        - name: anomalies_only
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+            title: Anomalies Only
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: >-
+                  Response Get Sensor History Api V1 Sensors  Sensor Id  Data
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/sensors/{sensor_id}/latest':
+    get:
+      tags:
+        - Sensors
+      summary: Última leitura de um sensor
+      operationId: get_sensor_latest_api_v1_sensors__sensor_id__latest_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: sensor_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Sensor Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorLatestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/devices:
+    get:
+      tags:
+        - Devices
+      summary: Listar dispositivos
+      operationId: list_devices_api_v1_devices_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            title: Page
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            default: 20
+            title: Size
+        - name: room_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: uuid
+              - type: 'null'
+            title: Room Id
+        - name: status
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/DeviceStatus'
+              - type: 'null'
+            title: Status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response List Devices Api V1 Devices Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - Devices
+      summary: Cadastrar dispositivo
+      operationId: create_device_api_v1_devices_post
+      security:
+        - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/devices/{device_id}':
+    get:
+      tags:
+        - Devices
+      summary: Detalhes de um dispositivo
+      operationId: get_device_api_v1_devices__device_id__get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Device Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+        - Devices
+      summary: Atualizar dispositivo
+      operationId: update_device_api_v1_devices__device_id__patch
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Device Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - Devices
+      summary: Desativar dispositivo
+      operationId: delete_device_api_v1_devices__device_id__delete
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Device Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/devices/{device_id}/control':
+    post:
+      tags:
+        - Devices
+      summary: Controlar dispositivo (ligar/desligar/setpoint)
+      operationId: control_device_api_v1_devices__device_id__control_post
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Device Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceControlRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceControlResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/devices/{device_id}/status':
+    get:
+      tags:
+        - Devices
+      summary: Status atual do dispositivo
+      operationId: get_device_status_api_v1_devices__device_id__status_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Device Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/rooms:
+    get:
+      tags:
+        - Rooms
+      summary: Listar salas
+      operationId: list_rooms_api_v1_rooms_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            title: Page
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            default: 20
+            title: Size
+        - name: building
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                maxLength: 100
+              - type: 'null'
+            title: Building
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response List Rooms Api V1 Rooms Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - Rooms
+      summary: Cadastrar sala
+      operationId: create_room_api_v1_rooms_post
+      security:
+        - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/rooms/{room_id}':
+    get:
+      tags:
+        - Rooms
+      summary: Detalhes de uma sala
+      operationId: get_room_api_v1_rooms__room_id__get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: room_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Room Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+        - Rooms
+      summary: Atualizar sala
+      operationId: update_room_api_v1_rooms__room_id__patch
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: room_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Room Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - Rooms
+      summary: Excluir sala
+      operationId: delete_room_api_v1_rooms__room_id__delete
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: room_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Room Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/alerts:
+    get:
+      tags:
+        - Alerts
+      summary: Listar alertas
+      operationId: list_alerts_api_v1_alerts_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            title: Page
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            default: 20
+            title: Size
+        - name: active_only
+          in: query
+          required: false
+          schema:
+            type: boolean
+            description: Somente alertas não resolvidos
+            default: false
+            title: Active Only
+          description: Somente alertas não resolvidos
+        - name: device_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+                format: uuid
+              - type: 'null'
+            title: Device Id
+        - name: severity
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/AlertSeverity'
+              - type: 'null'
+            title: Severity
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response List Alerts Api V1 Alerts Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - Alerts
+      summary: Criar alerta manualmente
+      operationId: create_alert_api_v1_alerts_post
+      security:
+        - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/alerts/history:
+    get:
+      tags:
+        - Alerts
+      summary: Histórico de alertas
+      operationId: get_alert_history_api_v1_alerts_history_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: days
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 365
+            minimum: 1
+            default: 30
+            title: Days
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            title: Page
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 200
+            minimum: 1
+            default: 50
+            title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Get Alert History Api V1 Alerts History Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/alerts/{alert_id}':
+    get:
+      tags:
+        - Alerts
+      summary: Detalhes de um alerta
+      operationId: get_alert_api_v1_alerts__alert_id__get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: alert_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Alert Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/alerts/{alert_id}/acknowledge':
+    post:
+      tags:
+        - Alerts
+      summary: Reconhecer alerta
+      operationId: acknowledge_alert_api_v1_alerts__alert_id__acknowledge_post
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: alert_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Alert Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/api/v1/alerts/{alert_id}/resolve':
+    post:
+      tags:
+        - Alerts
+      summary: Resolver alerta
+      operationId: resolve_alert_api_v1_alerts__alert_id__resolve_post
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: alert_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: Alert Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users:
+    get:
+      tags:
+        - Users
+      summary: Listar usuários (admin)
+      operationId: list_users_api_v1_users_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            title: Page
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            default: 20
+            title: Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response List Users Api V1 Users Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+        - Users
+      summary: Criar usuário (admin)
+      operationId: create_user_api_v1_users_post
+      security:
+        - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/me:
+    get:
+      tags:
+        - Users
+      summary: Perfil do usuário autenticado
+      operationId: get_me_api_v1_users_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+      security:
+        - HTTPBearer: []
+  '/api/v1/users/{user_id}':
+    get:
+      tags:
+        - Users
+      summary: Detalhes de um usuário (admin)
+      operationId: get_user_api_v1_users__user_id__get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+        - Users
+      summary: Atualizar usuário (admin)
+      operationId: update_user_api_v1_users__user_id__patch
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: User Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - Users
+      summary: Desativar usuário (admin)
+      operationId: delete_user_api_v1_users__user_id__delete
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            title: User Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/consumption:
+    get:
+      tags:
+        - Consumption
+      summary: Histórico de consumo energético
+      operationId: get_consumption_api_v1_consumption_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^(24h|7d|30d)$
+            default: 24h
+            title: Period
+        - name: device_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            title: Device Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Get Consumption Api V1 Consumption Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/consumption/summary:
+    get:
+      tags:
+        - Consumption
+      summary: Resumo de consumo por sala
+      operationId: get_consumption_summary_api_v1_consumption_summary_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^(24h|7d|30d)$
+            default: 7d
+            title: Period
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: >-
+                  Response Get Consumption Summary Api V1 Consumption Summary
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/predictions/24h:
+    get:
+      tags:
+        - Predictions
+      summary: Predição de consumo para as próximas 24 horas
+      operationId: get_predictions_24h_api_v1_predictions_24h_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Get Predictions 24H Api V1 Predictions 24H Get
+      security:
+        - HTTPBearer: []
+  /api/v1/predictions/train:
+    post:
+      tags:
+        - Predictions
+      summary: Retreinar modelo com dados históricos
+      description: Agenda retreinamento do modelo ML com últimos 30 dias de dados.
+      operationId: trigger_retrain_api_v1_predictions_train_post
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Trigger Retrain Api V1 Predictions Train Post
+      security:
+        - HTTPBearer: []
+  /api/v1/reports/consumption:
+    get:
+      tags:
+        - Reports
+      summary: Relatório de consumo
+      operationId: get_consumption_report_api_v1_reports_consumption_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^(24h|7d|30d)$
+            default: 7d
+            title: Period
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Get Consumption Report Api V1 Reports Consumption Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/reports/consumption/export:
+    get:
+      tags:
+        - Reports
+      summary: Exportar relatório de consumo em CSV
+      description: Exporta o relatório de consumo como arquivo CSV.
+      operationId: export_consumption_csv_api_v1_reports_consumption_export_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^(24h|7d|30d)$
+            default: 7d
+            title: Period
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/reports/alerts:
+    get:
+      tags:
+        - Reports
+      summary: Relatório de alertas
+      operationId: get_alerts_report_api_v1_reports_alerts_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: ^(24h|7d|30d)$
+            default: 7d
+            title: Period
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Response Get Alerts Report Api V1 Reports Alerts Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AlertCreate:
+      properties:
+        device_id:
+          type: string
+          format: uuid
+          title: Device Id
+        alert_type:
+          $ref: '#/components/schemas/AlertType'
+        severity:
+          $ref: '#/components/schemas/AlertSeverity'
+        message:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Message
+      type: object
+      required:
+        - device_id
+        - alert_type
+        - severity
+      title: AlertCreate
+    AlertResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        device_id:
+          type: string
+          format: uuid
+          title: Device Id
+        alert_type:
+          $ref: '#/components/schemas/AlertType'
+        severity:
+          $ref: '#/components/schemas/AlertSeverity'
+        message:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Message
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        acknowledged_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Acknowledged At
+        resolved_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Resolved At
+        is_active:
+          type: boolean
+          title: Is Active
+          default: true
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - id
+        - device_id
+        - alert_type
+        - severity
+        - created_at
+      title: AlertResponse
+    AlertSeverity:
+      type: string
+      enum:
+        - info
+        - warning
+        - critical
+      title: AlertSeverity
+    AlertType:
+      type: string
+      enum:
+        - HIGH_TEMPERATURE
+        - LOW_HUMIDITY
+        - ANOMALY_DETECTED
+        - DEVICE_OFFLINE
+        - WINDOW_OPEN
+        - CONSUMPTION_LIMIT
+      title: AlertType
+    DeviceControlRequest:
+      properties:
+        action:
+          type: string
+          pattern: ^(on|off|setpoint)$
+          title: Action
+          description: 'Ação: ''on'', ''off'' ou ''setpoint'''
+        value:
+          anyOf:
+            - type: number
+              maximum: 30
+              minimum: 16
+            - type: 'null'
+          title: Value
+          description: Temperatura desejada (obrigatório para setpoint)
+      type: object
+      required:
+        - action
+      title: DeviceControlRequest
+    DeviceControlResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        device_id:
+          type: string
+          format: uuid
+          title: Device Id
+        action:
+          type: string
+          title: Action
+        value:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Value
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+      type: object
+      required:
+        - status
+        - device_id
+        - action
+        - timestamp
+      title: DeviceControlResponse
+    DeviceCreate:
+      properties:
+        room_id:
+          type: string
+          format: uuid
+          title: Room Id
+        device_type:
+          $ref: '#/components/schemas/DeviceType'
+        model:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Model
+        serial_number:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Serial Number
+        setpoint_celsius:
+          anyOf:
+            - type: number
+              maximum: 30
+              minimum: 16
+            - type: 'null'
+          title: Setpoint Celsius
+        mqtt_topic:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Mqtt Topic
+        notes:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Notes
+      type: object
+      required:
+        - room_id
+        - device_type
+      title: DeviceCreate
+    DeviceResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        room_id:
+          type: string
+          format: uuid
+          title: Room Id
+        device_type:
+          $ref: '#/components/schemas/DeviceType'
+        model:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Model
+        serial_number:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Serial Number
+        status:
+          $ref: '#/components/schemas/DeviceStatus'
+        is_active:
+          type: boolean
+          title: Is Active
+        power_on:
+          type: boolean
+          title: Power On
+        setpoint_celsius:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Setpoint Celsius
+        mqtt_topic:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Mqtt Topic
+        notes:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Notes
+        last_seen_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Last Seen At
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Updated At
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - id
+        - room_id
+        - device_type
+        - status
+        - is_active
+        - power_on
+        - created_at
+      title: DeviceResponse
+    DeviceStatus:
+      type: string
+      enum:
+        - online
+        - offline
+        - maintenance
+      title: DeviceStatus
+    DeviceType:
+      type: string
+      enum:
+        - ac
+        - temperature_sensor
+        - humidity_sensor
+        - presence_sensor
+        - window_sensor
+      title: DeviceType
+    DeviceUpdate:
+      properties:
+        model:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Model
+        setpoint_celsius:
+          anyOf:
+            - type: number
+              maximum: 30
+              minimum: 16
+            - type: 'null'
+          title: Setpoint Celsius
+        mqtt_topic:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Mqtt Topic
+        notes:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Notes
+        is_active:
+          anyOf:
+            - type: boolean
+            - type: 'null'
+          title: Is Active
+      type: object
+      title: DeviceUpdate
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HateoasLink:
+      properties:
+        rel:
+          type: string
+          title: Rel
+        href:
+          type: string
+          title: Href
+        method:
+          type: string
+          title: Method
+          default: GET
+      type: object
+      required:
+        - rel
+        - href
+      title: HateoasLink
+    LoginRequest:
+      properties:
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - email
+        - password
+      title: LoginRequest
+    PaginationMeta:
+      properties:
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        total_pages:
+          type: integer
+          title: Total Pages
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - total
+        - page
+        - size
+        - total_pages
+      title: PaginationMeta
+    RefreshRequest:
+      properties:
+        refresh_token:
+          type: string
+          title: Refresh Token
+      type: object
+      required:
+        - refresh_token
+      title: RefreshRequest
+    RoomCreate:
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          minLength: 1
+          title: Name
+        building:
+          type: string
+          maxLength: 100
+          minLength: 1
+          title: Building
+        floor:
+          type: integer
+          maximum: 100
+          minimum: 0
+          title: Floor
+        area_m2:
+          anyOf:
+            - type: number
+              exclusiveMinimum: 0
+            - type: 'null'
+          title: Area M2
+      type: object
+      required:
+        - name
+        - building
+        - floor
+      title: RoomCreate
+    RoomResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        name:
+          type: string
+          title: Name
+        building:
+          type: string
+          title: Building
+        floor:
+          type: integer
+          title: Floor
+        area_m2:
+          anyOf:
+            - type: number
+            - type: 'null'
+          title: Area M2
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Updated At
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - id
+        - name
+        - building
+        - floor
+        - created_at
+      title: RoomResponse
+    RoomUpdate:
+      properties:
+        name:
+          anyOf:
+            - type: string
+              maxLength: 100
+              minLength: 1
+            - type: 'null'
+          title: Name
+        building:
+          anyOf:
+            - type: string
+              maxLength: 100
+              minLength: 1
+            - type: 'null'
+          title: Building
+        floor:
+          anyOf:
+            - type: integer
+              maximum: 100
+              minimum: 0
+            - type: 'null'
+          title: Floor
+        area_m2:
+          anyOf:
+            - type: number
+              exclusiveMinimum: 0
+            - type: 'null'
+          title: Area M2
+      type: object
+      title: RoomUpdate
+    SensorDataIngest:
+      properties:
+        sensor_id:
+          type: string
+          pattern: '^sensor-(temperature|humidity|presence)-\d{4}$'
+          title: Sensor Id
+        tipo:
+          $ref: '#/components/schemas/SensorTipo'
+        valor:
+          type: number
+          title: Valor
+        tick:
+          type: integer
+          minimum: 0
+          title: Tick
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+      type: object
+      required:
+        - sensor_id
+        - tipo
+        - valor
+        - tick
+        - timestamp
+      title: SensorDataIngest
+    SensorDataResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        sensor_id:
+          type: string
+          title: Sensor Id
+        tipo:
+          $ref: '#/components/schemas/SensorTipo'
+        valor:
+          type: number
+          title: Valor
+        tick:
+          type: integer
+          title: Tick
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        is_anomaly:
+          type: boolean
+          title: Is Anomaly
+        received_at:
+          type: string
+          format: date-time
+          title: Received At
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - id
+        - sensor_id
+        - tipo
+        - valor
+        - tick
+        - timestamp
+        - is_anomaly
+        - received_at
+      title: SensorDataResponse
+    SensorLatestResponse:
+      properties:
+        sensor_id:
+          type: string
+          title: Sensor Id
+        tipo:
+          $ref: '#/components/schemas/SensorTipo'
+        valor:
+          type: number
+          title: Valor
+        tick:
+          type: integer
+          title: Tick
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        is_anomaly:
+          type: boolean
+          title: Is Anomaly
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - sensor_id
+        - tipo
+        - valor
+        - tick
+        - timestamp
+        - is_anomaly
+      title: SensorLatestResponse
+    SensorListResponse:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/SensorResponse'
+          type: array
+          title: Data
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+      required:
+        - data
+        - meta
+      title: SensorListResponse
+    SensorResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        tipo:
+          $ref: '#/components/schemas/SensorTipo'
+        status:
+          $ref: '#/components/schemas/SensorStatus'
+        last_seen:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Last Seen
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - id
+        - tipo
+        - status
+      title: SensorResponse
+    SensorStatus:
+      type: string
+      enum:
+        - online
+        - offline
+        - maintenance
+      title: SensorStatus
+    SensorTipo:
+      type: string
+      enum:
+        - temperature
+        - humidity
+        - presence
+      title: SensorTipo
+    TokenResponse:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        refresh_token:
+          type: string
+          title: Refresh Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+        expires_in:
+          type: integer
+          title: Expires In
+      type: object
+      required:
+        - access_token
+        - refresh_token
+        - expires_in
+      title: TokenResponse
+    UserCreate:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        password:
+          type: string
+          minLength: 6
+          title: Password
+        role:
+          allOf:
+            - $ref: '#/components/schemas/UserRole'
+          default: visualizador
+      type: object
+      required:
+        - email
+        - password
+      title: UserCreate
+    UserResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        email:
+          type: string
+          title: Email
+        role:
+          $ref: '#/components/schemas/UserRole'
+        is_active:
+          type: boolean
+          title: Is Active
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Updated At
+        links:
+          items:
+            $ref: '#/components/schemas/HateoasLink'
+          type: array
+          title: Links
+      type: object
+      required:
+        - id
+        - email
+        - role
+        - is_active
+        - created_at
+      title: UserResponse
+    UserRole:
+      type: string
+      enum:
+        - admin
+        - operador
+        - visualizador
+      title: UserRole
+    UserUpdate:
+      properties:
+        role:
+          anyOf:
+            - $ref: '#/components/schemas/UserRole'
+            - type: 'null'
+        is_active:
+          anyOf:
+            - type: boolean
+            - type: 'null'
+          title: Is Active
+      type: object
+      title: UserUpdate
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
+tags:
+  - name: Health
+    description: Monitoramento de saúde dos subsistemas
+  - name: Auth
+    description: Autenticação e gestão de tokens JWT
+  - name: Sensors
+    description: Ingestão e consulta de dados dos sensores IoT
+  - name: Devices
+    description: Gestão e controle dos dispositivos (AC)
+  - name: Rooms
+    description: Gestão das salas do edifício
+  - name: Alerts
+    description: Alertas e notificações do sistema
+  - name: Consumption
+    description: Histórico e análise de consumo energético
+  - name: Predictions
+    description: Predições de consumo geradas pelo modelo de IA
+  - name: Reports
+    description: Relatórios consolidados exportáveis
+  - name: Users
+    description: Gestão de usuários e controle de acesso (RBAC)

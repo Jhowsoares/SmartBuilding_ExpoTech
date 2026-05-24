@@ -1,0 +1,64 @@
+services:
+
+  clock:
+    build: ./clock
+    container_name: clock
+    ports:
+      - "8000:8000"
+    networks:
+      - rede
+
+  server:
+    build: ./server
+    container_name: server
+    ports:
+      - "5000:5000"
+    networks:
+      - rede
+
+  client:
+    build: ./client
+    container_name: client
+    depends_on:
+      - server
+    networks:
+      - rede
+
+  scheduler:
+    build: ./scheduler
+    container_name: scheduler
+    depends_on:
+      - clock
+    networks:
+      - rede
+
+  sensor_temp_01:
+    build: ./sensor
+    container_name: sensor_temp_01
+    environment:
+      - SENSOR_TIPO=temperature
+      - SENSOR_INTERVALO=5
+    networks:
+      - rede
+
+  sensor_umid_01:
+    build: ./sensor
+    container_name: sensor_umid_01
+    environment:
+      - SENSOR_TIPO=humidity
+      - SENSOR_INTERVALO=7
+    networks:
+      - rede
+
+  sensor_presenca_01:
+    build: ./sensor
+    container_name: sensor_presenca_01
+    environment:
+      - SENSOR_TIPO=presence
+      - SENSOR_INTERVALO=3
+    networks:
+      - rede
+
+networks:
+  rede:
+    driver: bridge
