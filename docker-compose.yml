@@ -119,7 +119,7 @@ services:
     image: ngrok/ngrok:latest
     container_name: sb_ngrok
     environment:
-      NGROK_AUTHTOKEN: 3CJcSlLon4bkPz7a4IDp4Quiptp_2dZuiSRGjCnr4RNh4yMgm
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
     command: http backend:8000 --pooling-enabled
     depends_on:
       - backend

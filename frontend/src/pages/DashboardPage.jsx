@@ -1,27 +1,41 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
 import { format } from 'date-fns'
-import { getDevices, getAlerts, getSensors, getSensorData, getRooms } from '../services/api'
+import { getDevices, getAlerts, getSensors, getSensorData, getRooms, getHealth } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { SeverityBadge, StatusBadge } from '../components/AlertBadge'
 
+function StatusChip({ label, ok, pending }) {
+  const color = pending ? 'yellow' : ok ? 'green' : 'red'
+  return (
+    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border
+      ${color === 'green' ? 'text-green-400 border-green-700 bg-green-900/20'
+      : color === 'yellow' ? 'text-yellow-400 border-yellow-700 bg-yellow-900/20'
+      : 'text-red-400 border-red-700 bg-red-900/20'}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${pending ? 'bg-yellow-400 animate-pulse' : ok ? 'bg-green-400' : 'bg-red-500'}`} />
+      {label}
+    </div>
+  )
+}
+
 function StatCard({ label, value, icon, color = 'blue', sub }) {
   const colors = {
-    blue: 'text-blue-400 bg-blue-900/30',
+    blue: 'text-sb-primary bg-blue-900/30',
     green: 'text-green-400 bg-green-900/30',
-    yellow: 'text-yellow-400 bg-yellow-900/30',
+    yellow: 'text-sb-tertiary bg-yellow-900/30',
     purple: 'text-purple-400 bg-purple-900/30',
-    red: 'text-red-400 bg-red-900/30',
+    red: 'text-sb-error bg-red-900/30',
   }
   return (
     <div className="card p-5">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-gray-400 text-sm font-medium">{label}</p>
-          <p className="text-3xl font-bold text-white mt-1">{value}</p>
-          {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
+          <p className="text-sb-outline text-sm font-medium">{label}</p>
+          <p className="text-3xl font-bold text-sb-on-surface mt-1">{value}</p>
+          {sub && <p className="text-xs text-sb-outline mt-1">{sub}</p>}
         </div>
         <div className={`p-3 rounded-xl ${colors[color]}`}>{icon}</div>
       </div>
@@ -32,8 +46,8 @@ function StatCard({ label, value, icon, color = 'blue', sub }) {
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="card p-3 text-sm">
-      <p className="text-gray-400 mb-1">{label}</p>
+    <div className="card p-3 text-sm border border-sb-border">
+      <p className="text-sb-outline mb-1">{label}</p>
       {payload.map((p) => (
         <p key={p.dataKey} style={{ color: p.color }}>
           {p.name}: <span className="font-semibold">{p.value?.toFixed(1)}</span>
@@ -49,22 +63,24 @@ export default function DashboardPage() {
   const [recentAlerts, setRecentAlerts] = useState([])
   const [loading, setLoading] = useState(true)
   const [chartLoading, setChartLoading] = useState(false)
+  const [health, setHealth] = useState(null)
 
   const fetchStats = useCallback(async () => {
     try {
-      const [devRes, alertRes, roomRes] = await Promise.allSettled([
+      const [devRes, alertRes, roomRes, healthRes] = await Promise.allSettled([
         getDevices(),
         getAlerts({ active_only: true }),
         getRooms(),
+        getHealth(),
       ])
 
       const devices = devRes.status === 'fulfilled' ? devRes.value.data : []
       const alerts = alertRes.status === 'fulfilled' ? alertRes.value.data : []
       const rooms = roomRes.status === 'fulfilled' ? roomRes.value.data : []
 
-      const devArr = Array.isArray(devices) ? devices : devices?.items || []
-      const alertArr = Array.isArray(alerts) ? alerts : alerts?.items || []
-      const roomArr = Array.isArray(rooms) ? rooms : rooms?.items || []
+      const devArr = Array.isArray(devices) ? devices : devices?.data || devices?.items || []
+      const alertArr = Array.isArray(alerts) ? alerts : alerts?.data || alerts?.items || []
+      const roomArr = Array.isArray(rooms) ? rooms : rooms?.data || rooms?.items || []
 
       setStats({
         devices: devArr.filter((d) => d.status === 'online' || d.is_online).length || devArr.length,
@@ -73,6 +89,7 @@ export default function DashboardPage() {
         rooms: roomArr.length,
       })
       setRecentAlerts(alertArr.slice(0, 5))
+      if (healthRes.status === 'fulfilled') setHealth(healthRes.value.data)
     } catch (_) {}
   }, [])
 
@@ -82,7 +99,7 @@ export default function DashboardPage() {
       const sensorsRes = await getSensors()
       const sensors = Array.isArray(sensorsRes.data)
         ? sensorsRes.data
-        : sensorsRes.data?.items || []
+        : sensorsRes.data?.data || sensorsRes.data?.items || []
 
       if (sensors.length === 0) {
         setChartData(generateMockChartData())
@@ -228,18 +245,29 @@ export default function DashboardPage() {
         />
       </div>
 
+      {/* System status chips */}
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusChip label="MQTT Broker" ok={health?.subsystems?.mqtt === 'ok'} pending={!health} />
+        <StatusChip label="PostgreSQL"  ok={health?.subsystems?.database === 'ok'} pending={!health} />
+        <StatusChip label="Redis Cache" ok={health?.subsystems?.redis === 'ok'} pending={!health} />
+        <StatusChip label="Simulador"   ok={health?.subsystems?.simulator === 'ok'} pending={!health} />
+        <span className="ml-auto text-xs text-sb-outline">
+          {format(new Date(), "EEE., dd 'de' MMM. 'de' yyyy", { locale: undefined })}
+        </span>
+      </div>
+
       {/* Chart */}
       <div className="card p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-white font-semibold">Temperatura & Umidade em Tempo Real</h2>
-            <p className="text-gray-400 text-sm mt-0.5">Atualiza a cada 10 segundos</p>
+            <h2 className="text-sb-on-surface font-semibold">Temperatura & Umidade em Tempo Real</h2>
+            <p className="text-sb-outline text-sm mt-0.5">Atualiza a cada 10 segundos</p>
           </div>
           {chartLoading && <LoadingSpinner size="sm" />}
         </div>
 
         {chartData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-gray-500">
+          <div className="flex flex-col items-center justify-center h-48 text-sb-outline">
             <svg className="w-12 h-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -249,11 +277,11 @@ export default function DashboardPage() {
         ) : (
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="time" stroke="#6B7280" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-              <YAxis stroke="#6B7280" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#424754" />
+              <XAxis dataKey="time" stroke="#8c909f" tick={{ fill: '#c2c6d6', fontSize: 12 }} />
+              <YAxis stroke="#8c909f" tick={{ fill: '#c2c6d6', fontSize: 12 }} />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ color: '#9CA3AF', fontSize: 13 }} />
+              <Legend wrapperStyle={{ color: '#c2c6d6', fontSize: 13 }} />
               {lineKeys.map((key, i) => (
                 <Line
                   key={key}
@@ -272,11 +300,12 @@ export default function DashboardPage() {
 
       {/* Recent Alerts */}
       <div className="card">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-white font-semibold">Alertas Recentes</h2>
+        <div className="px-6 py-4 border-b border-sb-border flex items-center justify-between">
+          <h2 className="text-sb-on-surface font-semibold">Alertas Recentes</h2>
+          <Link to="/alerts" className="text-sb-primary hover:text-blue-300 text-sm transition-colors">Ver todos</Link>
         </div>
         {recentAlerts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-12 text-sb-outline">
             <svg className="w-10 h-10 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -287,7 +316,7 @@ export default function DashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-700">
+                <tr className="border-b border-sb-border">
                   <th className="table-header">Tipo</th>
                   <th className="table-header">Severidade</th>
                   <th className="table-header">Dispositivo</th>
@@ -295,14 +324,14 @@ export default function DashboardPage() {
                   <th className="table-header">Criado em</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700">
+              <tbody className="divide-y divide-sb-border">
                 {recentAlerts.map((a, i) => (
-                  <tr key={a.id || i} className="hover:bg-gray-700/50 transition-colors">
+                  <tr key={a.id || i} className="hover:bg-sb-card-high transition-colors">
                     <td className="table-cell font-medium">{a.type || a.alert_type || '-'}</td>
                     <td className="table-cell"><SeverityBadge severity={a.severity} /></td>
-                    <td className="table-cell text-gray-400">{a.device_id || a.device || '-'}</td>
+                    <td className="table-cell text-sb-outline">{a.device_id || a.device || '-'}</td>
                     <td className="table-cell"><StatusBadge status={a.status} /></td>
-                    <td className="table-cell text-gray-400">
+                    <td className="table-cell text-sb-outline">
                       {a.created_at ? format(new Date(a.created_at), 'dd/MM HH:mm') : '-'}
                     </td>
                   </tr>

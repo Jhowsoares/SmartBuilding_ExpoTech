@@ -15,15 +15,15 @@ const COST_KWH = 0.85 // R$ per kWh (example tariff)
 
 function StatCard({ label, value, sub, color = 'blue' }) {
   const colors = {
-    blue: 'text-blue-400',
+    blue: 'text-sb-primary',
     green: 'text-green-400',
-    yellow: 'text-yellow-400',
+    yellow: 'text-sb-tertiary',
   }
   return (
     <div className="card p-5">
-      <p className="text-gray-400 text-sm">{label}</p>
+      <p className="text-sb-outline text-sm">{label}</p>
       <p className={`text-3xl font-bold mt-1 ${colors[color]}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-sb-outline opacity-70 mt-1">{sub}</p>}
     </div>
   )
 }
@@ -31,9 +31,9 @@ function StatCard({ label, value, sub, color = 'blue' }) {
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="card p-3 text-sm">
-      <p className="text-gray-400 mb-1">{label}</p>
-      <p className="text-blue-400 font-semibold">{payload[0]?.value?.toFixed(2)} kWh</p>
+    <div className="card p-3 text-sm border border-sb-border">
+      <p className="text-sb-outline mb-1">{label}</p>
+      <p className="text-sb-primary font-semibold">{payload[0]?.value?.toFixed(2)} kWh</p>
     </div>
   )
 }
@@ -56,6 +56,7 @@ function downloadCSV(data, period) {
 export default function ReportsPage() {
   const [period, setPeriod] = useState('24h')
   const [data, setData] = useState([])
+  const [apiTotals, setApiTotals] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -65,11 +66,36 @@ export default function ReportsPage() {
     try {
       const res = await getConsumption(period)
       const raw = res.data
-      let arr = Array.isArray(raw) ? raw : raw?.data || raw?.readings || raw?.items || []
-      if (arr.length === 0) arr = generateMockData(period)
-      setData(arr)
+      // API returns { data: { total_kwh, custo_brl, breakdown_by_hour: [...] } }
+      const inner = raw?.data ?? raw
+      const breakdown = Array.isArray(inner?.breakdown_by_hour)
+        ? inner.breakdown_by_hour
+        : Array.isArray(inner)
+          ? inner
+          : []
+
+      if (breakdown.length > 0) {
+        // Use real data — map breakdown_by_hour into chart-friendly format
+        const mapped = breakdown.map((h) => ({
+          label: h.hora
+            ? new Date(h.hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            : (h.label || h.time || ''),
+          kwh: +(h.kwh_estimado ?? h.kwh ?? h.value ?? 0),
+          avg_temp: h.avg_temp_celsius ?? null,
+        }))
+        setData(mapped)
+        // Prefer backend totals when available
+        if (inner?.total_kwh != null) {
+          setApiTotals({ totalKwh: inner.total_kwh, costBrl: inner.custo_brl ?? 0 })
+        }
+      } else {
+        setData(generateMockData(period))
+        setApiTotals(null)
+        setError('Sem dados reais — exibindo estimativa.')
+      }
     } catch (_) {
       setData(generateMockData(period))
+      setApiTotals(null)
       setError('Usando dados de exemplo — API não disponível.')
     } finally {
       setLoading(false)
@@ -80,28 +106,28 @@ export default function ReportsPage() {
     fetchData()
   }, [period])
 
-  const totalKwh = data.reduce((sum, d) => sum + (d.kwh || d.value || d.consumption || 0), 0)
-  const totalCost = totalKwh * COST_KWH
+  const totalKwh = apiTotals?.totalKwh ?? data.reduce((sum, d) => sum + (d.kwh || 0), 0)
+  const totalCost = apiTotals?.costBrl ?? (totalKwh * COST_KWH)
   const avgKwh = data.length > 0 ? totalKwh / data.length : 0
 
   const chartData = data.map((d) => ({
-    label: d.label || d.time || d.hour || d.date || '',
-    kWh: +(d.kwh || d.value || d.consumption || 0).toFixed(2),
+    label: d.label || '',
+    kWh: +(d.kwh || 0).toFixed ? +(d.kwh || 0) : 0,
   }))
 
   return (
     <div className="space-y-6">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex rounded-lg overflow-hidden border border-gray-700">
+        <div className="flex rounded-lg overflow-hidden border border-sb-border">
           {PERIODS.map(({ value, label }) => (
             <button
               key={value}
               onClick={() => setPeriod(value)}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 period === value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'
+                  ? 'bg-sb-primary-btn text-white'
+                  : 'bg-sb-card text-sb-outline hover:text-sb-on-surface hover:bg-sb-card-high'
               }`}
             >
               {label}
@@ -156,32 +182,32 @@ export default function ReportsPage() {
 
       {/* Chart */}
       <div className="card p-6">
-        <h2 className="text-white font-semibold mb-6">Consumo de Energia</h2>
+        <h2 className="text-sb-on-surface font-semibold mb-6">Consumo de Energia</h2>
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <LoadingSpinner size="lg" />
           </div>
         ) : chartData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+          <div className="flex flex-col items-center justify-center h-64 text-sb-outline">
             <p>Sem dados de consumo disponíveis</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#424754" />
               <XAxis
                 dataKey="label"
-                stroke="#6B7280"
-                tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                stroke="#8c909f"
+                tick={{ fill: '#c2c6d6', fontSize: 11 }}
                 interval="preserveStartEnd"
               />
               <YAxis
-                stroke="#6B7280"
-                tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                stroke="#8c909f"
+                tick={{ fill: '#c2c6d6', fontSize: 11 }}
                 unit=" kWh"
               />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="kWh" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="kWh" fill="#4d8eff" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

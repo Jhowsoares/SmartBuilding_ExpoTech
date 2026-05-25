@@ -169,7 +169,16 @@ async def _async_callback(topic: str, payload: dict, sensor_type: str) -> None:
     from app.db.database import AsyncSessionLocal
     from app.ml.business_rules import rules_engine, RuleContext
     from app.models.sensor_data import SensorData
+    from app.models.device import DeviceStatus
     from app.repositories.device_repository import DeviceRepository
+
+    # Mapeia tipo de sensor ao tipo de dispositivo correspondente no banco
+    _SENSOR_TO_DEVICE_TYPE = {
+        "temperature": "temperature_sensor",
+        "humidity": "humidity_sensor",
+        "presence": "presence_sensor",
+        "window": "window_sensor",
+    }
 
     try:
         # Extrai room_id ou device_id do tópico
@@ -182,10 +191,56 @@ async def _async_callback(topic: str, payload: dict, sensor_type: str) -> None:
         ts_str = payload.get("timestamp")
         ts = datetime.fromisoformat(ts_str) if ts_str else datetime.now(timezone.utc)
 
+        # Extrai número da sala do entity_id (ex: "room-101" → "101")
+        room_num = entity_id.split("-")[-1] if "-" in entity_id else entity_id
+
         async with AsyncSessionLocal() as db:
+            # ── Atualiza status dos devices dessa sala para ONLINE ────────────
+            # Encontra o sensor device correspondente pelo mqtt_topic
+            # (compara pela parte do topic que inclui o número da sala)
+            try:
+                from sqlalchemy import select, or_
+                from app.models.device import Device, DeviceType
+                from app.models.room import Room
+
+                # Busca salas cujo nome contenha o número da sala
+                rooms_q = await db.execute(
+                    select(Room).where(Room.name.contains(room_num))
+                )
+                matching_rooms = rooms_q.scalars().all()
+
+                if matching_rooms:
+                    dev_type_str = _SENSOR_TO_DEVICE_TYPE.get(sensor_type)
+                    for room_obj in matching_rooms:
+                        # Atualiza o sensor deste tipo para online
+                        from sqlalchemy import update
+                        await db.execute(
+                            update(Device)
+                            .where(
+                                Device.room_id == room_obj.id,
+                                Device.device_type == dev_type_str,
+                            )
+                            .values(
+                                status=DeviceStatus.ONLINE,
+                                last_seen_at=ts,
+                            )
+                        )
+                        # Também marca o AC como online quando há atividade na sala
+                        await db.execute(
+                            update(Device)
+                            .where(
+                                Device.room_id == room_obj.id,
+                                Device.device_type == DeviceType.AC,
+                            )
+                            .values(status=DeviceStatus.ONLINE, last_seen_at=ts)
+                        )
+            except Exception as e:
+                logger.debug("Não foi possível atualizar status do device: %s", e)
+
+            # ── Persiste leitura ──────────────────────────────────────────────
             # RN08: Validação básica antes de persistir
             record = SensorData(
-                sensor_id=f"sensor-{sensor_type}-{entity_id[:8]}",
+                sensor_id=f"sensor-{sensor_type}-{entity_id}",
                 tipo=sensor_type,
                 valor=value,
                 tick=tick,

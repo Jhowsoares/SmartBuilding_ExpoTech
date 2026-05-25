@@ -1,241 +1,298 @@
 import { useState, useEffect } from 'react'
-import { getRooms, getDevices, controlDevice } from '../services/api'
+import { Link } from 'react-router-dom'
+import { getRooms, getDevices, controlDevice, createRoom } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 
-function DeviceControl({ device, onRefresh }) {
-  const [loading, setLoading] = useState('')
-  const [setpoint, setSetpoint] = useState(device.setpoint || 22)
-  const [localPower, setLocalPower] = useState(
-    device.power_status === 'on' || device.is_on || false
+// ── Toast ──────────────────────────────────────────────────────────────────
+function Toast({ message, type, onClose }) {
+  useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t) }, [onClose])
+  return (
+    <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium border
+      ${type === 'success'
+        ? 'bg-green-900/60 text-green-200 border-green-700/60 backdrop-blur-sm'
+        : 'bg-red-900/60 text-red-200 border-red-700/60 backdrop-blur-sm'}`}>
+      {type === 'success'
+        ? <span className="material-symbols-outlined text-[18px] text-green-400">check_circle</span>
+        : <span className="material-symbols-outlined text-[18px] text-red-400">error</span>}
+      {message}
+    </div>
   )
+}
 
-  const isOnline = device.status === 'online' || device.is_online
+// ── New Room Modal ─────────────────────────────────────────────────────────
+function NewRoomModal({ onClose, onSave }) {
+  const [form, setForm] = useState({ name: '', building: 'Edifício Principal', floor: 1, area_m2: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!form.name) { setError('Nome da sala é obrigatório.'); return }
+    setLoading(true)
+    try {
+      await createRoom({ ...form, floor: Number(form.floor), area_m2: form.area_m2 ? Number(form.area_m2) : null })
+      onSave(); onClose()
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Erro ao criar sala.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="bg-sb-card border border-sb-border rounded-2xl w-full max-w-md p-6 m-4 shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-sb-on-surface font-semibold text-lg">Nova Sala</h3>
+          <button onClick={onClose} className="text-sb-outline hover:text-sb-on-surface p-1 rounded-lg hover:bg-sb-card-high">
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-sb-on-muted mb-1">Nome da Sala *</label>
+            <input className="input-field" placeholder="Ex: Sala 101 - TI"
+              value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-sm text-sb-on-muted mb-1">Prédio</label>
+            <input className="input-field" value={form.building}
+              onChange={(e) => setForm((f) => ({ ...f, building: e.target.value }))} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-sb-on-muted mb-1">Andar</label>
+              <input className="input-field" type="number" min={0} value={form.floor}
+                onChange={(e) => setForm((f) => ({ ...f, floor: e.target.value }))} />
+            </div>
+            <div>
+              <label className="block text-sm text-sb-on-muted mb-1">Área (m²)</label>
+              <input className="input-field" type="number" min={1} placeholder="45"
+                value={form.area_m2} onChange={(e) => setForm((f) => ({ ...f, area_m2: e.target.value }))} />
+            </div>
+          </div>
+          {error && <p className="text-sb-error text-sm">{error}</p>}
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 btn-secondary">Cancelar</button>
+            <button type="submit" disabled={loading} className="flex-1 btn-primary disabled:opacity-50">
+              {loading ? 'Criando...' : 'Criar Sala'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// ── AC Control block (inline in card) ─────────────────────────────────────
+function ACControl({ device }) {
+  const [loading, setLoading] = useState('')
+  // C3 fix: API returns power_on (boolean) and setpoint_celsius (number)
+  const [setpoint, setSetpoint] = useState(device.setpoint_celsius ?? device.setpoint ?? 22)
+  const [isPoweredOn, setIsPoweredOn] = useState(device.power_on === true)
 
   const sendControl = async (action, value) => {
     setLoading(action)
     try {
       await controlDevice(device.id, { action, value })
-      if (action === 'on') setLocalPower(true)
-      if (action === 'off') setLocalPower(false)
+      if (action === 'on') setIsPoweredOn(true)
+      if (action === 'off') setIsPoweredOn(false)
       if (action === 'setpoint') setSetpoint(value)
-      onRefresh()
-    } catch (err) {
-      console.error('Control error', err)
-    } finally {
-      setLoading('')
-    }
+    } catch { /* silent */ }
+    finally { setLoading('') }
   }
 
   return (
-    <div className="bg-gray-700/40 rounded-xl p-4 border border-gray-700 space-y-3">
-      {/* Device header */}
-      <div className="flex items-start justify-between">
+    <div className="border-t border-sb-border pt-4 mt-auto">
+      {/* Label + segmented toggle */}
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-          <div>
-            <p className="text-white text-sm font-medium">{device.name || `Dispositivo ${device.id}`}</p>
-            <p className="text-gray-500 text-xs">{device.type || device.device_type || 'AC'}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className={`inline-block w-2 h-2 rounded-full ${isOnline ? 'bg-green-400' : 'bg-red-500'}`} />
-          <span className={`text-xs ${isOnline ? 'text-green-400' : 'text-red-400'}`}>
-            {isOnline ? 'Online' : 'Offline'}
+          <span className={`material-symbols-outlined text-[20px] ${isPoweredOn ? 'text-sb-primary' : 'text-sb-outline'}`}>
+            mode_fan
           </span>
+          <span className="text-sm font-medium text-sb-on-surface">Ar Condicionado</span>
         </div>
-      </div>
-
-      {/* Power toggle */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => sendControl('on', null)}
-          disabled={loading === 'on' || !isOnline}
-          className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-            localPower
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-600 text-gray-300 hover:bg-green-700'
-          } disabled:opacity-50 disabled:cursor-not-allowed`}
-        >
-          {loading === 'on' ? '...' : 'Ligar'}
-        </button>
-        <button
-          onClick={() => sendControl('off', null)}
-          disabled={loading === 'off' || !isOnline}
-          className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-            !localPower
-              ? 'bg-red-700 text-white'
-              : 'bg-gray-600 text-gray-300 hover:bg-red-800'
-          } disabled:opacity-50 disabled:cursor-not-allowed`}
-        >
-          {loading === 'off' ? '...' : 'Desligar'}
-        </button>
-      </div>
-
-      {/* Setpoint */}
-      <div>
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-xs text-gray-400">Temperatura Alvo</span>
-          <span className="text-xs font-bold text-blue-400">{setpoint}°C</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="range"
-            min={16}
-            max={30}
-            value={setpoint}
-            onChange={(e) => setSetpoint(Number(e.target.value))}
-            disabled={!isOnline || loading === 'setpoint'}
-            className="flex-1 accent-blue-500 disabled:opacity-50"
-          />
+        <div className="flex bg-sb-surface border border-sb-border rounded-lg overflow-hidden text-xs font-semibold">
           <button
-            onClick={() => sendControl('setpoint', setpoint)}
-            disabled={!isOnline || loading === 'setpoint'}
-            className="text-xs btn-primary py-1 px-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => sendControl('on', null)}
+            disabled={loading === 'on'}
+            className={`px-3 py-1.5 transition-colors ${isPoweredOn
+              ? 'bg-sb-primary text-sb-on-primary'
+              : 'text-sb-outline hover:bg-sb-card-high'}`}
           >
-            {loading === 'setpoint' ? '...' : 'OK'}
+            {loading === 'on' ? '…' : 'ON'}
+          </button>
+          <button
+            onClick={() => sendControl('off', null)}
+            disabled={loading === 'off'}
+            className={`px-3 py-1.5 transition-colors ${!isPoweredOn
+              ? 'bg-sb-card-highest text-sb-on-surface'
+              : 'text-sb-outline hover:bg-sb-card-high'}`}
+          >
+            {loading === 'off' ? '…' : 'OFF'}
           </button>
         </div>
-        <div className="flex justify-between text-xs text-gray-600 mt-0.5">
-          <span>16°C</span>
-          <span>30°C</span>
+      </div>
+
+      {/* Setpoint row */}
+      <div className={`flex items-center gap-3 ${!isPoweredOn ? 'opacity-40 pointer-events-none' : ''}`}>
+        <span className="font-data text-xl text-sb-on-surface w-14 flex-shrink-0">
+          {setpoint}°C
+        </span>
+        <div className="flex-1 flex items-center gap-2">
+          <span className="text-xs text-sb-outline">16°</span>
+          <input
+            type="range" min={16} max={30} value={setpoint}
+            onChange={(e) => setSetpoint(Number(e.target.value))}
+            onMouseUp={(e) => sendControl('setpoint', Number(e.target.value))}
+            onTouchEnd={(e) => sendControl('setpoint', Number(e.target.value))}
+            className="flex-1"
+          />
+          <span className="text-xs text-sb-outline">30°</span>
         </div>
       </div>
     </div>
   )
 }
 
-function RoomCard({ room, onRefresh }) {
+// ── Room Card ──────────────────────────────────────────────────────────────
+function RoomCard({ room }) {
   const [devices, setDevices] = useState([])
-  const [devLoading, setDevLoading] = useState(false)
-  const [expanded, setExpanded] = useState(false)
-
-  const fetchDevices = async () => {
-    setDevLoading(true)
-    try {
-      const res = await getDevices({ room_id: room.id })
-      const arr = Array.isArray(res.data) ? res.data : res.data?.items || []
-      setDevices(arr)
-    } catch (_) {
-      setDevices([])
-    } finally {
-      setDevLoading(false)
-    }
-  }
+  const [devLoading, setDevLoading] = useState(true)
 
   useEffect(() => {
-    fetchDevices()
+    getDevices({ room_id: room.id })
+      .then((res) => {
+        const arr = Array.isArray(res.data) ? res.data : res.data?.data || []
+        setDevices(arr)
+      })
+      .catch(() => setDevices([]))
+      .finally(() => setDevLoading(false))
   }, [room.id])
 
   const onlineCount = devices.filter((d) => d.status === 'online' || d.is_online).length
+  const offlineCount = devices.length - onlineCount
+  const acDevices = devices.filter((d) => {
+    const t = (d.device_type || d.type || '').toLowerCase()
+    return t.includes('ac') || t === ''
+  })
+  const isRoomOnline = onlineCount > 0
 
   return (
-    <div className="card overflow-hidden">
-      {/* Room header */}
-      <div className="p-5">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h3 className="text-white font-semibold">{room.name}</h3>
-            <div className="flex items-center gap-3 mt-1">
-              {room.building && (
-                <span className="text-gray-400 text-xs flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
-                  </svg>
-                  {room.building}
-                </span>
-              )}
-              {room.floor !== undefined && (
-                <span className="text-gray-400 text-xs">Andar {room.floor}</span>
-              )}
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-white">{devices.length}</p>
-            <p className="text-xs text-gray-400">dispositivos</p>
-          </div>
-        </div>
-
-        {/* Devices summary */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="flex items-center gap-1 text-green-400">
-            <span className="w-2 h-2 rounded-full bg-green-400" />
-            {onlineCount} online
-          </span>
-          {devices.length - onlineCount > 0 && (
-            <span className="flex items-center gap-1 text-red-400">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
-              {devices.length - onlineCount} offline
-            </span>
-          )}
-        </div>
-
-        {/* Expand toggle */}
-        {devices.length > 0 && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="mt-3 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
-          >
-            {expanded ? 'Ocultar controles' : 'Ver controles'}
-            <svg
-              className={`w-3 h-3 transition-transform ${expanded ? 'rotate-180' : ''}`}
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+    <div className="bg-sb-card border border-sb-border rounded-xl p-4 flex flex-col hover:border-sb-outline transition-colors duration-200">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+              isRoomOnline
+                ? 'bg-sb-primary shadow-[0_0_8px_rgba(173,198,255,0.5)]'
+                : 'bg-sb-error shadow-[0_0_8px_rgba(255,180,171,0.3)]'
+            }`} />
+            <Link
+              to={`/rooms/${room.id}`}
+              className="font-semibold text-sb-on-surface hover:text-sb-primary transition-colors leading-tight"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        )}
+              {room.name}
+            </Link>
+          </div>
+          <p className="text-xs text-sb-outline ml-[18px]">
+            {[room.building, room.floor !== undefined && `${room.floor}º Andar`]
+              .filter(Boolean).join(' • ')}
+          </p>
+        </div>
+        <Link
+          to={`/rooms/${room.id}`}
+          className="text-sb-outline hover:text-sb-on-surface transition-colors p-0.5"
+          title="Ver detalhes"
+        >
+          <span className="material-symbols-outlined text-[20px]">more_vert</span>
+        </Link>
       </div>
 
-      {/* Devices */}
-      {expanded && (
-        <div className="px-5 pb-5 space-y-3 border-t border-gray-700 pt-4">
-          {devLoading ? (
-            <LoadingSpinner size="sm" className="py-4" />
-          ) : devices.length === 0 ? (
-            <p className="text-gray-500 text-xs text-center py-2">
-              Nenhum dispositivo nesta sala
-            </p>
-          ) : (
-            devices.map((d) => (
-              <DeviceControl key={d.id} device={d} onRefresh={fetchDevices} />
-            ))
-          )}
+      {/* Device count chips */}
+      {devLoading ? (
+        <div className="flex gap-2 mb-4">
+          <div className="h-7 w-20 bg-sb-card-high rounded-md animate-pulse" />
+          <div className="h-7 w-24 bg-sb-card-high rounded-md animate-pulse" />
+        </div>
+      ) : (
+        <div className="flex gap-2 mb-4 flex-wrap">
+          <div className="bg-sb-surface border border-sb-border rounded-md px-2 py-1 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-[15px] text-sb-outline">router</span>
+            <span className="font-data text-sm text-sb-on-surface">{devices.length} Disp.</span>
+          </div>
+          <div className="bg-sb-surface border border-sb-border rounded-md px-2 py-1 flex items-center gap-2">
+            <span className="font-data text-sm text-sb-primary">{onlineCount} ON</span>
+            {offlineCount > 0 && (
+              <>
+                <span className="w-px h-3 bg-sb-border" />
+                <span className="font-data text-sm text-sb-error">{offlineCount} OFF</span>
+              </>
+            )}
+            {offlineCount === 0 && onlineCount > 0 && (
+              <>
+                <span className="w-px h-3 bg-sb-border" />
+                <span className="font-data text-sm text-sb-outline">0 OFF</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* AC control — always visible */}
+      {!devLoading && acDevices.length > 0 && (
+        <ACControl device={acDevices[0]} />
+      )}
+
+      {/* No AC — show "Ver detalhes" link instead */}
+      {!devLoading && acDevices.length === 0 && (
+        <div className="border-t border-sb-border pt-4 mt-auto">
+          <Link
+            to={`/rooms/${room.id}`}
+            className="flex items-center justify-center gap-2 text-sm text-sb-primary hover:text-blue-300 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+            Ver detalhes da sala
+          </Link>
         </div>
       )}
     </div>
   )
 }
 
+// ── Main page ──────────────────────────────────────────────────────────────
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [floorFilter, setFloorFilter] = useState('all')
+  const [showNewRoom, setShowNewRoom] = useState(false)
+  const [toast, setToast] = useState(null)
 
   const fetchRooms = async () => {
     setLoading(true)
     try {
       const res = await getRooms()
-      const arr = Array.isArray(res.data) ? res.data : res.data?.items || []
+      const arr = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.items || []
       setRooms(arr)
-    } catch (_) {
+    } catch {
       setRooms([])
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    fetchRooms()
-  }, [])
+  useEffect(() => { fetchRooms() }, [])
 
-  const filtered = rooms.filter((r) =>
-    r.name?.toLowerCase().includes(search.toLowerCase()) ||
-    r.building?.toLowerCase().includes(search.toLowerCase())
-  )
+  const floors = [...new Set(rooms.map((r) => r.floor).filter((f) => f !== undefined))].sort()
+
+  const filtered = rooms.filter((r) => {
+    const matchSearch = (r.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (r.building || '').toLowerCase().includes(search.toLowerCase())
+    const matchFloor = floorFilter === 'all' || String(r.floor) === floorFilter
+    return matchSearch && matchFloor
+  })
 
   if (loading) {
     return (
@@ -247,50 +304,77 @@ export default function RoomsPage() {
 
   return (
     <div className="space-y-6">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {showNewRoom && (
+        <NewRoomModal
+          onClose={() => setShowNewRoom(false)}
+          onSave={() => { fetchRooms(); setToast({ message: 'Sala criada com sucesso!', type: 'success' }) }}
+        />
+      )}
+
       {/* Toolbar */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            className="input-field pl-9"
-            placeholder="Buscar sala ou prédio..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          {/* Search */}
+          <div className="relative sm:w-72">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-sb-outline">
+              search
+            </span>
+            <input
+              className="w-full bg-sb-card border border-sb-border text-sb-on-surface rounded-lg pl-10 pr-4 py-2 text-sm
+                         placeholder:text-sb-outline focus:border-sb-primary focus:ring-1 focus:ring-sb-primary outline-none transition-colors"
+              placeholder="Buscar sala ou dispositivo..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {/* Floor filter */}
+          <div className="relative sm:w-44">
+            <select
+              className="w-full bg-sb-card border border-sb-border text-sb-on-surface rounded-lg pl-4 pr-9 py-2 text-sm
+                         appearance-none focus:border-sb-primary focus:ring-1 focus:ring-sb-primary outline-none cursor-pointer transition-colors"
+              value={floorFilter}
+              onChange={(e) => setFloorFilter(e.target.value)}
+            >
+              <option value="all">Todos os Andares</option>
+              {floors.map((f) => <option key={f} value={String(f)}>{f}º Andar</option>)}
+            </select>
+            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-sb-outline pointer-events-none">
+              expand_more
+            </span>
+          </div>
         </div>
-        <button onClick={fetchRooms} className="btn-secondary flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          Atualizar
+
+        <button
+          onClick={() => setShowNewRoom(true)}
+          className="w-full sm:w-auto bg-sb-secondary-c hover:bg-sb-primary-btn hover:text-white text-sb-on-surface
+                     border border-sb-border hover:border-transparent rounded-lg px-4 py-2 flex items-center
+                     justify-center gap-2 text-sm font-medium transition-all duration-150 shadow-sm"
+        >
+          <span className="material-symbols-outlined text-[18px]">add</span>
+          Nova Sala
         </button>
       </div>
 
-      {/* Rooms grid */}
+      {/* Room count */}
+      <p className="text-xs text-sb-outline">
+        {filtered.length} sala{filtered.length !== 1 ? 's' : ''} encontrada{filtered.length !== 1 ? 's' : ''}
+      </p>
+
+      {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center py-20 text-gray-500">
-          <svg className="w-16 h-16 mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
-          </svg>
-          <p className="text-lg font-medium">
+        <div className="bg-sb-card border border-sb-border rounded-xl flex flex-col items-center justify-center py-20 text-sb-outline">
+          <span className="material-symbols-outlined text-[56px] opacity-30 mb-4">meeting_room</span>
+          <p className="text-base font-medium">
             {rooms.length === 0 ? 'Nenhuma sala encontrada' : 'Nenhum resultado para a busca'}
           </p>
-          <p className="text-sm mt-1 text-gray-600">
-            {rooms.length === 0 ? 'O backend não retornou salas ainda.' : 'Tente outro termo.'}
+          <p className="text-sm mt-1 opacity-60">
+            {rooms.length === 0 ? 'Clique em "Nova Sala" para começar.' : 'Tente outro termo.'}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filtered.map((room) => (
-            <RoomCard key={room.id} room={room} onRefresh={fetchRooms} />
-          ))}
+          {filtered.map((room) => <RoomCard key={room.id} room={room} />)}
         </div>
       )}
     </div>

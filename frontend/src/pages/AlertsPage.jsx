@@ -42,7 +42,7 @@ export default function AlertsPage() {
       } else {
         res = await getAlerts(activeOnly ? { active_only: true } : {})
       }
-      const arr = Array.isArray(res.data) ? res.data : res.data?.items || []
+      const arr = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.items || []
       setAlerts(arr)
     } catch (_) {
       setAlerts([])

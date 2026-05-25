@@ -3,60 +3,74 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    box-sizing: border-box;
-  }
-  
+  * { box-sizing: border-box; }
+
   body {
-    @apply bg-gray-900 text-white;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background-color: #0c1322;
+    color: #dce2f7;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: #141b2b; }
+  ::-webkit-scrollbar-thumb { background: #424754; border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #8c909f; }
+
+  /* JetBrains Mono for numeric data */
+  .font-data { font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+  /* Custom range slider */
+  input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px; width: 16px;
+    border-radius: 50%;
+    background: #adc6ff;
+    cursor: pointer;
+    margin-top: -6px;
   }
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-800;
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%; height: 4px; cursor: pointer;
+    background: #424754; border-radius: 2px;
   }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gray-600 rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
-  }
+  input[type=range]:focus::-webkit-slider-runnable-track { background: #2e3545; }
+  input[type=range]:disabled::-webkit-slider-thumb { background: #424754; cursor: default; }
+  input[type=range]:disabled::-webkit-slider-runnable-track { background: #2e3545; }
 }
 
 @layer components {
   .card {
-    @apply bg-gray-800 border border-gray-700 rounded-xl shadow-lg;
+    @apply bg-sb-card border border-sb-border rounded-xl shadow-lg;
   }
 
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+    @apply bg-sb-primary-btn hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg
+           transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-sb-primary
+           focus:ring-offset-2 focus:ring-offset-sb-bg;
   }
 
   .btn-secondary {
-    @apply bg-gray-700 hover:bg-gray-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500;
+    @apply bg-sb-card-high hover:bg-sb-card-highest text-sb-on-surface font-medium px-4 py-2 rounded-lg
+           transition-colors duration-150 border border-sb-border
+           focus:outline-none focus:ring-2 focus:ring-sb-outline;
   }
 
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-150;
-  }
-
-  .btn-success {
-    @apply bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-150;
+    @apply bg-red-800 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg transition-colors;
   }
 
   .input-field {
-    @apply bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400;
+    @apply bg-sb-card-high border border-sb-border text-sb-on-surface rounded-lg px-3 py-2 w-full
+           focus:outline-none focus:ring-2 focus:ring-sb-primary focus:border-transparent
+           placeholder-sb-outline;
   }
 
   .table-header {
-    @apply text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-3;
+    @apply text-left text-xs font-semibold text-sb-outline uppercase tracking-wider px-4 py-3;
   }
 
   .table-cell {
-    @apply px-4 py-3 text-sm text-gray-300;
+    @apply px-4 py-3 text-sm text-sb-on-muted;
   }
 }

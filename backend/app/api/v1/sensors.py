@@ -19,7 +19,7 @@ from app.services.sensor_service import SensorService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
-_SENSOR_RE = re.compile(r"^sensor-(temperature|humidity|presence)-\d{4}$")
+_SENSOR_RE = re.compile(r"^sensor-(temperature|humidity|presence)-.+$")
 
 
 @router.post("/data", response_model=SensorDataResponse, status_code=status.HTTP_201_CREATED,
