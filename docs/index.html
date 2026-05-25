@@ -7,116 +7,186 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            bg:      '#0c1322',
-            surface: '#141b2b',
-            card:    '#191f2f',
-            high:    '#232a3a',
-            border:  '#424754',
-            muted:   '#8c909f',
-            text:    '#dce2f7',
-            sub:     '#c2c6d6',
-            accent:  '#adc6ff',
-            btn:     '#4d8eff',
-            tert:    '#ffb786',
-            danger:  '#ffb4ab',
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-        },
-      },
-    }
-  </script>
   <style>
-    html { scroll-behavior: smooth; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0c1322; }
-    ::-webkit-scrollbar-thumb { background: #424754; border-radius: 3px; }
-    .pill {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0c1322;
+      --surface: #141b2b;
+      --card:    #191f2f;
+      --high:    #232a3a;
+      --border:  #424754;
+      --muted:   #8c909f;
+      --text:    #dce2f7;
+      --sub:     #c2c6d6;
+      --accent:  #adc6ff;
+      --btn:     #4d8eff;
+      --tert:    #ffb786;
+      --danger:  #ffb4ab;
     }
-    .chip-accent  { background: rgba(173,198,255,.12); color: #adc6ff; border: 1px solid rgba(173,198,255,.25); }
-    .chip-success { background: rgba(52,211,153,.10);  color: #34d399; border: 1px solid rgba(52,211,153,.25); }
-    .chip-warn    { background: rgba(251,191,36,.10);  color: #fbbf24; border: 1px solid rgba(251,191,36,.25); }
-    .chip-danger  { background: rgba(255,180,171,.10); color: #ffb4ab; border: 1px solid rgba(255,180,171,.25); }
-    .card { background: #191f2f; border: 1px solid #424754; border-radius: 12px; }
-    .nav-link { color: #8c909f; text-decoration: none; font-size: 14px; transition: color .15s; }
-    .nav-link:hover { color: #dce2f7; }
-    .section { padding: 56px 0 32px; }
-    .badge-method {
-      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
-      padding: 2px 7px; border-radius: 4px; white-space: nowrap;
-    }
-    .badge-get    { background: rgba(52,211,153,.15); color: #34d399; }
-    .badge-post   { background: rgba(77,142,255,.15); color: #4d8eff; }
-    .badge-patch  { background: rgba(251,191,36,.15); color: #fbbf24; }
-    .badge-delete { background: rgba(255,180,171,.15); color: #ffb4ab; }
-    .flow-step {
-      display: flex; align-items: flex-start; gap: 16px; padding: 16px 20px;
-      background: #141b2b; border-radius: 10px; border: 1px solid #2e3545;
-    }
-    .flow-num {
-      flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
-      background: rgba(77,142,255,.2); color: #adc6ff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; border: 1px solid rgba(77,142,255,.3);
-    }
-    table { border-collapse: collapse; width: 100%; }
-    th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase;
-         letter-spacing: .06em; color: #8c909f; padding: 10px 14px;
-         border-bottom: 1px solid #424754; white-space: nowrap; }
-    td { font-size: 13px; color: #c2c6d6; padding: 10px 14px;
-         border-bottom: 1px solid #2e3545; vertical-align: top; }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Utilities ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    .section { padding: 52px 0 28px; }
+    .section-title { font-size: clamp(18px,3vw,22px); font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .section-sub  { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+
+    /* ── Pill / Badge ── */
+    .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .chip-accent  { background: rgba(173,198,255,.12); color: var(--accent); border: 1px solid rgba(173,198,255,.25); }
+    .chip-success { background: rgba(52,211,153,.10);  color: #34d399;      border: 1px solid rgba(52,211,153,.25); }
+    .chip-warn    { background: rgba(251,191,36,.10);  color: #fbbf24;      border: 1px solid rgba(251,191,36,.25); }
+    .chip-danger  { background: rgba(255,180,171,.10); color: var(--danger); border: 1px solid rgba(255,180,171,.25); }
+    .badge-method { font-family: 'JetBrains Mono',monospace; font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+    .badge-get    { background: rgba(52,211,153,.15);  color: #34d399; }
+    .badge-post   { background: rgba(77,142,255,.15);  color: var(--btn); }
+    .badge-patch  { background: rgba(251,191,36,.15);  color: #fbbf24; }
+    .badge-delete { background: rgba(255,180,171,.15); color: var(--danger); }
+
+    /* ── Card ── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+    .highlight-card { border-left: 3px solid var(--btn); }
+    .highlight-card-warn { border-left: 3px solid var(--tert); }
+
+    /* ── Nav ── */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(12,19,34,.92); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-brand-text { font-size: 18px; font-weight: 700; color: var(--text); }
+    .nav-links { display: flex; align-items: center; gap: 20px; }
+    .nav-link { color: var(--muted); text-decoration: none; font-size: 13px; transition: color .15s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta { background: var(--btn); color: #fff; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 8px; text-decoration: none; white-space: nowrap; }
+
+    /* Hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; background: none; border: none; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 2px; transition: .3s; }
+    .mobile-menu { display: none; position: fixed; inset: 56px 0 0; background: rgba(12,19,34,.97); backdrop-filter: blur(14px); z-index: 90; padding: 24px 20px; flex-direction: column; gap: 4px; border-top: 1px solid var(--border); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 12px 8px; color: var(--sub); text-decoration: none; font-size: 15px; border-bottom: 1px solid var(--border); }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu .m-cta { margin-top: 12px; background: var(--btn); color: #fff; border-radius: 8px; text-align: center; font-weight: 600; border-bottom: none; }
+
+    /* ── Sidebar TOC ── */
+    .layout { display: flex; gap: 40px; align-items: flex-start; }
+    .sidebar { width: 188px; flex-shrink: 0; position: sticky; top: 72px; }
+    .sidebar-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--border); margin-bottom: 10px; }
+    .toc-link { display: block; padding: 5px 0 5px 12px; font-size: 13px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; transition: all .15s; }
+    .toc-link:hover, .toc-link.active { color: var(--accent); border-left-color: var(--btn); }
+    .main-content { flex: 1; min-width: 0; }
+
+    /* ── Stats bar ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    .stat-cell { background: var(--card); padding: 18px 12px; text-align: center; }
+    .stat-val { font-size: clamp(22px,3vw,28px); font-weight: 700; color: var(--accent); font-family: 'JetBrains Mono',monospace; }
+    .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ── Flow steps ── */
+    .flow-step { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; background: var(--surface); border-radius: 10px; border: 1px solid #2e3545; }
+    .flow-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: rgba(77,142,255,.18); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 1px solid rgba(77,142,255,.3); }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; border: 1px solid var(--border); }
+    table { border-collapse: collapse; width: 100%; min-width: 420px; }
+    th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; background: var(--high); }
+    td { font-size: 13px; color: var(--sub); padding: 10px 14px; border-bottom: 1px solid #2e3545; vertical-align: top; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(255,255,255,.025); }
-    code { font-family: 'JetBrains Mono', monospace; font-size: 12px;
-           background: rgba(77,142,255,.1); color: #adc6ff;
-           padding: 2px 6px; border-radius: 4px; }
-    pre { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.7;
-          background: #0c1322; border: 1px solid #424754; border-radius: 10px;
-          padding: 20px; overflow-x: auto; color: #c2c6d6; }
-    .toc-link { display: block; padding: 5px 0; font-size: 13px; color: #8c909f;
-                text-decoration: none; border-left: 2px solid transparent;
-                padding-left: 12px; transition: all .15s; }
-    .toc-link:hover, .toc-link.active { color: #adc6ff; border-left-color: #4d8eff; }
-    @media (max-width: 768px) { .sidebar { display: none; } }
+
+    /* ── Code ── */
+    code { font-family: 'JetBrains Mono',monospace; font-size: 12px; background: rgba(77,142,255,.1); color: var(--accent); padding: 2px 6px; border-radius: 4px; word-break: break-all; }
+    pre  { font-family: 'JetBrains Mono',monospace; font-size: 12.5px; line-height: 1.75; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; overflow-x: auto; color: var(--sub); }
+
+    /* ── Two-col grids ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+
+    /* ── Hero ── */
+    .hero { padding: clamp(40px,8vw,72px) 20px clamp(32px,6vw,56px); text-align: center; max-width: 780px; margin: 0 auto; }
+    .hero h1 { font-size: clamp(24px,5vw,46px); font-weight: 700; line-height: 1.15; color: var(--text); margin: 16px 0; }
+    .hero p { font-size: clamp(14px,2vw,17px); color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+    .hero-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 24px; }
+    .hero-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn-primary { background: var(--btn); color: #fff; font-size: 14px; font-weight: 600; padding: 10px 22px; border-radius: 10px; text-decoration: none; }
+    .btn-secondary { background: var(--high); color: var(--sub); font-size: 14px; font-weight: 500; padding: 10px 22px; border-radius: 10px; text-decoration: none; border: 1px solid var(--border); }
+
+    /* ── C4 Diagram ── */
+    .diagram-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; overflow: hidden; }
+    .diagram-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); justify-content: center; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── Footer ── */
+    footer { border-top: 1px solid var(--border); padding: 32px 20px; text-align: center; }
+    .footer-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 12px 0; }
+    .footer-links a { font-size: 13px; color: var(--btn); text-decoration: none; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .flow-step { flex-direction: column; }
+      pre { font-size: 11px; padding: 14px; }
+      .hero-actions { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-secondary { width: 100%; max-width: 300px; text-align: center; }
+    }
   </style>
 </head>
-<body class="bg-bg text-text font-sans">
+<body>
 
-  <!-- Top Nav -->
-  <nav style="position:sticky;top:0;z-index:50;background:rgba(12,19,34,.9);backdrop-filter:blur(12px);border-bottom:1px solid #424754;">
-    <div style="max-width:1200px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span style="font-size:20px;font-weight:700;color:#dce2f7;">Smart Building</span>
+  <!-- ── Top Nav ── -->
+  <nav>
+    <div class="container nav-inner">
+      <div class="nav-brand">
+        <span class="nav-brand-text">Smart Building</span>
         <span class="pill chip-accent">ExpoTech 2026</span>
       </div>
-      <div style="display:flex;align-items:center;gap:24px;">
+      <div class="nav-links">
         <a href="#arquitetura" class="nav-link">Arquitetura</a>
         <a href="#regras"      class="nav-link">Regras</a>
         <a href="#api"         class="nav-link">API</a>
         <a href="#mqtt"        class="nav-link">MQTT</a>
         <a href="#hardware"    class="nav-link">Hardware</a>
         <a href="#equipe"      class="nav-link">Equipe</a>
-        <a href="./api.html"
-           style="background:#4d8eff;color:#fff;font-size:13px;font-weight:600;padding:7px 16px;border-radius:8px;text-decoration:none;">
-          Referência da API &rarr;
-        </a>
+        <a href="./api.html"   class="nav-cta">Referência da API &rarr;</a>
       </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <header style="padding:72px 24px 56px;text-align:center;max-width:800px;margin:0 auto;">
-    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#arquitetura" onclick="closeMenu()">Arquitetura</a>
+    <a href="#fluxo"       onclick="closeMenu()">Fluxo End-to-End</a>
+    <a href="#setup"       onclick="closeMenu()">Setup Local</a>
+    <a href="#regras"      onclick="closeMenu()">Regras de Negócio</a>
+    <a href="#api"         onclick="closeMenu()">Endpoints da API</a>
+    <a href="#mqtt"        onclick="closeMenu()">Tópicos MQTT</a>
+    <a href="#hardware"    onclick="closeMenu()">Hardware ESP32</a>
+    <a href="#ngrok"       onclick="closeMenu()">Rede ExpoTech</a>
+    <a href="#equipe"      onclick="closeMenu()">Equipe</a>
+    <a href="./api.html"   class="m-cta">Referência da API &rarr;</a>
+  </div>
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <div class="hero-pills">
       <span class="pill chip-accent">FastAPI 3.11</span>
       <span class="pill chip-accent">React 18</span>
       <span class="pill chip-accent">MQTT Mosquitto</span>
@@ -125,527 +195,530 @@
       <span class="pill chip-accent">scikit-learn ML</span>
       <span class="pill chip-accent">Docker Compose</span>
     </div>
-    <h1 style="font-size:clamp(28px,5vw,48px);font-weight:700;line-height:1.15;color:#dce2f7;margin:0 0 16px;">
-      Sistema de Controle Inteligente<br/>de Ar-Condicionado
-    </h1>
-    <p style="font-size:17px;color:#8c909f;line-height:1.7;margin:0 0 32px;">
-      Plataforma IoT completa para monitoramento e automação de climatização em edifícios corporativos.
-      Sensores em tempo real, motor de regras de negócio, predição por Machine Learning e painel React.
-    </p>
-    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-      <a href="./api.html"
-         style="background:#4d8eff;color:#fff;font-size:14px;font-weight:600;padding:10px 22px;border-radius:10px;text-decoration:none;">
-        Referência da API (ReDoc)
-      </a>
-      <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech"
-         style="background:#232a3a;color:#c2c6d6;font-size:14px;font-weight:500;padding:10px 22px;border-radius:10px;text-decoration:none;border:1px solid #424754;">
-        Ver no GitHub
-      </a>
-    </div>
-  </header>
-
-  <!-- Stats bar -->
-  <div style="max-width:1100px;margin:0 auto 48px;padding:0 24px;">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:#424754;border-radius:12px;overflow:hidden;border:1px solid #424754;">
-      <div style="background:#191f2f;padding:20px 24px;text-align:center;">
-        <div style="font-size:28px;font-weight:700;color:#adc6ff;font-family:'JetBrains Mono',monospace;">10</div>
-        <div style="font-size:12px;color:#8c909f;margin-top:4px;">Regras de Negócio</div>
-      </div>
-      <div style="background:#191f2f;padding:20px 24px;text-align:center;">
-        <div style="font-size:28px;font-weight:700;color:#adc6ff;font-family:'JetBrains Mono',monospace;">14</div>
-        <div style="font-size:12px;color:#8c909f;margin-top:4px;">Salas Simuladas</div>
-      </div>
-      <div style="background:#191f2f;padding:20px 24px;text-align:center;">
-        <div style="font-size:28px;font-weight:700;color:#adc6ff;font-family:'JetBrains Mono',monospace;">48</div>
-        <div style="font-size:12px;color:#8c909f;margin-top:4px;">Dispositivos IoT</div>
-      </div>
-      <div style="background:#191f2f;padding:20px 24px;text-align:center;">
-        <div style="font-size:28px;font-weight:700;color:#adc6ff;font-family:'JetBrains Mono',monospace;">30+</div>
-        <div style="font-size:12px;color:#8c909f;margin-top:4px;">Endpoints REST</div>
-      </div>
-      <div style="background:#191f2f;padding:20px 24px;text-align:center;">
-        <div style="font-size:28px;font-weight:700;color:#adc6ff;font-family:'JetBrains Mono',monospace;">8</div>
-        <div style="font-size:12px;color:#8c909f;margin-top:4px;">Tabelas PostgreSQL</div>
-      </div>
-      <div style="background:#191f2f;padding:20px 24px;text-align:center;">
-        <div style="font-size:28px;font-weight:700;color:#adc6ff;font-family:'JetBrains Mono',monospace;">5s</div>
-        <div style="font-size:12px;color:#8c909f;margin-top:4px;">Ciclo de Telemetria</div>
-      </div>
+    <h1>Sistema de Controle Inteligente de Ar-Condicionado</h1>
+    <p>Plataforma IoT completa para monitoramento e automação de climatização em edifícios corporativos. Sensores em tempo real, motor de regras de negócio, predição por Machine Learning e painel React.</p>
+    <div class="hero-actions">
+      <a href="./api.html"   class="btn-primary">Referência da API (ReDoc)</a>
+      <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech" class="btn-secondary">Ver no GitHub</a>
     </div>
   </div>
 
-  <!-- Main Layout -->
-  <div style="max-width:1100px;margin:0 auto;padding:0 24px 80px;display:flex;gap:40px;align-items:flex-start;">
+  <!-- ── Stats ── -->
+  <div class="container" style="margin-bottom:48px;">
+    <div class="stats-grid">
+      <div class="stat-cell"><div class="stat-val">10</div><div class="stat-lbl">Regras de Negócio</div></div>
+      <div class="stat-cell"><div class="stat-val">14</div><div class="stat-lbl">Salas Simuladas</div></div>
+      <div class="stat-cell"><div class="stat-val">48</div><div class="stat-lbl">Dispositivos IoT</div></div>
+      <div class="stat-cell"><div class="stat-val">30+</div><div class="stat-lbl">Endpoints REST</div></div>
+      <div class="stat-cell"><div class="stat-val">8</div><div class="stat-lbl">Tabelas PostgreSQL</div></div>
+      <div class="stat-cell"><div class="stat-val">5s</div><div class="stat-lbl">Ciclo Telemetria</div></div>
+    </div>
+  </div>
 
-    <!-- Sidebar TOC (sticky) -->
-    <aside class="sidebar" style="width:200px;flex-shrink:0;position:sticky;top:72px;">
-      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#424754;margin-bottom:12px;">Conteúdo</div>
-      <a class="toc-link" href="#arquitetura">Arquitetura</a>
-      <a class="toc-link" href="#fluxo">Fluxo End-to-End</a>
-      <a class="toc-link" href="#redis">Por que o Redis?</a>
-      <a class="toc-link" href="#setup">Setup Local</a>
-      <a class="toc-link" href="#credenciais">Credenciais</a>
-      <a class="toc-link" href="#regras">Regras de Negócio</a>
-      <a class="toc-link" href="#api">Endpoints da API</a>
-      <a class="toc-link" href="#mqtt">Tópicos MQTT</a>
-      <a class="toc-link" href="#hardware">Hardware ESP32</a>
-      <a class="toc-link" href="#ngrok">Rede ExpoTech</a>
-      <a class="toc-link" href="#equipe">Equipe</a>
-    </aside>
+  <!-- ── Layout ── -->
+  <div class="container">
+    <div class="layout">
 
-    <!-- Content -->
-    <main style="flex:1;min-width:0;">
+      <!-- Sidebar TOC -->
+      <aside class="sidebar">
+        <div class="sidebar-title">Conteúdo</div>
+        <a class="toc-link" href="#arquitetura">Arquitetura C4</a>
+        <a class="toc-link" href="#fluxo">Fluxo End-to-End</a>
+        <a class="toc-link" href="#redis">Por que o Redis?</a>
+        <a class="toc-link" href="#setup">Setup Local</a>
+        <a class="toc-link" href="#credenciais">Credenciais</a>
+        <a class="toc-link" href="#regras">Regras de Negócio</a>
+        <a class="toc-link" href="#api">Endpoints da API</a>
+        <a class="toc-link" href="#mqtt">Tópicos MQTT</a>
+        <a class="toc-link" href="#hardware">Hardware ESP32</a>
+        <a class="toc-link" href="#ngrok">Rede ExpoTech</a>
+        <a class="toc-link" href="#equipe">Equipe</a>
+      </aside>
 
-      <!-- Arquitetura -->
-      <section id="arquitetura" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Arquitetura do Sistema</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Visão de alto nível de todos os componentes e suas interações.</p>
-        <pre>╔══════════════════════════════════════════════════════════════╗
-║                   HARDWARE / BORDA IoT                       ║
-║                                                              ║
-║  ┌──────────────────┐    ┌──────────────────────────────┐   ║
-║  │ ESP32 + BME280   │    │     Simulador Docker         │   ║
-║  │ (Temp/Umidade)   │    │  14 salas × 5s → temp,       │   ║
-║  │ ESP32 + HC-SR501 │    │  umidade, presença via MQTT  │   ║
-║  │ (Presença PIR)   │    └──────────────────────────────┘   ║
-║  └────────┬─────────┘                  │                     ║
-╚═══════════╪════════════════════════════╪═════════════════════╝
-            │ MQTT publish               │ MQTT publish
-            ▼                           ▼
-╔══════════════════════════════════════════════════════════════╗
-║            MOSQUITTO BROKER  :1883                           ║
-╚═══════════════════╦══════════════════════════════════════════╝
-                    │ subscribe (paho-mqtt)
-                    ▼
-╔══════════════════════════════════════════════════════════════╗
-║               FASTAPI BACKEND  :8000                         ║
-║  ┌──────────────┐ ┌──────────────────┐ ┌─────────────────┐  ║
-║  │ MQTT Handler │→│ BusinessRules    │→│ Pydantic v2     │  ║
-║  │ (async-safe) │ │ Engine RN01–RN10 │ │ (validação)     │  ║
-║  └──────────────┘ └──────────────────┘ └────────┬────────┘  ║
-║                                                  │           ║
-║  ┌───────────────────────────────────────────────▼─────────┐ ║
-║  │               SQLAlchemy 2.0 (async)                     │ ║
-║  └────────────────────┬─────────────────────────────────────┘ ║
-║  ┌─────────────────────▼──────┐  ┌────────────────────────┐  ║
-║  │  PostgreSQL :5432          │  │  Redis :6379            │  ║
-║  │  sensor_data, devices,     │  │  blacklist JWT tokens   │  ║
-║  │  rooms, alerts, commands,  │  │  cache de leituras      │  ║
-║  │  audit_logs                │  └────────────────────────┘  ║
-║  └────────────────────────────┘                              ║
-║  REST API /api/v1  ←─────────────────────────────────────── ║
-╚═══════════════════════════════╦══════════════════════════════╝
-                                │ HTTP + JWT
-                                ▼
-╔══════════════════════════════════════════════════════════════╗
-║               REACT FRONTEND  :3000                          ║
-║  Dashboard │ Salas + Controle AC │ Alertas │ Relatórios     ║
-║  Predições │ Status do Sistema   │ Usuários│ Histórico      ║
-╚══════════════════════════════════════════════════════════════╝</pre>
-      </section>
+      <!-- Main Content -->
+      <main class="main-content">
 
-      <!-- Fluxo End-to-End -->
-      <section id="fluxo" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Fluxo End-to-End — O Caminho do Dado</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Uma leitura de temperatura do sensor até o gráfico no dashboard.</p>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div class="flow-step">
-            <div class="flow-num">1</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:4px;">Sensor publica via MQTT</div>
-              <div style="font-size:13px;color:#8c909f;">ESP32 ou Simulador → tópico <code>sensors/room/room-101/temperature</code></div>
-              <div style="font-size:13px;color:#8c909f;margin-top:2px;">Payload: <code>{"value": 24.3, "timestamp": "2026-05-24T23:00:00Z"}</code></div>
-            </div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">2</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:4px;">Mosquitto Broker repassa</div>
-              <div style="font-size:13px;color:#8c909f;">Backend subscrito via wildcard <code>sensors/room/+/temperature</code> — recebe a mensagem</div>
-            </div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">3</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:4px;">MQTT Handler — bridge thread-safe</div>
-              <div style="font-size:13px;color:#8c909f;">Callback paho-mqtt roda em thread separada. <code>asyncio.run_coroutine_threadsafe()</code> submete o processamento ao loop FastAPI sem criar um novo loop (evita conflito com asyncpg).</div>
-            </div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">4</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:4px;">Business Rules Engine — RN01 a RN10</div>
-              <div style="font-size:13px;color:#8c909f;">Monta <code>RuleContext</code> com valor do sensor, presença, setpoint, override manual, horário e consumo. Avalia todas as regras em sequência. Output: lista de <code>RuleAction</code>.</div>
-            </div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">5</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:4px;">Persistência — PostgreSQL via SQLAlchemy</div>
-              <div style="font-size:13px;color:#8c909f;">Insere <code>SensorData</code>, <code>Command</code> (auditoria) e <code>Alert</code> se gerado. Status do device → ONLINE.</div>
-            </div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">6</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:4px;">REST API serve os dados</div>
-              <div style="font-size:13px;color:#8c909f;"><code>GET /api/v1/sensors/{id}/data?period=1h</code> — resposta validada por Pydantic com envelope <code>{data, meta, links}</code></div>
-            </div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">7</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:4px;">React Dashboard renderiza</div>
-              <div style="font-size:13px;color:#8c909f;">Polling a cada 10s via Axios com interceptor JWT automático. Recharts atualiza o gráfico em tempo real. Zustand gerencia autenticação e RBAC.</div>
-            </div>
-          </div>
-        </div>
-      </section>
+        <!-- ── C4 DIAGRAM ── -->
+        <section id="arquitetura" class="section">
+          <div class="section-title">Diagrama C4 — Visão de Contêineres</div>
+          <div class="section-sub">Todos os componentes do sistema, suas responsabilidades e como se comunicam.</div>
+          <div class="diagram-wrap">
+            <svg viewBox="0 0 860 420" xmlns="http://www.w3.org/2000/svg"
+                 style="width:100%;height:auto;display:block;font-family:'Inter',system-ui,sans-serif;">
+              <defs>
+                <!-- Arrow markers -->
+                <marker id="ar-blue"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#4d8eff"/></marker>
+                <marker id="ar-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#34d399"/></marker>
+                <marker id="ar-amber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#d97706"/></marker>
+                <marker id="ar-pink"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3z" fill="#db2777"/></marker>
+              </defs>
 
-      <!-- Redis -->
-      <section id="redis" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Para que serve o Redis?</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Desmistificando o componente para quem nunca viu Redis antes.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div class="card" style="padding:20px;">
-            <div style="font-size:13px;font-weight:600;color:#adc6ff;margin-bottom:8px;">1. Blacklist de Tokens JWT (Logout Real)</div>
-            <div style="font-size:13px;color:#8c909f;line-height:1.7;">JWT é stateless — uma vez emitido, o token é válido até expirar. Sem Redis, um usuário que fez logout ainda conseguiria acessar a API com o token antigo por até 60 minutos. O Redis armazena o prefixo do token com TTL igual ao tempo restante de expiração.</div>
-          </div>
-          <div class="card" style="padding:20px;">
-            <div style="font-size:13px;font-weight:600;color:#adc6ff;margin-bottom:8px;">2. Cache de Leituras Recentes</div>
-            <div style="font-size:13px;color:#8c909f;line-height:1.7;">Endpoints consultados a cada 10 segundos pelo dashboard (como <code>/sensors/{id}/latest</code>) podem ser servidos diretamente do Redis, evitando uma query SQL a cada request. Em apresentações com múltiplos acessos, mantém a API responsiva.</div>
-          </div>
-        </div>
-      </section>
+              <!-- ── Swimlane backgrounds ── -->
+              <!-- IoT lane -->
+              <rect x="0" y="0" width="172" height="420" rx="0" fill="#0d1929"/>
+              <!-- System boundary -->
+              <rect x="178" y="22" width="510" height="376" rx="10" fill="none" stroke="#424754" stroke-width="1.5" stroke-dasharray="7,3"/>
+              <!-- Frontend lane -->
+              <rect x="698" y="0" width="162" height="420" rx="0" fill="#0d1929"/>
 
-      <!-- Setup -->
-      <section id="setup" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Setup Local em 3 Passos</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Pré-requisito: apenas Docker Desktop ≥ 4.x instalado.</p>
-        <pre><span style="color:#8c909f;"># 1. Clone o repositório</span>
+              <!-- ── Lane labels ── -->
+              <text x="86"  y="18" text-anchor="middle" font-size="9" fill="#5a6478" font-weight="600" letter-spacing="1.5">IoT / BORDA</text>
+              <text x="433" y="15" text-anchor="middle" font-size="9" fill="#5a6478" font-weight="600" letter-spacing="1.5">SMART BUILDING SYSTEM</text>
+              <text x="779" y="18" text-anchor="middle" font-size="9" fill="#5a6478" font-weight="600" letter-spacing="1.5">FRONTEND</text>
+
+              <!-- ════ CONTAINER BOXES ════ -->
+
+              <!-- ESP32 + Sensores -->
+              <rect x="10" y="44" width="152" height="88" rx="8" fill="#0f1f38" stroke="#2563eb" stroke-width="1.5"/>
+              <text x="86" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#93c5fd">ESP32</text>
+              <text x="86" y="87" text-anchor="middle" font-size="10" fill="#5c7aaa">BME280 · HC-SR501</text>
+              <text x="86" y="103" text-anchor="middle" font-size="9" fill="#3a5a8a">Temp · Umid · Presença</text>
+              <rect x="38" y="112" width="96" height="14" rx="3" fill="rgba(37,99,235,.15)"/>
+              <text x="86" y="123" text-anchor="middle" font-size="8.5" fill="#6090c0">Microcontrolador Wi-Fi</text>
+
+              <!-- Simulador Docker -->
+              <rect x="10" y="188" width="152" height="88" rx="8" fill="#0f1f38" stroke="#2563eb" stroke-width="1.5"/>
+              <text x="86" y="214" text-anchor="middle" font-size="12" font-weight="700" fill="#93c5fd">Simulador</text>
+              <text x="86" y="231" text-anchor="middle" font-size="10" fill="#5c7aaa">Python · Docker</text>
+              <text x="86" y="247" text-anchor="middle" font-size="9" fill="#3a5a8a">14 salas × 5 segundos</text>
+              <rect x="30" y="256" width="112" height="14" rx="3" fill="rgba(37,99,235,.15)"/>
+              <text x="86" y="267" text-anchor="middle" font-size="8.5" fill="#6090c0">Substitui ESP32 em dev</text>
+
+              <!-- Mosquitto -->
+              <rect x="192" y="44" width="150" height="88" rx="8" fill="#1a0f36" stroke="#7c3aed" stroke-width="1.5"/>
+              <text x="267" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#c4b5fd">Mosquitto</text>
+              <text x="267" y="87" text-anchor="middle" font-size="10" fill="#7a6aaa">MQTT Broker v2</text>
+              <text x="267" y="103" text-anchor="middle" font-size="9" fill="#5a4a8a">:1883  ·  :9001 WebSocket</text>
+              <rect x="210" y="112" width="114" height="14" rx="3" fill="rgba(124,58,237,.15)"/>
+              <text x="267" y="123" text-anchor="middle" font-size="8.5" fill="#9070cc">Protocolo MQTT 3.1.1</text>
+
+              <!-- FastAPI Backend -->
+              <rect x="392" y="44" width="158" height="88" rx="8" fill="#0a2a1c" stroke="#059669" stroke-width="1.5"/>
+              <text x="471" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#6ee7b7">FastAPI Backend</text>
+              <text x="471" y="87" text-anchor="middle" font-size="10" fill="#4a8a6a">Python 3.11 · Pydantic v2</text>
+              <text x="471" y="103" text-anchor="middle" font-size="9" fill="#2a6a4a">:8000  ·  JWT + RBAC</text>
+              <rect x="408" y="112" width="126" height="14" rx="3" fill="rgba(5,150,105,.15)"/>
+              <text x="471" y="123" text-anchor="middle" font-size="8.5" fill="#3a9a6a">Rules Engine RN01–RN10</text>
+
+              <!-- PostgreSQL -->
+              <rect x="192" y="218" width="150" height="82" rx="8" fill="#1e1608" stroke="#d97706" stroke-width="1.5"/>
+              <text x="267" y="245" text-anchor="middle" font-size="12" font-weight="700" fill="#fcd34d">PostgreSQL</text>
+              <text x="267" y="262" text-anchor="middle" font-size="10" fill="#8a7a4a">8 tabelas · SQLAlchemy 2</text>
+              <text x="267" y="278" text-anchor="middle" font-size="9" fill="#6a5a2a">:5432  ·  asyncpg</text>
+              <rect x="208" y="286" width="118" height="8" rx="2" fill="rgba(217,119,6,.12)"/>
+
+              <!-- Redis -->
+              <rect x="392" y="218" width="158" height="82" rx="8" fill="#1e1608" stroke="#d97706" stroke-width="1.5"/>
+              <text x="471" y="245" text-anchor="middle" font-size="12" font-weight="700" fill="#fcd34d">Redis</text>
+              <text x="471" y="262" text-anchor="middle" font-size="10" fill="#8a7a4a">JWT Blacklist · Cache</text>
+              <text x="471" y="278" text-anchor="middle" font-size="9" fill="#6a5a2a">:6379  ·  aioredis</text>
+              <rect x="406" y="286" width="130" height="8" rx="2" fill="rgba(217,119,6,.12)"/>
+
+              <!-- ML Engine -->
+              <rect x="590" y="218" width="90" height="82" rx="8" fill="#200f1a" stroke="#db2777" stroke-width="1.5"/>
+              <text x="635" y="247" text-anchor="middle" font-size="11" font-weight="700" fill="#f9a8d4">ML Engine</text>
+              <text x="635" y="264" text-anchor="middle" font-size="9" fill="#8a4a6a">scikit-learn</text>
+              <text x="635" y="280" text-anchor="middle" font-size="9" fill="#6a2a4a">RandomForest</text>
+              <rect x="600" y="288" width="70" height="8" rx="2" fill="rgba(219,39,119,.12)"/>
+
+              <!-- React Dashboard -->
+              <rect x="708" y="44" width="140" height="88" rx="8" fill="#0f1e32" stroke="#4d8eff" stroke-width="1.5"/>
+              <text x="778" y="70" text-anchor="middle" font-size="12" font-weight="700" fill="#93c5fd">React</text>
+              <text x="778" y="87" text-anchor="middle" font-size="10" fill="#4a6a9a">Dashboard · Vite 5</text>
+              <text x="778" y="103" text-anchor="middle" font-size="9" fill="#2a4a7a">:3000 · Recharts · Zustand</text>
+              <rect x="722" y="112" width="112" height="14" rx="3" fill="rgba(77,142,255,.15)"/>
+              <text x="778" y="123" text-anchor="middle" font-size="8.5" fill="#6090c0">TailwindCSS · Axios</text>
+
+              <!-- User persona -->
+              <circle cx="778" cy="248" r="20" fill="none" stroke="#4d8eff" stroke-width="1.5"/>
+              <!-- simple person: head + body lines -->
+              <circle cx="778" cy="242" r="8" fill="#0f1e32" stroke="#4d8eff" stroke-width="1.2"/>
+              <path d="M762,263 Q778,256 794,263" fill="none" stroke="#4d8eff" stroke-width="1.2"/>
+              <text x="778" y="283" text-anchor="middle" font-size="11" font-weight="600" fill="#adc6ff">Usuário</text>
+              <text x="778" y="296" text-anchor="middle" font-size="9" fill="#5c7aaa">Admin / Operador / Viewer</text>
+
+              <!-- ════ ARROWS ════ -->
+
+              <!-- ESP32 → Mosquitto (horizontal) -->
+              <line x1="162" y1="88" x2="192" y2="88" stroke="#4d8eff" stroke-width="1.5" marker-end="url(#ar-blue)"/>
+              <text x="177" y="82" text-anchor="middle" font-size="8" fill="#4d8eff">MQTT</text>
+
+              <!-- Simulator → Mosquitto (curve up) -->
+              <path d="M162,232 C180,232 180,132 192,132" stroke="#4d8eff" stroke-width="1.5" fill="none" stroke-dasharray="5,2" marker-end="url(#ar-blue)"/>
+
+              <!-- Mosquitto ↔ FastAPI (horizontal) -->
+              <line x1="342" y1="88" x2="392" y2="88" stroke="#34d399" stroke-width="1.5" marker-end="url(#ar-green)"/>
+              <text x="367" y="82" text-anchor="middle" font-size="8" fill="#34d399">subscribe</text>
+
+              <!-- FastAPI → React (horizontal, crosses boundary) -->
+              <line x1="550" y1="88" x2="708" y2="88" stroke="#4d8eff" stroke-width="1.5" marker-end="url(#ar-blue)"/>
+              <text x="629" y="82" text-anchor="middle" font-size="8" fill="#4d8eff">REST API · JWT</text>
+
+              <!-- FastAPI → PostgreSQL (diagonal) -->
+              <path d="M471,132 C471,175 267,175 267,218" stroke="#d97706" stroke-width="1.3" fill="none" stroke-dasharray="5,2" marker-end="url(#ar-amber)"/>
+              <text x="360" y="172" text-anchor="middle" font-size="8" fill="#d97706">SQLAlchemy</text>
+
+              <!-- FastAPI → Redis (straight down) -->
+              <line x1="471" y1="132" x2="471" y2="218" stroke="#d97706" stroke-width="1.3" stroke-dasharray="5,2" marker-end="url(#ar-amber)"/>
+              <text x="484" y="178" font-size="8" fill="#d97706">aioredis</text>
+
+              <!-- FastAPI → ML (diagonal down-right) -->
+              <path d="M550,120 C580,120 635,185 635,218" stroke="#db2777" stroke-width="1.3" fill="none" stroke-dasharray="5,2" marker-end="url(#ar-pink)"/>
+              <text x="602" y="162" text-anchor="middle" font-size="8" fill="#db2777">predições</text>
+
+              <!-- React → User (vertical) -->
+              <line x1="778" y1="132" x2="778" y2="226" stroke="#4d8eff" stroke-width="1.3" stroke-dasharray="5,2" marker-end="url(#ar-blue)"/>
+
+              <!-- System boundary label -->
+              <text x="433" y="390" text-anchor="middle" font-size="9" fill="#424754" font-style="italic">Sistema Smart Building — boundary C4</text>
+            </svg>
+
+            <!-- Legend -->
+            <div class="diagram-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#2563eb;"></div> IoT / Borda</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;"></div> MQTT Broker</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#059669;"></div> API Backend</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#d97706;"></div> Persistência</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#db2777;"></div> ML Engine</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#4d8eff;"></div> Frontend</div>
+              <div class="legend-item"><div class="legend-dot" style="border:1px solid #424754;background:transparent;"></div> System Boundary (dashed)</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── FLUXO ── -->
+        <section id="fluxo" class="section">
+          <div class="section-title">Fluxo End-to-End — O Caminho do Dado</div>
+          <div class="section-sub">Uma leitura de temperatura do sensor até o gráfico no dashboard — passo a passo.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="flow-step">
+              <div class="flow-num">1</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;">Sensor publica via MQTT</div>
+                <div style="font-size:13px;color:var(--muted);">ESP32 ou Simulador publica em <code>sensors/room/room-101/temperature</code> com payload <code>{"value":24.3,"timestamp":"ISO8601"}</code></div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">2</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;">Mosquitto Broker repassa</div>
+                <div style="font-size:13px;color:var(--muted);">Backend subscrito via wildcard <code>sensors/room/+/temperature</code> recebe a mensagem com QoS 1.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">3</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;">MQTT Handler — bridge thread-safe</div>
+                <div style="font-size:13px;color:var(--muted);">Callback paho-mqtt roda em thread separada. <code>asyncio.run_coroutine_threadsafe()</code> submete ao loop asyncio do FastAPI sem criar um loop novo — solução para o conflito com asyncpg.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">4</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;">Business Rules Engine avalia RN01–RN10</div>
+                <div style="font-size:13px;color:var(--muted);">Monta <code>RuleContext</code> imutável com valor, presença, setpoint, override manual e horário. Cada regra é avaliada em sequência. Output: lista de <code>RuleAction</code>.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">5</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;">Persistência via SQLAlchemy 2.0</div>
+                <div style="font-size:13px;color:var(--muted);">Insere <code>SensorData</code>, <code>Command</code> (auditoria) e <code>Alert</code> quando gerado. Status do device → ONLINE com <code>last_seen_at</code>.</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">6</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;">FastAPI serve via REST</div>
+                <div style="font-size:13px;color:var(--muted);"><code>GET /api/v1/sensors/{id}/data?period=1h</code> — resposta envelope <code>{data, meta, links}</code> com HATEOAS parcial (links de navegação no response body).</div>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">7</div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;">React Dashboard renderiza em tempo real</div>
+                <div style="font-size:13px;color:var(--muted);">Polling a cada 10s via Axios com interceptor JWT automático. Recharts atualiza o gráfico. Zustand gerencia autenticação e persiste no localStorage.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── REDIS ── -->
+        <section id="redis" class="section">
+          <div class="section-title">Para que serve o Redis?</div>
+          <div class="section-sub">Desmistificando o componente para quem nunca viu Redis antes.</div>
+          <div class="grid-2">
+            <div class="card" style="padding:20px;">
+              <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:8px;">1. Blacklist de Tokens JWT — Logout Real</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.7;">JWT é stateless — uma vez emitido, é válido até expirar. Sem Redis, um usuário que clicou "Logout" ainda conseguiria acessar a API com o token antigo por até 60 minutos. O Redis guarda o prefixo do token com TTL igual ao tempo restante de expiração.</div>
+            </div>
+            <div class="card" style="padding:20px;">
+              <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:8px;">2. Cache de Leituras Recentes</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.7;">Endpoints consultados a cada 10 segundos pelo dashboard podem ser servidos diretamente do Redis, evitando uma query SQL a cada request. Latência sub-milissegundo garante respostas rápidas mesmo em apresentações com múltiplos acessos simultâneos.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── SETUP ── -->
+        <section id="setup" class="section">
+          <div class="section-title">Setup Local em 3 Passos</div>
+          <div class="section-sub">Pré-requisito único: Docker Desktop ≥ 4.x instalado.</div>
+          <pre><span style="color:var(--muted);"># 1. Clone o repositório</span>
 git clone https://github.com/Jhowsoares/SmartBuilding_ExpoTech.git
 cd SmartBuilding_ExpoTech
 
-<span style="color:#8c909f;"># 2. Suba todos os serviços (banco, backend, frontend, MQTT, simulador)</span>
+<span style="color:var(--muted);"># 2. Suba todos os serviços</span>
 docker compose up -d --build
 
-<span style="color:#8c909f;"># 3. Aguarde ~30s e confirme que o backend subiu</span>
+<span style="color:var(--muted);"># 3. Confirme que o backend inicializou</span>
 docker compose logs backend --tail=20
-<span style="color:#8c909f;"># Você deve ver: "Application startup complete."</span></pre>
-        <div style="margin-top:16px;">
-          <table style="width:100%;">
-            <thead><tr>
-              <th>Serviço</th><th>URL</th><th>Descrição</th>
-            </tr></thead>
-            <tbody>
-              <tr><td style="color:#dce2f7;font-weight:500;">Dashboard React</td><td><code>localhost:3000</code></td><td>Interface principal do sistema</td></tr>
-              <tr><td style="color:#dce2f7;font-weight:500;">Swagger UI</td><td><code>localhost:8000/api/docs</code></td><td>Documentação interativa — executa requisições reais</td></tr>
-              <tr><td style="color:#dce2f7;font-weight:500;">ReDoc (local)</td><td><code>localhost:8000/api/redoc</code></td><td>Referência visual elegante da API</td></tr>
-              <tr><td style="color:#dce2f7;font-weight:500;">Health Check</td><td><code>localhost:8000/api/v1/health</code></td><td>Status de DB, Redis, MQTT e Simulador</td></tr>
-              <tr><td style="color:#dce2f7;font-weight:500;">Ngrok Dashboard</td><td><code>localhost:4040</code></td><td>Painel do túnel TCP para ESP32</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+<span style="color:var(--muted);"># Aguarde: "Application startup complete."</span></pre>
 
-      <!-- Credenciais -->
-      <section id="credenciais" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Credenciais de Acesso</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Inseridas automaticamente pelo seed script na inicialização.</p>
-        <table>
-          <thead><tr><th>Usuário</th><th>Senha</th><th>Papel</th><th>Permissões</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><code>admin@smartbuilding.local</code></td>
-              <td><code>admin123</code></td>
-              <td><span class="pill chip-danger">Admin</span></td>
-              <td>Tudo: CRUD, controle de AC, treinar ML, gerenciar usuários</td>
-            </tr>
-            <tr>
-              <td><code>operador@smartbuilding.local</code></td>
-              <td><code>op123</code></td>
-              <td><span class="pill chip-warn">Operador</span></td>
-              <td>Controlar dispositivos, reconhecer alertas</td>
-            </tr>
-            <tr>
-              <td><code>visualizador@smartbuilding.local</code></td>
-              <td><code>view123</code></td>
-              <td><span class="pill chip-success">Viewer</span></td>
-              <td>Somente leitura — dashboards e relatórios</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- Regras de Negócio -->
-      <section id="regras" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Regras de Negócio — RN01 a RN10</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Implementadas em <code>backend/app/ml/business_rules.py</code>. Avaliadas a cada mensagem MQTT dentro de um <code>RuleContext</code> imutável.</p>
-        <table>
-          <thead><tr><th>ID</th><th>Regra</th><th>Parâmetro</th><th>Função</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><span class="pill chip-warn">RN01</span></td>
-              <td style="color:#dce2f7;">Desligamento automático por ausência</td>
-              <td>15 min sem presença</td>
-              <td><code>_rn01_absence_auto_off()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-warn">RN02</span></td>
-              <td style="color:#dce2f7;">Bloqueio com janela aberta</td>
-              <td>&gt; 5 min aberta</td>
-              <td><code>_rn02_window_open_block()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-accent">RN03</span></td>
-              <td style="color:#dce2f7;">Setpoint na faixa de conforto</td>
-              <td>23°C – 25°C</td>
-              <td><code>_rn03_ideal_temperature()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-accent">RN04</span></td>
-              <td style="color:#dce2f7;">Override manual suspende automações</td>
-              <td>30 min de prioridade</td>
-              <td><code>mark_manual_override()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-danger">RN05</span></td>
-              <td style="color:#dce2f7;">Alerta de consumo elevado</td>
-              <td>&gt; 50 kWh/dia</td>
-              <td><code>_rn05_consumption_alert()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-accent">RN06</span></td>
-              <td style="color:#dce2f7;">Horário de funcionamento</td>
-              <td>07h – 21h</td>
-              <td><code>_rn06_operating_hours()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-accent">RN07</span></td>
-              <td style="color:#dce2f7;">Retreinamento do modelo ML</td>
-              <td>Sob demanda via API</td>
-              <td><code>predictor.train()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-warn">RN08</span></td>
-              <td style="color:#dce2f7;">Validação de leituras anômalas</td>
-              <td>Temp 5–55°C | Umid 5–100%</td>
-              <td><code>_rn08_validate_sensor()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-accent">RN09</span></td>
-              <td style="color:#dce2f7;">Auditoria completa de ações</td>
-              <td>Toda ação registrada</td>
-              <td><code>audit_repository.log()</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-success">RN10</span></td>
-              <td style="color:#dce2f7;">Eficiência energética adaptativa</td>
-              <td>+0.15 kW/°C acima de 24°C</td>
-              <td><code>consumption._estimate_kwh()</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- API Endpoints -->
-      <section id="api" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Endpoints Principais da API</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 8px;">Base URL: <code>http://localhost:8000/api/v1</code> · <a href="./api.html" style="color:#4d8eff;">Ver documentação completa &rarr;</a></p>
-        <table>
-          <thead><tr><th>Método</th><th>Endpoint</th><th>Auth</th><th>Descrição</th></tr></thead>
-          <tbody>
-            <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/auth/login</code></td><td>—</td><td>Login → access token + refresh token JWT</td></tr>
-            <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/auth/logout</code></td><td>Bearer</td><td>Revoga token via Redis blacklist</td></tr>
-            <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/sensors/{id}/data?period=1h</code></td><td>Bearer</td><td>Histórico de leituras (1h/24h/7d/30d)</td></tr>
-            <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/sensors/data</code></td><td>Token IoT</td><td>Ingestão de dado de sensor ESP32</td></tr>
-            <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/devices</code></td><td>Bearer</td><td>Listar dispositivos com status online/offline</td></tr>
-            <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/devices/{id}/control</code></td><td>Operador+</td><td>Ligar / Desligar / Ajustar setpoint AC</td></tr>
-            <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/rooms/{id}/commands</code></td><td>Bearer</td><td>Histórico real de comandos da sala</td></tr>
-            <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/consumption?period=24h</code></td><td>Bearer</td><td>Histórico kWh com breakdown por hora</td></tr>
-            <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/predictions/24h</code></td><td>Bearer</td><td>Predição ML das próximas 24 horas</td></tr>
-            <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/predictions/train</code></td><td>Admin</td><td>Retreina o modelo RandomForestRegressor</td></tr>
-            <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/alerts?active_only=true</code></td><td>Bearer</td><td>Alertas ativos com severidade e tipo</td></tr>
-            <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/health</code></td><td>—</td><td>Status real de DB, Redis, MQTT e Simulador</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- MQTT -->
-      <section id="mqtt" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Tópicos MQTT — Protocolo dos Sensores</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Broker Mosquitto na porta 1883. Payload sempre em JSON.</p>
-        <table>
-          <thead><tr><th>Direção</th><th>Tópico</th><th>Payload</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><span class="pill chip-success">Sensor → Broker</span></td>
-              <td><code>sensors/room/{room_id}/temperature</code></td>
-              <td><code>{"value": 24.3, "timestamp": "ISO8601", "tick": 42}</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-success">Sensor → Broker</span></td>
-              <td><code>sensors/room/{room_id}/humidity</code></td>
-              <td><code>{"value": 62.1, "timestamp": "ISO8601"}</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-success">Sensor → Broker</span></td>
-              <td><code>sensors/room/{room_id}/presence</code></td>
-              <td><code>{"value": 1, "timestamp": "ISO8601"}</code> (1=detectado, 0=ausência)</td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-accent">Backend → AC</span></td>
-              <td><code>devices/ac/{device_id}/commands</code></td>
-              <td><code>{"action": "on"|"off"|"setpoint", "value": 23.0}</code></td>
-            </tr>
-            <tr>
-              <td><span class="pill chip-warn">AC → Backend</span></td>
-              <td><code>devices/ac/{device_id}/feedback</code></td>
-              <td><code>{"power": "on", "setpoint": 23.0, "timestamp": "ISO8601"}</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- Hardware ESP32 -->
-      <section id="hardware" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Hardware de Bancada — ESP32</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Como testar com hardware físico sem precisar de um ar-condicionado real.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
-          <div class="card" style="padding:20px;">
-            <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:12px;">Componentes (1 nó de teste)</div>
-            <table style="margin:0;">
-              <thead><tr><th>Componente</th><th>Função</th></tr></thead>
+          <div class="table-wrap" style="margin-top:16px;">
+            <table>
+              <thead><tr><th>Serviço</th><th>URL</th><th>Descrição</th></tr></thead>
               <tbody>
-                <tr><td style="color:#dce2f7;">ESP32 DevKit v1</td><td>Microcontrolador Wi-Fi + MQTT</td></tr>
-                <tr><td style="color:#dce2f7;">BME280 (I2C, 3.3V)</td><td>Temperatura + Umidade</td></tr>
-                <tr><td style="color:#dce2f7;">HC-SR501 (PIR, 5V)</td><td>Detecção de presença</td></tr>
-                <tr><td style="color:#dce2f7;">LED IR 940nm + 330Ω</td><td>Simula comando AC</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">Dashboard React</td><td><code>localhost:3000</code></td><td>Interface principal do sistema</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">Swagger UI</td><td><code>localhost:8000/api/docs</code></td><td>Documentação interativa — executa requisições reais</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">ReDoc (local)</td><td><code>localhost:8000/api/redoc</code></td><td>Referência visual elegante da API</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">Health Check</td><td><code>localhost:8000/api/v1/health</code></td><td>Status de DB, Redis, MQTT e Simulador</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">Ngrok Dashboard</td><td><code>localhost:4040</code></td><td>Painel do túnel TCP para ESP32 físico</td></tr>
               </tbody>
             </table>
           </div>
-          <div class="card" style="padding:20px;">
-            <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:12px;">Pinagem ESP32</div>
-            <table style="margin:0;">
-              <thead><tr><th>Pino ESP32</th><th>Destino</th></tr></thead>
+        </section>
+
+        <!-- ── CREDENCIAIS ── -->
+        <section id="credenciais" class="section">
+          <div class="section-title">Credenciais de Acesso</div>
+          <div class="section-sub">Inseridas automaticamente pelo seed script na primeira inicialização.</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuário</th><th>Senha</th><th>Papel</th><th>Permissões</th></tr></thead>
               <tbody>
-                <tr><td><code>GPIO 21 (SDA)</code></td><td>BME280 SDA</td></tr>
-                <tr><td><code>GPIO 22 (SCL)</code></td><td>BME280 SCL</td></tr>
-                <tr><td><code>GPIO 13</code></td><td>HC-SR501 OUT</td></tr>
-                <tr><td><code>GPIO 4 → 330Ω</code></td><td>LED IR anodo (+)</td></tr>
-                <tr><td><code>3V3</code></td><td>VCC BME280</td></tr>
-                <tr><td><code>5V (VIN)</code></td><td>VCC HC-SR501</td></tr>
+                <tr>
+                  <td><code>admin@smartbuilding.local</code></td>
+                  <td><code>admin123</code></td>
+                  <td><span class="pill chip-danger">Admin</span></td>
+                  <td>CRUD completo, controle de AC, treinar ML, gerenciar usuários</td>
+                </tr>
+                <tr>
+                  <td><code>operador@smartbuilding.local</code></td>
+                  <td><code>op123</code></td>
+                  <td><span class="pill chip-warn">Operador</span></td>
+                  <td>Controlar dispositivos, reconhecer alertas</td>
+                </tr>
+                <tr>
+                  <td><code>visualizador@smartbuilding.local</code></td>
+                  <td><code>view123</code></td>
+                  <td><span class="pill chip-success">Viewer</span></td>
+                  <td>Somente leitura — dashboards e relatórios</td>
+                </tr>
               </tbody>
             </table>
           </div>
-        </div>
-        <div class="card" style="padding:20px;border-left:3px solid #4d8eff;margin-bottom:12px;">
-          <div style="font-size:14px;font-weight:600;color:#adc6ff;margin-bottom:8px;">Truque da Câmera do Celular</div>
-          <div style="font-size:13px;color:#8c909f;line-height:1.7;">O LED IR emite luz infravermelha invisível ao olho humano, mas captável pela câmera frontal do celular (sem filtro IR). Para validar: abra a câmera frontal → aponte o LED → acione OFF no dashboard → se o LED piscar em roxo/lilás na tela, toda a cadeia funcionou: <strong>Dashboard → API → MQTT → ESP32 → IR</strong>. Nenhum ar-condicionado necessário.</div>
-        </div>
-        <div class="card" style="padding:20px;border-left:3px solid #ffb786;">
-          <div style="font-size:14px;font-weight:600;color:#ffb786;margin-bottom:8px;">Testando com TV ou Aparelho de Som Doméstico</div>
-          <div style="font-size:13px;color:#8c909f;line-height:1.7;">Os pacotes IR de qualquer aparelho doméstico seguem o mesmo protocolo. Codifique o comando POWER OFF da sua TV com a biblioteca <code>IRremoteESP8266</code> (Arduino) e aponte o LED para ela. Quando a RN01 disparar por ausência, a TV apagará — comportamento rigorosamente idêntico ao de um AC real.</div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Rede ExpoTech -->
-      <section id="ngrok" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Estratégia de Rede para a ExpoTech</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">100% local + túnel sob demanda para o ESP32 físico.</p>
-        <div class="card" style="padding:20px;margin-bottom:16px;">
-          <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:12px;">Por que rodar local?</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
-            <div style="font-size:13px;color:#8c909f;"><strong style="color:#dce2f7;">Sem dependência de internet</strong><br/>Wi-Fi instável da feira não derruba o sistema</div>
-            <div style="font-size:13px;color:#8c909f;"><strong style="color:#dce2f7;">Latência mínima</strong><br/>Tudo local, sem RTT de datacenter</div>
-            <div style="font-size:13px;color:#8c909f;"><strong style="color:#dce2f7;">Custo zero</strong><br/>Sem cloud, sem cobrança por uso</div>
+        <!-- ── REGRAS ── -->
+        <section id="regras" class="section">
+          <div class="section-title">Regras de Negócio — RN01 a RN10</div>
+          <div class="section-sub">Implementadas em <code>backend/app/ml/business_rules.py</code>. Avaliadas a cada mensagem MQTT dentro de um <code>RuleContext</code> imutável.</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Regra</th><th>Parâmetro</th><th>Função no código</th></tr></thead>
+              <tbody>
+                <tr><td><span class="pill chip-warn">RN01</span></td><td style="color:var(--text);">Desligamento automático por ausência</td><td>15 min sem presença</td><td><code>_rn01_absence_auto_off()</code></td></tr>
+                <tr><td><span class="pill chip-warn">RN02</span></td><td style="color:var(--text);">Bloqueio com janela aberta</td><td>&gt; 5 min aberta</td><td><code>_rn02_window_open_block()</code></td></tr>
+                <tr><td><span class="pill chip-accent">RN03</span></td><td style="color:var(--text);">Setpoint na faixa de conforto</td><td>23°C – 25°C</td><td><code>_rn03_ideal_temperature()</code></td></tr>
+                <tr><td><span class="pill chip-accent">RN04</span></td><td style="color:var(--text);">Override manual suspende automações</td><td>30 min de prioridade</td><td><code>mark_manual_override()</code></td></tr>
+                <tr><td><span class="pill chip-danger">RN05</span></td><td style="color:var(--text);">Alerta de consumo elevado</td><td>&gt; 50 kWh/dia</td><td><code>_rn05_consumption_alert()</code></td></tr>
+                <tr><td><span class="pill chip-accent">RN06</span></td><td style="color:var(--text);">Horário de funcionamento</td><td>07h – 21h</td><td><code>_rn06_operating_hours()</code></td></tr>
+                <tr><td><span class="pill chip-accent">RN07</span></td><td style="color:var(--text);">Retreinamento do modelo ML</td><td>Sob demanda via API</td><td><code>predictor.train()</code></td></tr>
+                <tr><td><span class="pill chip-warn">RN08</span></td><td style="color:var(--text);">Validação de leituras anômalas</td><td>Temp 5–55°C · Umid 5–100%</td><td><code>_rn08_validate_sensor()</code></td></tr>
+                <tr><td><span class="pill chip-accent">RN09</span></td><td style="color:var(--text);">Auditoria completa de ações</td><td>Toda ação registrada</td><td><code>audit_repository.log()</code></td></tr>
+                <tr><td><span class="pill chip-success">RN10</span></td><td style="color:var(--text);">Eficiência energética adaptativa</td><td>+0.15 kW/°C acima 24°C</td><td><code>consumption._estimate_kwh()</code></td></tr>
+              </tbody>
+            </table>
           </div>
-        </div>
-        <div style="font-size:14px;font-weight:600;color:#dce2f7;margin-bottom:12px;">Como conectar o ESP32 ao Docker local</div>
-        <pre><span style="color:#8c909f;"># 1. Adicione seu token Ngrok ao .env na raiz do projeto</span>
-NGROK_AUTHTOKEN=seu_token_aqui   <span style="color:#8c909f;"># ngrok.com/dashboard</span>
+        </section>
 
-<span style="color:#8c909f;"># 2. Suba o sistema (o serviço ngrok já está no docker-compose)</span>
+        <!-- ── API ── -->
+        <section id="api" class="section">
+          <div class="section-title">Endpoints Principais da API</div>
+          <div class="section-sub">Base URL: <code>http://localhost:8000/api/v1</code> · <a href="./api.html" style="color:var(--btn);">Documentação completa &rarr;</a></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Método</th><th>Endpoint</th><th>Auth</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/auth/login</code></td><td>—</td><td>Login → access + refresh tokens JWT</td></tr>
+                <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/auth/logout</code></td><td>Bearer</td><td>Revoga token no Redis (blacklist)</td></tr>
+                <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/sensors/{id}/data?period=1h</code></td><td>Bearer</td><td>Histórico de leituras (1h/24h/7d/30d)</td></tr>
+                <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/sensors/data</code></td><td>Token IoT</td><td>Ingestão de dado de sensor ESP32</td></tr>
+                <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/devices</code></td><td>Bearer</td><td>Listar dispositivos com status online/offline</td></tr>
+                <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/devices/{id}/control</code></td><td>Operador+</td><td>Ligar / Desligar / Ajustar setpoint AC</td></tr>
+                <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/rooms/{id}/commands</code></td><td>Bearer</td><td>Histórico real de comandos da sala</td></tr>
+                <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/consumption?period=24h</code></td><td>Bearer</td><td>Histórico kWh com breakdown por hora</td></tr>
+                <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/predictions/24h</code></td><td>Bearer</td><td>Predição ML das próximas 24 horas</td></tr>
+                <tr><td><span class="badge-method badge-post">POST</span></td><td><code>/predictions/train</code></td><td>Admin</td><td>Retreina o modelo RandomForestRegressor</td></tr>
+                <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/alerts?active_only=true</code></td><td>Bearer</td><td>Alertas ativos com severidade e tipo</td></tr>
+                <tr><td><span class="badge-method badge-get">GET</span></td><td><code>/health</code></td><td>—</td><td>Status real de DB, Redis, MQTT e Simulador</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── MQTT ── -->
+        <section id="mqtt" class="section">
+          <div class="section-title">Tópicos MQTT — Protocolo dos Sensores</div>
+          <div class="section-sub">Broker Mosquitto na porta 1883. Payload sempre em JSON.</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Direção</th><th>Tópico</th><th>Payload de exemplo</th></tr></thead>
+              <tbody>
+                <tr><td><span class="pill chip-success">Sensor → Broker</span></td><td><code>sensors/room/{room_id}/temperature</code></td><td><code>{"value":24.3,"timestamp":"ISO8601","tick":42}</code></td></tr>
+                <tr><td><span class="pill chip-success">Sensor → Broker</span></td><td><code>sensors/room/{room_id}/humidity</code></td><td><code>{"value":62.1,"timestamp":"ISO8601"}</code></td></tr>
+                <tr><td><span class="pill chip-success">Sensor → Broker</span></td><td><code>sensors/room/{room_id}/presence</code></td><td><code>{"value":1,"timestamp":"ISO8601"}</code> <em style="color:var(--muted);">(1=detectado, 0=ausência)</em></td></tr>
+                <tr><td><span class="pill chip-accent">Backend → AC</span></td><td><code>devices/ac/{device_id}/commands</code></td><td><code>{"action":"on"|"off"|"setpoint","value":23.0}</code></td></tr>
+                <tr><td><span class="pill chip-warn">AC → Backend</span></td><td><code>devices/ac/{device_id}/feedback</code></td><td><code>{"power":"on","setpoint":23.0,"timestamp":"ISO8601"}</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── HARDWARE ESP32 ── -->
+        <section id="hardware" class="section">
+          <div class="section-title">Hardware de Bancada — ESP32</div>
+          <div class="section-sub">Como testar com hardware físico sem precisar de um ar-condicionado real.</div>
+          <div class="grid-2" style="margin-bottom:16px;">
+            <div class="card" style="padding:20px;">
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;">Componentes (1 nó de teste)</div>
+              <div class="table-wrap">
+                <table style="min-width:unset;">
+                  <thead><tr><th>Componente</th><th>Função</th></tr></thead>
+                  <tbody>
+                    <tr><td style="color:var(--text);">ESP32 DevKit v1</td><td>Microcontrolador Wi-Fi + MQTT</td></tr>
+                    <tr><td style="color:var(--text);">BME280 (I2C, 3.3V)</td><td>Temperatura + Umidade</td></tr>
+                    <tr><td style="color:var(--text);">HC-SR501 (PIR, 5V)</td><td>Detecção de presença</td></tr>
+                    <tr><td style="color:var(--text);">LED IR 940nm + 330Ω</td><td>Simula comando AC via IR</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card" style="padding:20px;">
+              <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;">Pinagem ESP32</div>
+              <div class="table-wrap">
+                <table style="min-width:unset;">
+                  <thead><tr><th>Pino ESP32</th><th>Destino</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>GPIO 21 (SDA)</code></td><td>BME280 SDA</td></tr>
+                    <tr><td><code>GPIO 22 (SCL)</code></td><td>BME280 SCL</td></tr>
+                    <tr><td><code>GPIO 13</code></td><td>HC-SR501 OUT</td></tr>
+                    <tr><td><code>GPIO 4 → 330Ω</code></td><td>LED IR anodo (+)</td></tr>
+                    <tr><td><code>3V3</code></td><td>VCC do BME280</td></tr>
+                    <tr><td><code>5V (VIN)</code></td><td>VCC do HC-SR501</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card highlight-card" style="padding:20px;margin-bottom:12px;">
+            <div style="font-size:14px;font-weight:600;color:var(--accent);margin-bottom:8px;">Truque da Câmera do Celular</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7;">O LED IR emite luz <strong style="color:var(--text);">infravermelha invisível ao olho humano</strong>, mas captável pela câmera frontal do celular (sem filtro IR). Para validar: abra a câmera frontal → aponte o LED → acione OFF no dashboard → se o LED piscar em roxo/lilás na tela, toda a cadeia funcionou: <strong style="color:var(--text);">Dashboard → API → MQTT → ESP32 → IR</strong>. Nenhum ar-condicionado necessário.</div>
+          </div>
+          <div class="card highlight-card-warn" style="padding:20px;">
+            <div style="font-size:14px;font-weight:600;color:var(--tert);margin-bottom:8px;">Testando com TV ou Aparelho de Som Doméstico</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7;">Os pacotes IR de qualquer aparelho doméstico seguem o mesmo protocolo. Codifique o comando POWER OFF da sua TV com a biblioteca <code>IRremoteESP8266</code> (Arduino) e aponte o LED para ela. Quando a RN01 disparar por ausência de presença, a TV apagará — comportamento rigorosamente idêntico ao de um AC real. Perfeito para demonstração em banca.</div>
+          </div>
+        </section>
+
+        <!-- ── NGROK ── -->
+        <section id="ngrok" class="section">
+          <div class="section-title">Estratégia de Rede para a ExpoTech</div>
+          <div class="section-sub">100% local + túnel TCP sob demanda para conectar o ESP32 físico.</div>
+          <div class="grid-3" style="margin-bottom:20px;">
+            <div class="card" style="padding:18px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Sem dependência de internet</div>
+              <div style="font-size:13px;color:var(--muted);">Wi-Fi instável da feira não derruba o sistema. PostgreSQL, Redis, MQTT e API rodam no notebook.</div>
+            </div>
+            <div class="card" style="padding:18px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Latência mínima</div>
+              <div style="font-size:13px;color:var(--muted);">Tudo local — sem RTT de datacenter. O dashboard responde em &lt;20ms mesmo com carga alta.</div>
+            </div>
+            <div class="card" style="padding:18px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Custo zero</div>
+              <div style="font-size:13px;color:var(--muted);">Nenhuma cobrança por cloud. O Ngrok free tier é suficiente para o túnel TCP durante a feira.</div>
+            </div>
+          </div>
+          <pre><span style="color:var(--muted);"># 1. Adicione seu token Ngrok ao .env na raiz</span>
+NGROK_AUTHTOKEN=seu_token_aqui   <span style="color:var(--muted);"># ngrok.com/dashboard</span>
+
+<span style="color:var(--muted);"># 2. Suba (o serviço ngrok já está no docker-compose)</span>
 docker compose up -d
 
-<span style="color:#8c909f;"># 3. Descubra a URL TCP gerada</span>
+<span style="color:var(--muted);"># 3. Descubra a URL TCP gerada</span>
 docker compose logs ngrok
-<span style="color:#8c909f;"># → "url":"tcp://0.tcp.sa.ngrok.io:XXXXX"</span>
-<span style="color:#8c909f;"># Ou acesse http://localhost:4040</span>
+<span style="color:var(--muted);"># → "url":"tcp://0.tcp.sa.ngrok.io:XXXXX"</span>
+<span style="color:var(--muted);"># Ou acesse: http://localhost:4040</span>
 
-<span style="color:#8c909f;"># 4. Configure o ESP32 com essa URL e porta como broker MQTT</span></pre>
-        <div style="font-size:13px;color:#8c909f;margin-top:12px;line-height:1.7;">O Ngrok cria um túnel TCP da porta 1883 local para um endereço público. O ESP32 em qualquer rede da feira conecta a esse endereço e conversa diretamente com o Mosquitto rodando no Docker do notebook — como se estivessem na mesma rede.</div>
-      </section>
+<span style="color:var(--muted);"># 4. Configure o ESP32 com esse host e porta como broker MQTT</span></pre>
+        </section>
 
-      <!-- Equipe -->
-      <section id="equipe" class="section">
-        <h2 style="font-size:22px;font-weight:700;color:#dce2f7;margin:0 0 8px;">Equipe</h2>
-        <p style="color:#8c909f;font-size:14px;margin:0 0 24px;">Engenharia da Computação · ExpoTech 2026</p>
-        <table>
-          <thead><tr><th>Integrante</th><th>Papel</th><th>Escopo Técnico</th></tr></thead>
-          <tbody>
-            <tr>
-              <td style="color:#dce2f7;font-weight:500;">Jhonata Soares</td>
-              <td><span class="pill chip-accent">Backend Lead</span></td>
-              <td>FastAPI · PostgreSQL · JWT/RBAC · API REST Design · Docker</td>
-            </tr>
-            <tr>
-              <td style="color:#dce2f7;font-weight:500;">João Arnaldo</td>
-              <td><span class="pill chip-success">IoT & MQTT</span></td>
-              <td>Mosquitto · Simulador Python · ESP32 Firmware · IR · Ngrok</td>
-            </tr>
-            <tr>
-              <td style="color:#dce2f7;font-weight:500;">Rickelmy</td>
-              <td><span class="pill chip-warn">IA & Dados</span></td>
-              <td>scikit-learn · Pipeline ML · Regras RN01–RN10 · Análise de Consumo</td>
-            </tr>
-            <tr>
-              <td style="color:#dce2f7;font-weight:500;">Felipe Pardinho</td>
-              <td><span class="pill chip-accent">Frontend</span></td>
-              <td>React 18 · Tailwind · Recharts · UX/UI · Zustand</td>
-            </tr>
-            <tr>
-              <td style="color:#dce2f7;font-weight:500;">Claudio Rodrigues</td>
-              <td><span class="pill chip-accent">DevOps & QA</span></td>
-              <td>Docker Compose · Alembic · Seed Scripts · Testes de Integração</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+        <!-- ── EQUIPE ── -->
+        <section id="equipe" class="section">
+          <div class="section-title">Equipe</div>
+          <div class="section-sub">Engenharia da Computação · ExpoTech 2026</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Integrante</th><th>Papel</th><th>Escopo Técnico</th></tr></thead>
+              <tbody>
+                <tr><td style="color:var(--text);font-weight:500;">Jhonata Soares</td><td><span class="pill chip-accent">Backend Lead</span></td><td>FastAPI · PostgreSQL · JWT/RBAC · API REST · Docker</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">João Arnaldo</td><td><span class="pill chip-success">IoT & MQTT</span></td><td>Mosquitto · Simulador · ESP32 Firmware · IR · Ngrok</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">Rickelmy</td><td><span class="pill chip-warn">IA & Dados</span></td><td>scikit-learn · Pipeline ML · Regras RN01–RN10 · Consumo</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">Felipe Pardinho</td><td><span class="pill chip-accent">Frontend</span></td><td>React 18 · Tailwind · Recharts · UX/UI · Zustand</td></tr>
+                <tr><td style="color:var(--text);font-weight:500;">Claudio Rodrigues</td><td><span class="pill chip-accent">DevOps & QA</span></td><td>Docker Compose · Alembic · Seed Scripts · Testes</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-    </main>
-  </div>
+      </main>
+    </div><!-- /.layout -->
+  </div><!-- /.container -->
 
-  <!-- Footer -->
-  <footer style="border-top:1px solid #424754;padding:32px 24px;text-align:center;">
-    <div style="max-width:600px;margin:0 auto;">
-      <div style="font-size:16px;font-weight:600;color:#dce2f7;margin-bottom:8px;">Smart Building · ExpoTech 2026</div>
-      <div style="font-size:13px;color:#8c909f;margin-bottom:16px;">Engenharia da Computação</div>
-      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
-        <a href="./api.html" style="font-size:13px;color:#4d8eff;text-decoration:none;">Referência da API (ReDoc)</a>
-        <span style="color:#424754;">·</span>
-        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech" style="font-size:13px;color:#4d8eff;text-decoration:none;">GitHub</a>
-        <span style="color:#424754;">·</span>
-        <a href="http://localhost:8000/api/docs" style="font-size:13px;color:#4d8eff;text-decoration:none;">Swagger UI (local)</a>
-      </div>
-      <div style="margin-top:16px;font-size:12px;color:#424754;">Documentação atualizada em 24/05/2026</div>
+  <!-- ── Footer ── -->
+  <footer>
+    <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;">Smart Building · ExpoTech 2026</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Engenharia da Computação</div>
+    <div class="footer-links">
+      <a href="./api.html">Referência da API (ReDoc)</a>
+      <span style="color:var(--border);">·</span>
+      <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+      <span style="color:var(--border);">·</span>
+      <a href="http://localhost:8000/api/docs">Swagger UI (local)</a>
     </div>
+    <div style="font-size:12px;color:var(--border);margin-top:8px;">Documentação atualizada em 25/05/2026</div>
   </footer>
 
   <script>
-    // Highlight active TOC link on scroll
+    // ── Hamburger menu ──
+    const btn  = document.getElementById('hamburger')
+    const menu = document.getElementById('mobile-menu')
+    btn.addEventListener('click', () => menu.classList.toggle('open'))
+    function closeMenu() { menu.classList.remove('open') }
+
+    // ── TOC scroll spy ──
     const sections = document.querySelectorAll('section[id]')
-    const links    = document.querySelectorAll('.toc-link')
-    const obs = new IntersectionObserver((entries) => {
+    const tocLinks  = document.querySelectorAll('.toc-link')
+    const observer  = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          links.forEach(l => l.classList.remove('active'))
-          const active = document.querySelector('.toc-link[href="#' + e.target.id + '"]')
-          if (active) active.classList.add('active')
+          tocLinks.forEach(l => l.classList.remove('active'))
+          const a = document.querySelector('.toc-link[href="#' + e.target.id + '"]')
+          if (a) a.classList.add('active')
         }
       })
-    }, { rootMargin: '-20% 0px -70% 0px' })
-    sections.forEach(s => obs.observe(s))
+    }, { rootMargin: '-15% 0px -75% 0px' })
+    sections.forEach(s => observer.observe(s))
   </script>
 </body>
 </html>
