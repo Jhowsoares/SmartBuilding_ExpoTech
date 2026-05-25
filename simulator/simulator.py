@@ -41,7 +41,9 @@ logger = logging.getLogger(__name__)
 # ── Configurações ────────────────────────────────────────────────────────────
 MQTT_BROKER = os.getenv("MQTT_BROKER", "localhost")
 MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
-INTERVAL = float(os.getenv("INTERVAL", "5"))        # segundos entre publicações
+# INTERVAL = float(os.getenv("INTERVAL", "60"))        # segundos entre publicações
+INTERVAL = float(5) # alterei manualmente aqui jhow, pra ter certeza que n tem mais um env escondido sla.
+# print(INTERVAL)
 HAS_PRESENCE_ROOMS = {0, 1, 4, 5, 9, 10}           # índices com sensor de presença
 
 # ── Definição das 14 salas ───────────────────────────────────────────────────

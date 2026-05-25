@@ -176,7 +176,7 @@ export default function DashboardPage() {
     const interval = setInterval(() => {
       fetchStats()
       fetchChartData()
-    }, 10000)
+    }, 60000)
     return () => clearInterval(interval)
   }, [fetchStats, fetchChartData])
 
@@ -261,7 +261,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-sb-on-surface font-semibold">Temperatura & Umidade em Tempo Real</h2>
-            <p className="text-sb-outline text-sm mt-0.5">Atualiza a cada 10 segundos</p>
+            <p className="text-sb-outline text-sm mt-0.5">Atualiza a cada 60 segundos</p>
           </div>
           {chartLoading && <LoadingSpinner size="sm" />}
         </div>

@@ -38,7 +38,7 @@ services:
       - rede
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jhonata -d expotech_db"]
-      interval: 10s
+      interval: 60s
       timeout: 5s
       retries: 5
       start_period: 10s

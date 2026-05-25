@@ -7,6 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner'
 import useAuthStore from '../store/authStore'
 import { format } from 'date-fns'
 
+// ── Tooltip personalizado ──────────────────────────────────────────────
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   const d = payload[0]?.payload
@@ -21,6 +22,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   )
 }
 
+// ── Barra de confiança ─────────────────────────────────────────────────
 function ConfidenceBar({ value }) {
   const pct = Math.round((value || 0) * 100)
   const color = pct >= 75 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'
@@ -37,6 +39,7 @@ function ConfidenceBar({ value }) {
   )
 }
 
+// ── Página principal ───────────────────────────────────────────────────
 export default function PredictionsPage() {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -47,14 +50,21 @@ export default function PredictionsPage() {
   const [lastTrained, setLastTrained] = useState(null)
   const isAdmin = useAuthStore((s) => s.isAdmin?.() || s.role === 'admin')
 
+  // ── Busca dados da API ──────────────────────────────────────────────
   const fetchData = async () => {
     setLoading(true)
     try {
       const res = await getPredictions24h()
       const raw = res.data
-      const arr = Array.isArray(raw) ? raw : raw?.predictions || raw?.data || raw?.items || []
+      const arr =
+        raw?.data?.hourly_predictions ??
+        raw?.hourly_predictions ??
+        raw?.predictions ??
+        []
+
       if (arr.length > 0) {
         processData(arr)
+        setUsingMock(false)
       } else {
         processData(generateMock())
         setUsingMock(true)
@@ -67,24 +77,48 @@ export default function PredictionsPage() {
     }
   }
 
+  // ── Processa dados para o gráfico ────────────────────────────────────
   const processData = (arr) => {
-    const normalized = arr.map((d, i) => ({
-      hour: d.hour || d.label || d.time || `${String(i).padStart(2, '0')}:00`,
-      predicted: +(d.predicted || d.value || d.kwh || d.consumption || 0),
-      confidence: d.confidence ?? d.confidence_score ?? 0.75,
-    }))
+    const normalized = [...arr]
+      .map((d, idx) => {
+        const hourFromLabel = d.label ? Number(String(d.label).split(':')[0]) : null
+        const hour = Number.isFinite(hourFromLabel)
+          ? hourFromLabel
+          : Number(d.hour_of_day ?? idx)
+
+        return {
+          idx,
+          timestamp: d.timestamp ?? null,
+          hour: d.label ?? `${String(hour).padStart(2, '0')}:00`,
+          predicted: Number(d.kwh_previsto ?? d.predicted ?? d.value ?? d.kwh ?? d.consumption ?? 0),
+          confidence: Number(d.confidence ?? d.confidence_score ?? 0.75),
+        }
+      })
+      .sort((a, b) => {
+        if (a.timestamp && b.timestamp) {
+          return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        }
+        return a.idx - b.idx
+      })
+      .map(({ idx, timestamp, ...rest }) => rest)
+
     setData(normalized)
 
     const totalKwh = normalized.reduce((s, d) => s + d.predicted, 0)
     const avgConf = normalized.reduce((s, d) => s + d.confidence, 0) / (normalized.length || 1)
     const peak = normalized.reduce((a, b) => (b.predicted > a.predicted ? b : a), normalized[0])
-    setMeta({ totalKwh, avgConfidence: avgConf, peakHour: peak?.hour || null })
-  }
 
+    setMeta({
+      totalKwh,
+      avgConfidence: avgConf,
+      peakHour: peak?.hour || null,
+    })
+  }
   useEffect(() => {
     fetchData()
   }, [])
 
+  // ── Retreinamento do modelo ──────────────────────────────────────────
   const handleTrain = async () => {
     setTrainLoading(true)
     setTrainMsg('')
@@ -177,19 +211,21 @@ export default function PredictionsPage() {
             <LoadingSpinner size="lg" />
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={data} margin={{ top: 10, right: 10, bottom: 20, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis
-                dataKey="hour"
-                stroke="#6B7280"
-                tick={{ fill: '#9CA3AF', fontSize: 11 }}
-                interval={2}
-              />
+                  dataKey="hour"
+                  stroke="#6B7280"
+                  tick={{ fill: '#9CA3AF', fontSize: 10, angle: -45, textAnchor: 'end' }}
+                  interval={0}
+                  minTickGap={0}
+                />
               <YAxis
                 stroke="#6B7280"
                 tick={{ fill: '#9CA3AF', fontSize: 11 }}
                 unit=" kWh"
+                domain={[0, 'auto']}
               />
               <Tooltip content={<CustomTooltip />} />
               <ReferenceLine
@@ -198,7 +234,7 @@ export default function PredictionsPage() {
                 strokeDasharray="4 4"
                 label={{ value: 'Média', fill: '#F59E0B', fontSize: 11 }}
               />
-              <Bar dataKey="predicted" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="predicted" fill="#3B82F6" radius={[4, 4, 0, 0]} minPointSize={2} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -209,7 +245,7 @@ export default function PredictionsPage() {
         <h2 className="text-white font-semibold mb-4">Metadados do Modelo</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            ['Registros de Treino', '145.200 reais'],
+            ['Registros de Treino', '145.200'],
             ['Versão do Modelo', 'synthetic/2026-05-24'],
             ['Última Atualização', lastTrained ? format(lastTrained, 'dd/MM/yyyy HH:mm') : 'Hoje, 04:12 AM'],
             ['Métrica de Confiança (R²)', `${(meta.avgConfidence * 100).toFixed(1)}%`],
@@ -290,6 +326,7 @@ export default function PredictionsPage() {
   )
 }
 
+// ── Funções auxiliares ──────────────────────────────────────────────────
 function buildRecommendations(meta, data) {
   const recs = []
   if (!data.length) return recs
@@ -338,14 +375,19 @@ function buildRecommendations(meta, data) {
 }
 
 function generateMock() {
+  const now = new Date()
+  const currentHour = now.getHours()
   return Array.from({ length: 24 }, (_, i) => {
-    const isDay = i >= 7 && i <= 19
-    const isPeak = (i >= 9 && i <= 11) || (i >= 14 && i <= 17)
+    const hour = (currentHour + i + 1) % 24
+    const isDay = hour >= 7 && hour <= 19
+    const isPeak = (hour >= 9 && hour <= 11) || (hour >= 14 && hour <= 17)
     const base = isDay ? (isPeak ? 7 : 5) : 2
     return {
-      hour: `${String(i).padStart(2, '0')}:00`,
-      predicted: +(base + Math.random() * 2).toFixed(2),
+      hour_of_day: hour,
+      kwh_previsto: +(base + Math.random() * 2).toFixed(2),
       confidence: +(0.65 + Math.random() * 0.3).toFixed(2),
+      is_operating_hour: isDay,
+      timestamp: new Date(now.getTime() + (i + 1) * 3600000).toISOString(),
     }
   })
 }

@@ -69,6 +69,7 @@ export const getConsumption = (period = '24h') =>
 
 // ─── Predictions ────────────────────────────────────────────────────────────
 export const getPredictions24h = () => api.get('/predictions/24h')
+// export const getPredictions24h = () => api.get('/api/v1/predictions/24h');
 export const trainModel = () => api.post('/predictions/train')
 
 // ─── Users ──────────────────────────────────────────────────────────────────
