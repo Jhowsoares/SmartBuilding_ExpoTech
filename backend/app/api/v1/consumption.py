@@ -24,11 +24,49 @@ _PERIOD_DELTA = {
     "30d": timedelta(days=30),
 }
 
+_PERIOD_GRANULARITY = {
+    "24h": "hour",
+    "7d": "day",
+    "30d": "day",
+}
+
 
 def _estimate_kwh(avg_temp: float, hours: float) -> float:
     """Estima kWh com base na temperatura média."""
     extra = max(0.0, avg_temp - _IDEAL_TEMP) * _KW_POR_GRAU_ACIMA_IDEAL
     return round((_KW_BASE_AC + extra) * hours, 2)
+
+
+def _aggregate_hourly_to_daily(hourly: list[dict]) -> list[dict]:
+    """Soma consumo horário em buckets diários para períodos 7d/30d."""
+    daily: dict[str, dict] = {}
+    for item in hourly:
+        ts = item.get("timestamp")
+        if not ts:
+            continue
+        day_key = ts[:10]  # YYYY-MM-DD
+        if day_key not in daily:
+            daily[day_key] = {
+                "timestamp": f"{day_key}T00:00:00+00:00",
+                "avg_temp_celsius": item["avg_temp_celsius"],
+                "leituras": item["leituras"],
+                "kwh_estimado": 0.0,
+                "_temps": [item["avg_temp_celsius"]],
+            }
+        else:
+            daily[day_key]["leituras"] += item["leituras"]
+            daily[day_key]["_temps"].append(item["avg_temp_celsius"])
+        daily[day_key]["kwh_estimado"] = round(
+            daily[day_key]["kwh_estimado"] + item["kwh_estimado"], 2
+        )
+
+    breakdown: list[dict] = []
+    for day_key in sorted(daily.keys()):
+        bucket = daily[day_key]
+        temps = bucket.pop("_temps")
+        bucket["avg_temp_celsius"] = round(sum(temps) / len(temps), 1)
+        breakdown.append(bucket)
+    return breakdown
 
 
 @router.get("", status_code=200, summary="Histórico de consumo energético")
@@ -39,10 +77,11 @@ async def get_consumption(
     current_user: dict = Depends(get_current_user),
 ) -> dict:
     delta = _PERIOD_DELTA[period]
+    granularity = _PERIOD_GRANULARITY[period]
     cutoff = datetime.now(timezone.utc) - delta
     hours = delta.total_seconds() / 3600
 
-    # Busca leituras de temperatura no período
+    # Sempre agrega por hora no SQL; reagrupa por dia no Python quando necessário
     q = (
         select(
             func.date_trunc("hour", SensorData.timestamp).label("hora"),
@@ -58,20 +97,27 @@ async def get_consumption(
     )
     rows = (await db.execute(q)).all()
 
-    breakdown_by_hour = []
+    hourly_breakdown: list[dict] = []
     total_kwh = 0.0
     for row in rows:
         kwh = _estimate_kwh(float(row.avg_temp or _IDEAL_TEMP), 1.0)
         total_kwh += kwh
-        breakdown_by_hour.append({
-            "hora": row.hora.isoformat() if row.hora else None,
+        ts = row.hora.isoformat() if row.hora else None
+        hourly_breakdown.append({
+            "timestamp": ts,
+            "hora": ts,  # compatibilidade com clientes antigos
             "avg_temp_celsius": round(float(row.avg_temp or 0), 1),
             "leituras": row.leituras,
             "kwh_estimado": kwh,
         })
 
-    if not breakdown_by_hour:
-        # Estimativa sem dados reais: assume operação constante
+    if granularity == "day":
+        breakdown = _aggregate_hourly_to_daily(hourly_breakdown)
+    else:
+        breakdown = hourly_breakdown
+
+    if not breakdown:
+        # Estimativa sem dados reais: assume operação constante no período
         total_kwh = _estimate_kwh(_IDEAL_TEMP, hours)
 
     custo_brl = round(total_kwh * settings.ENERGIA_TARIFA_KWH_BRL, 2)
@@ -79,11 +125,13 @@ async def get_consumption(
     return {
         "data": {
             "period": period,
+            "granularity": granularity,
             "cutoff": cutoff.isoformat(),
             "total_kwh": round(total_kwh, 2),
             "custo_brl": custo_brl,
             "tarifa_kwh_brl": settings.ENERGIA_TARIFA_KWH_BRL,
-            "breakdown_by_hour": breakdown_by_hour,
+            "breakdown": breakdown,
+            "breakdown_by_hour": hourly_breakdown,
         }
     }
 

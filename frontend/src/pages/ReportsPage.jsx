@@ -11,7 +11,32 @@ const PERIODS = [
   { value: '30d', label: 'Últimos 30 dias' },
 ]
 
-const COST_KWH = 0.85 // R$ per kWh (example tariff)
+const COST_KWH = 0.85 // fallback se API não enviar tarifa
+
+function formatBucketLabel(timestamp, period, granularity) {
+  if (!timestamp) return ''
+  const d = new Date(timestamp)
+  if (Number.isNaN(d.getTime())) return ''
+
+  if (period === '24h' || granularity === 'hour') {
+    return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  }
+  if (period === '7d') {
+    return d.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' })
+  }
+  return d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })
+}
+
+function mapBreakdownToChart(breakdown, period, granularity) {
+  return breakdown.map((h) => ({
+    label: formatBucketLabel(h.timestamp ?? h.hora, period, granularity)
+      || h.label
+      || h.time
+      || '',
+    kwh: +(h.kwh_estimado ?? h.kwh ?? h.value ?? 0),
+    avg_temp: h.avg_temp_celsius ?? null,
+  }))
+}
 
 function StatCard({ label, value, sub, color = 'blue' }) {
   const colors = {
@@ -56,7 +81,9 @@ function downloadCSV(data, period) {
 export default function ReportsPage() {
   const [period, setPeriod] = useState('24h')
   const [data, setData] = useState([])
+  const [granularity, setGranularity] = useState('hour')
   const [apiTotals, setApiTotals] = useState(null)
+  const [tariff, setTariff] = useState(COST_KWH)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -66,36 +93,39 @@ export default function ReportsPage() {
     try {
       const res = await getConsumption(period)
       const raw = res.data
-      // API returns { data: { total_kwh, custo_brl, breakdown_by_hour: [...] } }
       const inner = raw?.data ?? raw
-      const breakdown = Array.isArray(inner?.breakdown_by_hour)
-        ? inner.breakdown_by_hour
-        : Array.isArray(inner)
-          ? inner
-          : []
+      const bucketGranularity = inner?.granularity ?? (period === '24h' ? 'hour' : 'day')
+      const breakdown = Array.isArray(inner?.breakdown)
+        ? inner.breakdown
+        : Array.isArray(inner?.breakdown_by_hour)
+          ? inner.breakdown_by_hour
+          : Array.isArray(inner)
+            ? inner
+            : []
 
       if (breakdown.length > 0) {
-        // Use real data — map breakdown_by_hour into chart-friendly format
-        const mapped = breakdown.map((h) => ({
-          label: h.hora
-            ? new Date(h.hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-            : (h.label || h.time || ''),
-          kwh: +(h.kwh_estimado ?? h.kwh ?? h.value ?? 0),
-          avg_temp: h.avg_temp_celsius ?? null,
-        }))
-        setData(mapped)
-        // Prefer backend totals when available
+        setGranularity(bucketGranularity)
+        setData(mapBreakdownToChart(breakdown, period, bucketGranularity))
         if (inner?.total_kwh != null) {
           setApiTotals({ totalKwh: inner.total_kwh, costBrl: inner.custo_brl ?? 0 })
+        } else {
+          setApiTotals(null)
+        }
+        if (inner?.tarifa_kwh_brl != null) {
+          setTariff(inner.tarifa_kwh_brl)
         }
       } else {
+        setGranularity(period === '24h' ? 'hour' : 'day')
         setData(generateMockData(period))
         setApiTotals(null)
+        setTariff(COST_KWH)
         setError('Sem dados reais — exibindo estimativa.')
       }
     } catch (_) {
+      setGranularity(period === '24h' ? 'hour' : 'day')
       setData(generateMockData(period))
       setApiTotals(null)
+      setTariff(COST_KWH)
       setError('Usando dados de exemplo — API não disponível.')
     } finally {
       setLoading(false)
@@ -107,12 +137,14 @@ export default function ReportsPage() {
   }, [period])
 
   const totalKwh = apiTotals?.totalKwh ?? data.reduce((sum, d) => sum + (d.kwh || 0), 0)
-  const totalCost = apiTotals?.costBrl ?? (totalKwh * COST_KWH)
+  const totalCost = apiTotals?.costBrl ?? (totalKwh * tariff)
   const avgKwh = data.length > 0 ? totalKwh / data.length : 0
+  const avgLabel = granularity === 'hour' ? 'por hora' : 'por dia'
+  const xAxisInterval = period === '30d' ? 2 : period === '7d' ? 0 : 'preserveStartEnd'
 
   const chartData = data.map((d) => ({
     label: d.label || '',
-    kWh: +(d.kwh || 0).toFixed ? +(d.kwh || 0) : 0,
+    kWh: Number(d.kwh ?? 0),
   }))
 
   return (
@@ -169,20 +201,25 @@ export default function ReportsPage() {
         <StatCard
           label="Custo Estimado"
           value={`R$ ${totalCost.toFixed(2)}`}
-          sub={`Tarifa: R$ ${COST_KWH}/kWh`}
+          sub={`Tarifa: R$ ${tariff.toFixed(2)}/kWh`}
           color="green"
         />
         <StatCard
-          label="Média por Período"
+          label="Média por Intervalo"
           value={`${avgKwh.toFixed(2)} kWh`}
-          sub="por intervalo"
+          sub={avgLabel}
           color="yellow"
         />
       </div>
 
       {/* Chart */}
       <div className="card p-6">
-        <h2 className="text-sb-on-surface font-semibold mb-6">Consumo de Energia</h2>
+        <h2 className="text-sb-on-surface font-semibold mb-6">
+          Consumo de Energia
+          <span className="text-sb-outline text-sm font-normal ml-2">
+            {granularity === 'hour' ? 'por hora' : 'por dia'}
+          </span>
+        </h2>
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <LoadingSpinner size="lg" />
@@ -199,7 +236,7 @@ export default function ReportsPage() {
                 dataKey="label"
                 stroke="#8c909f"
                 tick={{ fill: '#c2c6d6', fontSize: 11 }}
-                interval="preserveStartEnd"
+                interval={xAxisInterval}
               />
               <YAxis
                 stroke="#8c909f"
@@ -207,7 +244,7 @@ export default function ReportsPage() {
                 unit=" kWh"
               />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="kWh" fill="#4d8eff" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="kWh" fill="#4d8eff" radius={[4, 4, 0, 0]} minPointSize={2} />
             </BarChart>
           </ResponsiveContainer>
         )}

@@ -16,6 +16,12 @@ backend/.venv/
 backend/env/
 backend/venv/
 
+# === Modelos ML (gerados localmente — não versionar) ===
+*.pkl
+*.joblib
+backend/app/ml/models/*.pkl
+!backend/app/ml/models/.gitkeep
+
 # === Node / React Frontend ===
 frontend/node_modules/
 frontend/dist/

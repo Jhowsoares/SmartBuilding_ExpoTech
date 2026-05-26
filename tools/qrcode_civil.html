@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Building — QR Code ExpoTech 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @media print {
+      body { background: #fff; }
+      .no-print { display: none !important; }
+      .card { break-inside: avoid; page-break-inside: avoid; }
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      gap: 24px;
+    }
+    h1 { font-size: 22px; color: #1a2340; font-weight: 700; text-align: center; }
+    .subtitle { font-size: 14px; color: #5c6a8a; text-align: center; }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .card {
+      background: #fff;
+      border: 2px solid #d0d8f0;
+      border-radius: 16px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 260px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #3a4a6a;
+      text-align: center;
+    }
+
+    .qr-box {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #e0e8f8;
+    }
+
+    .url-label {
+      font-size: 10px;
+      color: #8a9ab8;
+      text-align: center;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-blue  { background: #e8efff; color: #2d5be3; }
+    .badge-green { background: #e8fff4; color: #1a9e5c; }
+    .badge-purple{ background: #f3e8ff; color: #7c3aed; }
+
+    .divider {
+      width: 100%;
+      max-width: 900px;
+      border: none;
+      border-top: 1px solid #d0d8f0;
+    }
+
+    .credentials {
+      background: #fff;
+      border: 2px solid #d0d8f0;
+      border-radius: 16px;
+      padding: 24px 28px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .credentials h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a2340;
+      margin-bottom: 16px;
+    }
+
+    .cred-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .cred-item {
+      background: #f5f8ff;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .cred-role { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #5c6a8a; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .cred-email { font-size: 12px; font-family: monospace; color: #1a2340; }
+    .cred-pass  { font-size: 12px; font-family: monospace; color: #2d5be3; font-weight: 600; }
+
+    .services {
+      background: #fff;
+      border: 2px solid #d0d8f0;
+      border-radius: 16px;
+      padding: 24px 28px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .services h2 { font-size: 15px; font-weight: 700; color: #1a2340; margin-bottom: 16px; }
+    .service-list { display: flex; flex-direction: column; gap: 8px; }
+    .service-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f0f4ff; }
+    .service-row:last-child { border-bottom: none; }
+    .service-name { font-size: 13px; font-weight: 600; color: #1a2340; width: 160px; flex-shrink: 0; }
+    .service-url  { font-size: 12px; font-family: monospace; color: #2d5be3; }
+
+    .print-btn {
+      background: #2d5be3;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .print-btn:hover { background: #1a44c8; }
+
+    footer { font-size: 11px; color: #8a9ab8; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h1>Smart Building — ExpoTech 2026</h1>
+  <p class="subtitle">Imprimível para a maquete e bancas de avaliação</p>
+
+  <!-- QR Codes -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-title">Documentação do Projeto</div>
+      <div class="qr-box" id="qr-docs"></div>
+      <span class="badge badge-blue">GitHub Pages</span>
+      <div class="url-label">jhowsoares.github.io/SmartBuilding_ExpoTech</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">API Interativa (Swagger)</div>
+      <div class="qr-box" id="qr-swagger"></div>
+      <span class="badge badge-green">Swagger UI</span>
+      <div class="url-label">localhost:8000/api/docs</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Dashboard React</div>
+      <div class="qr-box" id="qr-dashboard"></div>
+      <span class="badge badge-purple">Dashboard</span>
+      <div class="url-label">localhost:3000</div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Credenciais -->
+  <div class="credentials">
+    <h2>Credenciais de Acesso</h2>
+    <div class="cred-grid">
+      <div class="cred-item">
+        <div class="cred-role">Administrador</div>
+        <div class="cred-email">admin@smartbuilding.local</div>
+        <div class="cred-pass">admin123</div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-role">Operador</div>
+        <div class="cred-email">operador@smartbuilding.local</div>
+        <div class="cred-pass">op123</div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-role">Visualizador</div>
+        <div class="cred-email">visualizador@smartbuilding.local</div>
+        <div class="cred-pass">view123</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Serviços locais -->
+  <div class="services">
+    <h2>Serviços Locais (Docker)</h2>
+    <div class="service-list">
+      <div class="service-row">
+        <div class="service-name">Dashboard React</div>
+        <div class="service-url">http://localhost:3000</div>
+      </div>
+      <div class="service-row">
+        <div class="service-name">Swagger UI</div>
+        <div class="service-url">http://localhost:8000/api/docs</div>
+      </div>
+      <div class="service-row">
+        <div class="service-name">Health Check</div>
+        <div class="service-url">http://localhost:8000/api/v1/health</div>
+      </div>
+      <div class="service-row">
+        <div class="service-name">MQTT Broker</div>
+        <div class="service-url">localhost:1883</div>
+      </div>
+      <div class="service-row">
+        <div class="service-name">Ngrok (tunnel ESP32)</div>
+        <div class="service-url">http://localhost:4040</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="print-btn no-print" onclick="window.print()">Imprimir / Salvar PDF</button>
+  <footer>Smart Building ExpoTech 2026 — Engenharia da Computação</footer>
+
+  <script>
+    function makeQR(elementId, url, size) {
+      new QRCode(document.getElementById(elementId), {
+        text: url,
+        width:  size || 180,
+        height: size || 180,
+        colorDark:  "#1a2340",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+
+    makeQR("qr-docs",      "https://jhowsoares.github.io/SmartBuilding_ExpoTech/");
+    makeQR("qr-swagger",   "http://localhost:8000/api/docs");
+    makeQR("qr-dashboard", "http://localhost:3000");
+  </script>
+</body>
+</html>
