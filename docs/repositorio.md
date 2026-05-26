@@ -9,16 +9,6 @@
 | Imagens Docker (após `docker compose up`) | **2–8 GB** | Não — ficam no Docker Desktop |
 | Volumes do banco (`postgres_data/`) | Cresce com uso | Não — `.gitignore` |
 
-Se um colega disse que o projeto tem **8 GB**, quase sempre é a soma de **clone + Docker images + volumes**, não só o Git.
-
----
-
-## O que já foi corrigido neste projeto
-
-1. **`*.pkl` adicionado ao `.gitignore`** — modelos ML não serão commitados de novo.
-2. **Arquivos `.pkl` removidos do rastreamento Git** — continuam no seu PC local, mas não vão para novos commits.
-3. **`.gitkeep`** em `backend/app/ml/models/` — a pasta existe; o modelo é gerado no treino.
-
 ---
 
 ## Limpar o histórico Git (remover `.pkl` de commits antigos)
