@@ -41,7 +41,7 @@ Login padrão: `admin@smartbuilding.local` / `admin123`
 
 ## Documentação completa
 
-A documentação foi dividida em arquivos menores para facilitar a leitura e a manutenção. **Nenhuma informação foi removida** — apenas reorganizada.
+A documentação foi dividida em arquivos menores para facilitar a leitura e a manutenção.
 
 | Documento | Conteúdo |
 |-----------|----------|
