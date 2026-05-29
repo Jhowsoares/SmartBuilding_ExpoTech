@@ -45,8 +45,8 @@ frontend/build/
 *.sln
 *.swp
 
+docs/rascunho/
 
-docs/rascunho
 
 # Cursor AI
 .cursor/

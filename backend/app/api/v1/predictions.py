@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +14,10 @@ from app.models.sensor_data import SensorData
 
 router = APIRouter(prefix="/predictions", tags=["Predictions"])
 logger = logging.getLogger(__name__)
+
+# Semáforo: apenas 1 treino simultâneo (operação cara, ~30s)
+# Critério de performance/resiliência — throttling por concorrência
+_train_semaphore = asyncio.Semaphore(1)
 
 BRASILIA_OFFSET = timedelta(hours=-3)
 BRASILIA_TZ = timezone(BRASILIA_OFFSET, name="BRT")
@@ -310,40 +315,52 @@ async def trigger_retrain(
     current_user: dict = Depends(require_admin),
 ) -> dict:
     """
-    Treino síncrono para o frontend só seguir quando o modelo estiver pronto.
+    Retreina o modelo ML com os últimos 30 dias de dados de temperatura.
+
+    Throttling: apenas 1 treino simultâneo via semáforo asyncio.
+    Se já houver um treino em andamento, retorna 503 (degradação controlada).
     """
-    from app.ml.predictor import predictor
+    # Throttling por concorrência — critério de performance/resiliência
+    if _train_semaphore.locked():
+        raise HTTPException(
+            status_code=503,
+            detail="Retreinamento já em andamento. Aguarde a conclusão e tente novamente.",
+            headers={"Retry-After": "60"},
+        )
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+    async with _train_semaphore:
+        from app.ml.predictor import predictor
 
-    try:
-        rows = (
-            await db.execute(
-                select(SensorData)
-                .where(
-                    SensorData.tipo == "temperature",
-                    SensorData.timestamp >= cutoff,
+        cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+
+        try:
+            rows = (
+                await db.execute(
+                    select(SensorData)
+                    .where(
+                        SensorData.tipo == "temperature",
+                        SensorData.timestamp >= cutoff,
+                    )
+                    .order_by(SensorData.timestamp)
                 )
-                .order_by(SensorData.timestamp)
-            )
-        ).scalars().all()
-    except Exception:
-        logger.exception("Erro ao buscar dados para treino")
-        return {"message": "Erro ao acessar banco de dados.", "n_samples": 0}
+            ).scalars().all()
+        except Exception:
+            logger.exception("Erro ao buscar dados para treino")
+            return {"message": "Erro ao acessar banco de dados.", "n_samples": 0}
 
-    records = [
-        {"timestamp": r.timestamp, "valor": r.valor, "sensor_id": r.sensor_id}
-        for r in rows
-    ]
+        records = [
+            {"timestamp": r.timestamp, "valor": r.valor, "sensor_id": r.sensor_id}
+            for r in rows
+        ]
 
-    try:
-        metrics = predictor.train(records)
-        logger.info("Treinamento concluído: %s", metrics)
-        return {
-            "message": "Retreinamento concluído com sucesso.",
-            "n_samples": len(records),
-            "metrics": metrics,
-        }
-    except Exception:
-        logger.exception("Falha no treinamento")
-        return {"message": "Falha no retreinamento.", "n_samples": len(records)}
+        try:
+            metrics = predictor.train(records)
+            logger.info("Treinamento concluído: %s", metrics)
+            return {
+                "message": "Retreinamento concluído com sucesso.",
+                "n_samples": len(records),
+                "metrics": metrics,
+            }
+        except Exception:
+            logger.exception("Falha no treinamento")
+            return {"message": "Falha no retreinamento.", "n_samples": len(records)}

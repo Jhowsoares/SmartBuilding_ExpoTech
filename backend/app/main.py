@@ -23,9 +23,9 @@ import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from app.api.v1.router import api_router
 from app.core.config import settings
@@ -142,6 +142,23 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Accept", "X-Request-ID"],
     expose_headers=["X-Request-ID"],
 )
+
+
+# ─────────────────────────────────────────────────────────────
+# MIDDLEWARE — Cache-Control (LGPD / RFC 7234)
+# Respostas da API com dados autenticados nunca devem ser
+# armazenadas em caches intermediários (proxies, CDNs).
+# Assets estáticos do frontend ficam com public+immutable
+# (configurado no nginx.conf do container frontend).
+# ─────────────────────────────────────────────────────────────
+@app.middleware("http")
+async def cache_control_middleware(request: Request, call_next) -> Response:
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        # Dados sensíveis: não cachear em nenhum intermediário (LGPD)
+        response.headers.setdefault("Cache-Control", "private, no-store")
+        response.headers.setdefault("Pragma", "no-cache")
+    return response
 
 
 # ─────────────────────────────────────────────────────────────
