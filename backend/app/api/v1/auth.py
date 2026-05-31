@@ -1,8 +1,8 @@
 """Autenticação JWT — POST /api/v1/auth/login|refresh|logout."""
 
-from __future__ import annotations
 import logging
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
+from app.core.limiter import limiter
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,18 +21,19 @@ _bearer = HTTPBearer(auto_error=False)
 
 
 @router.post("/login", response_model=TokenResponse, summary="Autenticar e obter tokens JWT")
-async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+@limiter.limit("10/minute")
+async def login(request: Request, body: LoginRequest, db: AsyncSession = Depends(get_db)) -> TokenResponse:
     repo = UserRepository(db)
     user = await repo.get_by_email(body.email)
     if not user or not user.is_active:
         raise UnauthorizedError("Credenciais inválidas.")
     if not verify_password(body.password, user.password_hash):
         raise UnauthorizedError("Credenciais inválidas.")
-    payload = {"sub": str(user.id), "email": user.email, "role": user.role.value}
+    token_payload = {"sub": str(user.id), "email": user.email, "role": user.role.value}
     logger.info("Login realizado | email=%s role=%s", user.email, user.role)
     return TokenResponse(
-        access_token=create_access_token(payload),
-        refresh_token=create_refresh_token(payload),
+        access_token=create_access_token(token_payload),
+        refresh_token=create_refresh_token(token_payload),
         token_type="bearer",
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )

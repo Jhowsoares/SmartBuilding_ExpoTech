@@ -5,7 +5,7 @@ import uuid
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_db, require_admin
+from app.core.deps import get_db, get_current_user, require_admin
 from app.schemas.base import PaginationMeta
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from app.services.user_service import UserService
@@ -44,7 +44,7 @@ async def create_user(
             summary="Perfil do usuário autenticado")
 async def get_me(
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_admin),
+    current_user: dict = Depends(get_current_user),
 ) -> UserResponse:
     from app.repositories.user_repository import UserRepository
     repo = UserRepository(db)

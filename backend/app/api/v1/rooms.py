@@ -1,21 +1,26 @@
 """Salas — /api/v1/rooms — CRUD completo."""
-from __future__ import annotations
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.deps import get_current_user, get_db, require_admin
 from app.schemas.base import PaginationMeta
 from app.schemas.room import RoomCreate, RoomResponse, RoomUpdate
 from app.services.room_service import RoomService
 
 router = APIRouter(prefix="/rooms", tags=["Rooms"])
+_limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("", status_code=200, summary="Listar salas")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def list_rooms(
+    request: Request,
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
     building: Optional[str] = Query(None, max_length=100),
@@ -33,7 +38,9 @@ async def list_rooms(
 
 @router.post("", response_model=RoomResponse, status_code=status.HTTP_201_CREATED,
              summary="Cadastrar sala")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def create_room(
+    request: Request,
     payload: RoomCreate,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_admin),
@@ -44,8 +51,10 @@ async def create_room(
 
 @router.get("/{room_id}", response_model=RoomResponse, status_code=200,
             summary="Detalhes de uma sala")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_room(
     room_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ) -> RoomResponse:
@@ -55,8 +64,10 @@ async def get_room(
 
 @router.patch("/{room_id}", response_model=RoomResponse, status_code=200,
               summary="Atualizar sala")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def update_room(
     room_id: uuid.UUID,
+    request: Request,
     payload: RoomUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_admin),
@@ -66,8 +77,10 @@ async def update_room(
 
 
 @router.delete("/{room_id}", status_code=204, response_class=Response, summary="Excluir sala")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def delete_room(
     room_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ) -> Response:

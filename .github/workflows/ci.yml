@@ -1,0 +1,125 @@
+name: CI — Lint + Testes
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # -------------------------------------------------------
+  # 1. Lint do contrato OpenAPI com Spectral
+  # -------------------------------------------------------
+  lint-openapi:
+    name: Lint OpenAPI (Spectral)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Spectral
+        run: npm install -g @stoplight/spectral-cli
+
+      - name: Lint openapi.yaml
+        run: spectral lint docs/openapi.yaml --ruleset .spectral.yml --fail-severity warn
+
+  # -------------------------------------------------------
+  # 2. Testes de backend (pytest)
+  # -------------------------------------------------------
+  test-backend:
+    name: Testes Backend (pytest)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: smartbuilding
+          POSTGRES_PASSWORD: smartbuilding
+          POSTGRES_DB: smartbuilding_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U smartbuilding"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r backend/requirements.txt
+
+      - name: Copiar .env de exemplo
+        run: cp backend/.env.example backend/.env
+
+      - name: Rodar migrações
+        run: |
+          cd backend
+          alembic upgrade head
+        env:
+          DATABASE_URL: postgresql+asyncpg://smartbuilding:smartbuilding@localhost:5432/smartbuilding_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: Executar testes
+        run: |
+          cd backend
+          pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
+        env:
+          DATABASE_URL: postgresql+asyncpg://smartbuilding:smartbuilding@localhost:5432/smartbuilding_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET_KEY: ci-test-secret-key-nao-use-em-producao
+          ENVIRONMENT: test
+
+      - name: Upload cobertura
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: backend/htmlcov/
+
+  # -------------------------------------------------------
+  # 3. Verificação de contrato: openapi.yaml sincronizado
+  # -------------------------------------------------------
+  contract-check:
+    name: Verificar contrato OpenAPI exportado
+    runs-on: ubuntu-latest
+    needs: test-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: pip install -r backend/requirements.txt
+
+      - name: Exportar openapi.yaml do FastAPI
+        run: |
+          cd backend
+          python tools/export_openapi.py
+        env:
+          EXPORT_ONLY: "true"
+
+      - name: Verificar se openapi.yaml está atualizado
+        run: |
+          if ! git diff --exit-code docs/openapi.yaml; then
+            echo "::error::openapi.yaml está desatualizado. Rode 'python tools/export_openapi.py' e commite o resultado."
+            exit 1
+          fi

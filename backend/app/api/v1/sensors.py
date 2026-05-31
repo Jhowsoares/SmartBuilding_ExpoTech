@@ -1,13 +1,15 @@
 """Sensores IoT — /api/v1/sensors/*"""
 
-from __future__ import annotations
 import logging, re
 from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.deps import get_current_user, get_db
 from app.core.exceptions import ResourceNotFoundError
 from app.schemas.base import HateoasLink, PaginationMeta
@@ -20,10 +22,12 @@ from app.services.sensor_service import SensorService
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
 _SENSOR_RE = re.compile(r"^sensor-(temperature|humidity|presence)-.+$")
+_limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/data", response_model=SensorDataResponse, status_code=status.HTTP_201_CREATED,
              summary="Ingerir leitura de sensor IoT")
+@_limiter.limit(settings.RATE_LIMIT_SENSOR_INGEST)
 async def ingest_sensor_data(
     payload: SensorDataIngest,
     request: Request,
@@ -39,7 +43,9 @@ async def ingest_sensor_data(
 
 @router.get("", response_model=SensorListResponse, status_code=200,
             summary="Listar sensores registrados", name="list_sensors")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def list_sensors(
+    request: Request,
     page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100),
     tipo: Optional[SensorTipo] = Query(None),
     db: AsyncSession = Depends(get_db),
@@ -56,8 +62,10 @@ async def list_sensors(
 
 @router.get("/{sensor_id}", response_model=SensorResponse, status_code=200,
             summary="Detalhes de um sensor", name="get_sensor")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_sensor(
     sensor_id: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ) -> SensorResponse:
@@ -78,8 +86,10 @@ async def get_sensor(
 
 
 @router.get("/{sensor_id}/data", status_code=200, summary="Histórico de leituras", name="get_sensor_history")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_sensor_history(
     sensor_id: str,
+    request: Request,
     period: str = Query("24h", pattern="^(1h|24h|7d|30d)$"),
     page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100),
     anomalies_only: bool = Query(False),
@@ -100,8 +110,10 @@ async def get_sensor_history(
 
 @router.get("/{sensor_id}/latest", response_model=SensorLatestResponse, status_code=200,
             summary="Última leitura de um sensor", name="get_sensor_latest")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_sensor_latest(
     sensor_id: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ) -> SensorLatestResponse:

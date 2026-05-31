@@ -169,7 +169,7 @@ export default function SystemStatusPage() {
         </div>
       </div>
 
-      {/* MQTT connections */}
+      {/* MQTT connections
       <div className="card p-6">
         <h3 className="text-white font-semibold mb-4">Conexões MQTT Ativas</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -187,7 +187,7 @@ export default function SystemStatusPage() {
             <p className="text-gray-400 text-sm mt-1">Subscribers (Painéis)</p>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

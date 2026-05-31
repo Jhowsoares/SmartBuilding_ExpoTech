@@ -26,10 +26,16 @@ from typing import AsyncGenerator
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from app.errors.handlers import register_error_handlers
+from app.middleware.rate_limit import RateLimitMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
+from app.core.limiter import limiter
 
 # ─────────────────────────────────────────────────────────────
 # LOGGING
@@ -78,8 +84,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     from app.mqtt.client import mqtt_client
     from app.mqtt.handlers import register_mqtt_subscriptions, set_main_event_loop
     try:
-        # Grava o loop principal para que os callbacks MQTT
-        # (em thread paho) possam usar run_coroutine_threadsafe
         set_main_event_loop(asyncio.get_running_loop())
         mqtt_client.connect()
         register_mqtt_subscriptions()
@@ -106,11 +110,9 @@ app = FastAPI(
     title=settings.APP_TITLE,
     description=settings.APP_DESCRIPTION,
     version=settings.APP_VERSION,
-    # Swagger e ReDoc sob /api/docs e /api/redoc (RNF06)
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
-    # Referência ao contrato externo (Design API-First)
     openapi_tags=[
         {"name": "Health",      "description": "Monitoramento de saúde dos subsistemas"},
         {"name": "Auth",        "description": "Autenticação e gestão de tokens JWT"},
@@ -124,15 +126,15 @@ app = FastAPI(
         {"name": "Users",       "description": "Gestão de usuários e controle de acesso (RBAC)"},
     ],
     lifespan=lifespan,
-    # Segurança: não expor detalhes de servidor no header
-    # (configurado via proxy reverso em produção)
 )
 
+app.add_middleware(RateLimitMiddleware)
+register_error_handlers(app)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ─────────────────────────────────────────────────────────────
 # CORS
-# Permite que o frontend React (localhost:3000/5173) e o dashboard
-# em produção consumam a API sem bloqueios de browser.
 # ─────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
@@ -146,16 +148,11 @@ app.add_middleware(
 
 # ─────────────────────────────────────────────────────────────
 # MIDDLEWARE — Cache-Control (LGPD / RFC 7234)
-# Respostas da API com dados autenticados nunca devem ser
-# armazenadas em caches intermediários (proxies, CDNs).
-# Assets estáticos do frontend ficam com public+immutable
-# (configurado no nginx.conf do container frontend).
 # ─────────────────────────────────────────────────────────────
 @app.middleware("http")
 async def cache_control_middleware(request: Request, call_next) -> Response:
     response = await call_next(request)
     if request.url.path.startswith("/api/"):
-        # Dados sensíveis: não cachear em nenhum intermediário (LGPD)
         response.headers.setdefault("Cache-Control", "private, no-store")
         response.headers.setdefault("Pragma", "no-cache")
     return response
@@ -169,7 +166,6 @@ register_exception_handlers(app)
 
 # ─────────────────────────────────────────────────────────────
 # ROUTERS
-# Todos sob /api/v1 conforme openapi.yaml → servers[0].url
 # ─────────────────────────────────────────────────────────────
 app.include_router(api_router, prefix="/api/v1")
 

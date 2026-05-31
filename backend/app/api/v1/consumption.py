@@ -1,9 +1,10 @@
 """Consumo energético — /api/v1/consumption."""
-from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +13,7 @@ from app.core.deps import get_current_user, get_db
 from app.models.sensor_data import SensorData
 
 router = APIRouter(prefix="/consumption", tags=["Consumption"])
+_limiter = Limiter(key_func=get_remote_address)
 
 # Constantes de consumo estimado (RN10 — eficiência energética)
 _KW_POR_GRAU_ACIMA_IDEAL = 0.15   # kW extra por grau acima de 25°C
@@ -70,7 +72,9 @@ def _aggregate_hourly_to_daily(hourly: list[dict]) -> list[dict]:
 
 
 @router.get("", status_code=200, summary="Histórico de consumo energético")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_consumption(
+    request: Request,
     period: str = Query("24h", pattern="^(24h|7d|30d)$"),
     device_id: Optional[str] = Query(None),
     db: AsyncSession = Depends(get_db),
@@ -137,7 +141,9 @@ async def get_consumption(
 
 
 @router.get("/summary", status_code=200, summary="Resumo de consumo por sala")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_consumption_summary(
+    request: Request,
     period: str = Query("7d", pattern="^(24h|7d|30d)$"),
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),

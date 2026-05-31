@@ -1,11 +1,10 @@
-from __future__ import annotations
-
 import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from app.core.limiter import limiter
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -310,7 +309,9 @@ async def get_predictions_24h(
 
 
 @router.post("/train", status_code=202)
+@limiter.limit("3/hour")
 async def trigger_retrain(
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ) -> dict:

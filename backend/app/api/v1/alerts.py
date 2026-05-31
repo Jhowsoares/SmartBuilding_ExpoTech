@@ -1,11 +1,13 @@
 """Alertas — /api/v1/alerts."""
-from __future__ import annotations
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.deps import get_current_user, get_db, require_operador
 from app.models.alert import AlertSeverity
 from app.schemas.alert import AlertCreate, AlertResponse
@@ -13,10 +15,13 @@ from app.schemas.base import PaginationMeta
 from app.services.alert_service import AlertService
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
+_limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("", status_code=200, summary="Listar alertas")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def list_alerts(
+    request: Request,
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
     active_only: bool = Query(False, description="Somente alertas não resolvidos"),
@@ -37,7 +42,9 @@ async def list_alerts(
 
 
 @router.get("/history", status_code=200, summary="Histórico de alertas")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_alert_history(
+    request: Request,
     days: int = Query(30, ge=1, le=365),
     page: int = Query(1, ge=1),
     size: int = Query(50, ge=1, le=200),
@@ -55,7 +62,9 @@ async def get_alert_history(
 
 @router.post("", response_model=AlertResponse, status_code=status.HTTP_201_CREATED,
              summary="Criar alerta manualmente")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def create_alert(
+    request: Request,
     payload: AlertCreate,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_operador),
@@ -66,8 +75,10 @@ async def create_alert(
 
 @router.get("/{alert_id}", response_model=AlertResponse, status_code=200,
             summary="Detalhes de um alerta")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_alert(
     alert_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ) -> AlertResponse:
@@ -77,8 +88,10 @@ async def get_alert(
 
 @router.post("/{alert_id}/acknowledge", response_model=AlertResponse, status_code=200,
              summary="Reconhecer alerta")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def acknowledge_alert(
     alert_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_operador),
 ) -> AlertResponse:
@@ -88,8 +101,10 @@ async def acknowledge_alert(
 
 @router.post("/{alert_id}/resolve", response_model=AlertResponse, status_code=200,
              summary="Resolver alerta")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def resolve_alert(
     alert_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_operador),
 ) -> AlertResponse:

@@ -1,0 +1,108 @@
+extends: [[spectral:oas, off]]
+
+rules:
+  # -------------------------------------------------------
+  # Regras obrigatórias — falha o CI se violadas
+  # -------------------------------------------------------
+
+  # Todo endpoint deve ter operationId
+  operation-operationId:
+    description: "Todo endpoint precisa de operationId único."
+    given: "$.paths[*][get,post,put,patch,delete]"
+    severity: error
+    then:
+      field: operationId
+      function: truthy
+
+  # Todo endpoint deve ter summary
+  operation-summary:
+    description: "Todo endpoint precisa de summary."
+    given: "$.paths[*][get,post,put,patch,delete]"
+    severity: error
+    then:
+      field: summary
+      function: truthy
+
+  # Todos os schemas nos responses devem ter description
+  response-schema-description:
+    description: "Responses 2xx devem ter description."
+    given: "$.paths[*][*].responses[2*]"
+    severity: warn
+    then:
+      field: description
+      function: truthy
+
+  # Parâmetros de query devem ter description
+  parameter-description:
+    description: "Parâmetros devem ter description."
+    given: "$.paths[*][*].parameters[*]"
+    severity: warn
+    then:
+      field: description
+      function: truthy
+
+  # Erros 4xx devem usar o schema de Problem Details (RFC 7807)
+  error-response-rfc7807:
+    description: "Respostas 4xx devem referenciar o schema ProblemDetail (RFC 7807)."
+    given: "$.paths[*][*].responses[4*].content.application/json.schema"
+    severity: error
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          required: [type, title, status, detail]
+
+  # Nomes de propriedades em snake_case
+  property-snake-case:
+    description: "Propriedades dos schemas devem usar snake_case."
+    given: "$.components.schemas[*].properties[*]~"
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-z0-9_]*$"
+
+  # Paths em kebab-case
+  path-kebab-case:
+    description: "Segmentos de path devem usar kebab-case."
+    given: "$.paths[*]~"
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(/[a-z0-9{}-]+)+$"
+
+  # Versão /v1 obrigatória
+  path-versioned:
+    description: "Todos os paths da API devem conter /v1/."
+    given: "$.paths[*]~"
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^/api/v[0-9]+"
+
+  # Respostas de erro 5xx devem estar documentadas
+  server-error-documented:
+    description: "Endpoints devem documentar resposta 500 ou 503."
+    given: "$.paths[*][post,put,patch,delete]"
+    severity: warn
+    then:
+      field: responses
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          anyOf:
+            - required: ["500"]
+            - required: ["503"]
+
+  # Tags obrigatórias nos endpoints
+  operation-tags:
+    description: "Todo endpoint deve ter pelo menos uma tag."
+    given: "$.paths[*][get,post,put,patch,delete]"
+    severity: warn
+    then:
+      field: tags
+      function: truthy

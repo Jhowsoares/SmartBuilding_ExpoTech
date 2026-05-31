@@ -1,11 +1,13 @@
 """Dispositivos — /api/v1/devices — CRUD completo + controle."""
-from __future__ import annotations
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.deps import get_current_user, get_db, require_admin, require_operador
 from app.models.device import DeviceStatus
 from app.schemas.base import PaginationMeta
@@ -16,10 +18,13 @@ from app.schemas.device import (
 from app.services.device_service import DeviceService
 
 router = APIRouter(prefix="/devices", tags=["Devices"])
+_limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get("", status_code=200, summary="Listar dispositivos")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def list_devices(
+    request: Request,
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
     room_id: Optional[uuid.UUID] = Query(None),
@@ -38,7 +43,9 @@ async def list_devices(
 
 @router.post("", response_model=DeviceResponse, status_code=status.HTTP_201_CREATED,
              summary="Cadastrar dispositivo")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def create_device(
+    request: Request,
     payload: DeviceCreate,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_admin),
@@ -49,8 +56,10 @@ async def create_device(
 
 @router.get("/{device_id}", response_model=DeviceResponse, status_code=200,
             summary="Detalhes de um dispositivo")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_device(
     device_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ) -> DeviceResponse:
@@ -60,8 +69,10 @@ async def get_device(
 
 @router.patch("/{device_id}", response_model=DeviceResponse, status_code=200,
               summary="Atualizar dispositivo")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def update_device(
     device_id: uuid.UUID,
+    request: Request,
     payload: DeviceUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_admin),
@@ -71,8 +82,10 @@ async def update_device(
 
 
 @router.delete("/{device_id}", status_code=204, response_class=Response, summary="Desativar dispositivo")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def delete_device(
     device_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_admin),
 ) -> Response:
@@ -83,8 +96,10 @@ async def delete_device(
 
 @router.post("/{device_id}/control", response_model=DeviceControlResponse, status_code=200,
              summary="Controlar dispositivo (ligar/desligar/setpoint)")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def control_device(
     device_id: uuid.UUID,
+    request: Request,
     payload: DeviceControlRequest,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_operador),
@@ -95,8 +110,10 @@ async def control_device(
 
 @router.get("/{device_id}/status", response_model=DeviceResponse, status_code=200,
             summary="Status atual do dispositivo")
+@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_device_status(
     device_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ) -> DeviceResponse:

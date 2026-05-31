@@ -75,10 +75,19 @@ FastAPI · PostgreSQL · Redis · Mosquitto MQTT · React 18 · Docker Compose �
 
 ---
 
+## ⚡ Performance e Acordo de Nível de Serviço (SLA)
+
+Para garantir a alta disponibilidade e a eficiência na ingestão de dados IoT e controle predial, o sistema foi projetado seguindo rígidos critérios de performance.
+
+* **SLO (Objetivo de Nível de Serviço):** 99% das respostas em < 300ms em ambiente local.
+
+---
+
 ## Repositório pesado?
 
 Se o clone ou a pasta parecem ter **vários GB**, leia **[docs/repositorio.md](docs/repositorio.md)**.
-
+| **[Repositório — tamanho](docs/repositorio.md)** | Por que o clone parece pesado, como limpar |
+| **[Política de Depreciação](docs/deprecation-policy.md)** | Diretrizes de ciclo de vida e desativação de endpoints legados (Critério 5) |
 Resumo:
 
 - O **Git** tinha modelos ML (`.pkl` ~50 MB) versionados — agora estão no `.gitignore`.
