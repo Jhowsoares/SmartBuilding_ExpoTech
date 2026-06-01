@@ -33,27 +33,22 @@ jobs:
   test-backend:
     name: Testes Backend (pytest)
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: smartbuilding
-          POSTGRES_PASSWORD: smartbuilding
-          POSTGRES_DB: smartbuilding_test
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U smartbuilding"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-      redis:
-        image: redis:7-alpine
-        ports: ["6379:6379"]
-        options: --health-cmd "redis-cli ping" --health-interval 5s --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup PostgreSQL
+        uses: ikalnytskyi/action-setup-postgres@v8
+        with:
+          username: smartbuilding
+          password: smartbuilding
+          database: smartbuilding_test
+          postgres-version: "15"
+
+      - name: Start Redis
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y redis-server
+          sudo systemctl start redis-server
 
       - name: Setup Python
         uses: actions/setup-python@v5
