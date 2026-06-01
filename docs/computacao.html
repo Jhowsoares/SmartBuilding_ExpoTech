@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eng. Computação — Smart Building</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="container inner">
+      <a class="site-brand" href="./index.html">
+        <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
+        Smart Building
+      </a>
+      <div class="site-links">
+        <a href="./index.html">Apresentação</a>
+        <a href="./engenharias.html">Integrador</a>
+        <a href="./sistema.html">Arquitetura</a>
+        <a href="./api.html" class="nav-cta">API</a>
+        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="eng-subnav">
+    <div class="container inner">
+      <a href="./engenharias.html">Panorama</a>
+      <a href="./civil.html">Civil</a>
+      <a href="./eletrica.html">Elétrica</a>
+      <a href="./producao.html">Produção</a>
+      <a href="./computacao.html" class="active">Computação</a>
+    </div>
+  </div>
+
+  <main class="container page-main">
+    <h1>Engenharia da Computação</h1>
+    <p class="page-sub">Plataforma digital: API REST, ingestão MQTT, machine learning, dashboard React e pipeline DevOps — núcleo técnico do Smart Building.</p>
+
+    <section class="page-section">
+      <h2>Stack entregue</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Camada</th><th>Tecnologia</th></tr></thead>
+          <tbody>
+            <tr><td>API REST</td><td>FastAPI, OpenAPI 3.1, JWT/RBAC, RFC 7807</td></tr>
+            <tr><td>Dados</td><td>PostgreSQL 15, Redis 7, Alembic</td></tr>
+            <tr><td>IoT</td><td>Mosquitto MQTT, simulador Python, ESP32</td></tr>
+            <tr><td>IA</td><td>scikit-learn — predição de consumo 24h</td></tr>
+            <tr><td>Frontend</td><td>React 18, Tailwind, Recharts</td></tr>
+            <tr><td>DevOps</td><td>Docker Compose, GitHub Actions (Spectral + pytest)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <h2>Fluxo de dados</h2>
+      <pre class="flow-pre">Simulador / ESP32 / Arduino+BT
+         ↓ MQTT
+    Backend FastAPI → PostgreSQL
+         ↓ REST /api/v1/*
+    Dashboard React</pre>
+    </section>
+
+    <section class="page-section">
+      <h2>Documentação técnica</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="card-head">
+            <div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg></div>
+            <h3>Arquitetura completa</h3>
+          </div>
+          <p>Diagrama C4, regras RN01–RN10, MQTT, ESP32 e estrutura do repositório.</p>
+          <div class="card-actions"><a class="btn" href="./sistema.html">Abrir sistema.html</a></div>
+        </article>
+        <article class="card">
+          <div class="card-head">
+            <div class="icon-box amber"><svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M8 11h8M8 14h5"/></svg></div>
+            <h3>Contrato da API</h3>
+          </div>
+          <p>OpenAPI versionado, ReDoc interativo, autenticação e exemplos de erro.</p>
+          <div class="card-actions"><a class="btn" href="./api.html">Abrir ReDoc</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <h2>Entregáveis em PDF</h2>
+      <div class="doc-links">
+        <a class="btn" href="./engenharias/entregaveis/em_pdf/Arquitetura%20do%20sistema.pdf">Arquitetura do sistema</a>
+        <a class="btn btn-outline" href="./engenharias/entregaveis/em_pdf/Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf">Escopo e arquitetura funcional</a>
+        <a class="btn btn-outline" href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">Repositório GitHub</a>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <h2>Documentação fonte (Markdown)</h2>
+      <p class="page-sub">Textos completos no repositório — mapeados para cada seção de <a href="./sistema.html" style="color:var(--btn)">sistema.html</a>.</p>
+      <div class="doc-links">
+        <a class="btn btn-outline" href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech/blob/main/docs/sistema/architecture.md">architecture.md</a>
+        <a class="btn btn-outline" href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech/blob/main/docs/sistema/api.md">api.md</a>
+        <a class="btn btn-outline" href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech/blob/main/docs/sistema/mqtt.md">mqtt.md</a>
+        <a class="btn btn-outline" href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech/blob/main/docs/sistema/business-rules.md">business-rules.md</a>
+        <a class="btn btn-outline" href="./documentacao.html">Ver mapa completo →</a>
+      </div>
+    </section>
+
+    <p class="team-box"><strong>Equipe Computação:</strong> Jhonata, João Arnaldo, Rickelmy, Felipe, Claudio</p>
+  </main>
+
+  <footer class="site-footer">
+    <a href="./engenharias.html">← Voltar ao Integrador</a>
+  </footer>
+</body>
+</html>

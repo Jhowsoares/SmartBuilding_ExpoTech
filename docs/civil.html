@@ -6,83 +6,89 @@
   <title>Eng. Civil — Smart Building</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./assets/site.css" />
-  <style>
-    h1{font-size:clamp(22px,4vw,32px);margin-bottom:8px}
-    .page-sub{color:var(--muted);margin-bottom:28px;font-size:14px}
-    section{margin-bottom:40px}
-    section h2{font-size:18px;margin-bottom:12px;color:var(--accent)}
-    ul{padding-left:20px;color:var(--muted);font-size:14px}
-    li{margin-bottom:8px}
-    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-    .fig{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    .fig img{width:100%;height:220px;object-fit:cover;display:block;background:var(--surface)}
-    .fig .cap{padding:14px;font-size:13px;color:var(--muted)}
-    .fig .cap strong{color:var(--text);display:block;margin-bottom:4px}
-    .placeholder{height:220px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#141b2b,#1a2744);color:var(--muted);font-size:13px;text-align:center;padding:20px}
-    .team{font-size:14px;color:var(--muted);margin-top:24px;padding:16px;background:var(--card);border-radius:10px;border:1px solid var(--border)}
-    main{padding:32px 0 16px}
-  </style>
 </head>
 <body>
   <nav class="site-nav">
     <div class="container inner">
       <a class="site-brand" href="./index.html">
         <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
-        Eng. Civil
+        Smart Building
       </a>
       <div class="site-links">
         <a href="./index.html">Apresentação</a>
         <a href="./engenharias.html">Integrador</a>
         <a href="./sistema.html">Arquitetura</a>
-        <a href="./api.html">API</a>
+        <a href="./api.html" class="nav-cta">API</a>
+        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
       </div>
     </div>
   </nav>
 
-  <main class="container">
-    <h1>Engenharia Civil</h1>
-    <p class="page-sub">Infraestrutura física, conforto térmico, eficiência energética e maquete de apresentação — laboratório de elétrica (subsolo).</p>
+  <div class="eng-subnav">
+    <div class="container inner">
+      <a href="./engenharias.html">Panorama</a>
+      <a href="./civil.html" class="active">Civil</a>
+      <a href="./eletrica.html">Elétrica</a>
+      <a href="./producao.html">Produção</a>
+      <a href="./computacao.html">Computação</a>
+    </div>
+  </div>
 
-    <section>
+  <main class="container page-main">
+    <h1>Engenharia Civil</h1>
+    <p class="page-sub">Infraestrutura física, conforto térmico, eficiência energética, maquete de apresentação e <strong>modelo 3D</strong> do laboratório de elétrica (subsolo).</p>
+
+    <section class="page-section">
       <h2>Contribuições no projeto</h2>
-      <ul>
+      <ul class="page-list">
         <li>Levantamento das características das salas e pontos para sensores</li>
         <li>Avaliação de vedação, condensação e isolamento térmico de tubulações</li>
         <li>Projeto e construção da maquete física para a ExpoTech</li>
+        <li>Modelo / vista 3D do ambiente monitorado (entrega formal em PDF)</li>
         <li>Integração com Elétrica (passagem de cabos) e Computação (QR codes → dashboard)</li>
       </ul>
     </section>
 
-    <section>
-      <h2>Modelo 3D e maquete</h2>
-      <p class="page-sub" style="margin-bottom:16px">Visualização do ambiente monitorado. Imagens abaixo — adicione arquivos em <code style="color:var(--accent);font-size:12px">docs/engenharias/assets/</code> para substituir os placeholders.</p>
+    <section class="page-section" id="modelo-3d">
+      <h2>Modelo 3D do laboratório</h2>
+      <p class="page-sub">Entrega Civil: vista 3D do subsolo com eletrodutos, ar-condicionado e tablet de controle. Visualize abaixo ou baixe o PDF.</p>
+      <iframe
+        class="pdf-viewer"
+        title="Vista 3D — laboratório de elétrica"
+        src="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf">
+      </iframe>
+      <div class="doc-links">
+        <a class="btn" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf">Baixar vista 3D (PDF)</a>
+        <a class="btn btn-outline" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf">Relatório integrador Civil (PDF)</a>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <h2>Maquete e infraestrutura</h2>
+      <p class="page-sub">Fotos da maquete física e detalhes construtivos — adicione imagens em <code style="color:var(--accent);font-size:12px">docs/engenharias/assets/</code>.</p>
       <div class="gallery">
         <figure class="fig">
-          <img src="./engenharias/assets/maquete-3d.jpg" alt="Modelo 3D do laboratório"
+          <img src="./engenharias/assets/maquete-3d.jpg" alt="Modelo 3D"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-          <div class="placeholder" style="display:none">Adicionar <strong>maquete-3d.jpg</strong><br>em engenharias/assets/</div>
-          <figcaption class="cap"><strong>Vista 3D</strong> Laboratório de elétrica — subsolo do prédio principal</figcaption>
+          <div class="fig-placeholder" style="display:none">Adicionar <strong>maquete-3d.jpg</strong></div>
+          <figcaption class="cap"><strong>Render / foto 3D</strong> Laboratório — subsolo</figcaption>
         </figure>
         <figure class="fig">
           <img src="./engenharias/assets/maquete-fisica.jpg" alt="Maquete física"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-          <div class="placeholder" style="display:none">Adicionar <strong>maquete-fisica.jpg</strong></div>
-          <figcaption class="cap"><strong>Maquete física</strong> Suporte para sensores e fiação na apresentação</figcaption>
+          <div class="fig-placeholder" style="display:none">Adicionar <strong>maquete-fisica.jpg</strong></div>
+          <figcaption class="cap"><strong>Maquete física</strong> Suporte para sensores na feira</figcaption>
         </figure>
         <figure class="fig">
-          <img src="./engenharias/assets/infraestrutura.jpg" alt="Infraestrutura e isolamento"
+          <img src="./engenharias/assets/infraestrutura.jpg" alt="Infraestrutura"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-          <div class="placeholder" style="display:none">Adicionar <strong>infraestrutura.jpg</strong></div>
-          <figcaption class="cap"><strong>Infraestrutura</strong> Eletroduto aparente e barreira térmica</figcaption>
+          <div class="fig-placeholder" style="display:none">Adicionar <strong>infraestrutura.jpg</strong></div>
+          <figcaption class="cap"><strong>Infraestrutura</strong> Isolamento térmico e eletroduto</figcaption>
         </figure>
-      </div>
-      <div class="card-actions" style="margin-top:16px">
-        <a class="btn" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf">Baixar PDF — visão geral 3D</a>
-        <a class="btn btn-outline" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf">Relatório Civil (PDF)</a>
       </div>
     </section>
 
-    <p class="team"><strong style="color:var(--text)">Equipe Civil:</strong> Kayke, Nicolas, Renan, Lucca, Bruno</p>
+    <p class="team-box"><strong>Equipe Civil:</strong> Kayke Rennan Lima Matos · Nicolas Soares Pires · Renan Soares · Lucca Martins · Bruno Cassiano</p>
   </main>
 
   <footer class="site-footer">

@@ -35,12 +35,21 @@
       <div class="site-links">
         <a href="./index.html">Apresentação</a>
         <a href="./sistema.html">Arquitetura</a>
-        <a href="./civil.html">Eng. Civil</a>
         <a href="./api.html" class="nav-cta">API (ReDoc)</a>
         <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
       </div>
     </div>
   </nav>
+
+  <div class="eng-subnav">
+    <div class="container inner">
+      <a href="./engenharias.html" class="active">Panorama</a>
+      <a href="./civil.html">Civil</a>
+      <a href="./eletrica.html">Elétrica</a>
+      <a href="./producao.html">Produção</a>
+      <a href="./computacao.html">Computação</a>
+    </div>
+  </div>
 
   <div class="hero container">
     <span class="pill">ExpoTech 2026 · UniFECAF</span>
@@ -60,6 +69,7 @@
         <p>Infraestrutura, conforto térmico, maquete e modelo 3D.</p>
         <div class="card-links">
           <a href="./civil.html">Página Civil →</a>
+          <a href="./civil.html#modelo-3d">Vista 3D →</a>
           <a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf">PDF →</a>
         </div>
       </div>
@@ -70,7 +80,7 @@
         </div>
         <p>Arduino, sensores, Bluetooth, integração MQTT.</p>
         <div class="card-links">
-          <a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf">PDF conceito →</a>
+          <a href="./eletrica.html">Página Elétrica →</a>
         </div>
       </div>
       <div class="card">
@@ -80,6 +90,7 @@
         </div>
         <p>CAPEX, OPEX, ROI e cronograma integrado.</p>
         <div class="card-links">
+          <a href="./producao.html">Página Produção →</a>
           <a href="./engenharias/entregaveis/em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf">PDF →</a>
         </div>
       </div>
@@ -90,8 +101,8 @@
         </div>
         <p>API REST, MQTT, ML, dashboard React.</p>
         <div class="card-links">
+          <a href="./computacao.html">Página Computação →</a>
           <a href="./sistema.html">Arquitetura →</a>
-          <a href="./engenharias/entregaveis/em_pdf/Arquitetura%20do%20sistema.pdf">PDF →</a>
         </div>
       </div>
     </div>
@@ -210,10 +221,10 @@
       <table>
         <thead><tr><th>Documento</th><th>Área</th><th>Download</th></tr></thead>
         <tbody>
-        <tr><td>Relatório integrador</td><td>Eng. Civil</td><td><a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
-<tr><td>Relatório financeiro</td><td>Eng. Produção</td><td><a href="./engenharias/entregaveis/em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
-<tr><td>Visão geral do laboratório</td><td>Conceito</td><td><a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
-<tr><td>Arquitetura do sistema</td><td>Eng. Computação</td><td><a href="./engenharias/entregaveis/em_pdf/Arquitetura%20do%20sistema.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
+        <tr><td>Relatório integrador</td><td>Eng. Civil</td><td><a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf" style="color:#4d8eff">Baixar PDF</a> · <a href="./civil.html" style="color:#4d8eff">Página</a></td></tr>
+<tr><td>Vista 3D do laboratório</td><td>Eng. Civil</td><td><a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf" style="color:#4d8eff">Baixar PDF</a> · <a href="./civil.html#modelo-3d" style="color:#4d8eff">Visualizar</a></td></tr>
+<tr><td>Relatório financeiro</td><td>Eng. Produção</td><td><a href="./engenharias/entregaveis/em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf" style="color:#4d8eff">Baixar PDF</a> · <a href="./producao.html" style="color:#4d8eff">Página</a></td></tr>
+<tr><td>Arquitetura do sistema</td><td>Eng. Computação</td><td><a href="./engenharias/entregaveis/em_pdf/Arquitetura%20do%20sistema.pdf" style="color:#4d8eff">Baixar PDF</a> · <a href="./computacao.html" style="color:#4d8eff">Página</a></td></tr>
 <tr><td>Escopo e arquitetura funcional</td><td>Eng. Computação</td><td><a href="./engenharias/entregaveis/em_pdf/Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
 <tr><td>Cronograma integrado</td><td>Todas</td><td><a href="./engenharias/entregaveis/cronograma-projeto-faculdade.xlsb" style="color:#4d8eff">Baixar Excel (.xlsb)</a></td></tr>
         </tbody>
@@ -234,7 +245,11 @@
 
   <footer class="site-footer">
     <p>Smart Building · ExpoTech 2026</p>
-    <p style="margin-top:8px"><a href="./index.html">Apresentação</a> · <a href="./sistema.html">Arquitetura</a></p>
+    <p style="margin-top:8px">
+      <a href="./index.html">Apresentação</a> ·
+      <a href="./documentacao.html">Mapa docs</a> ·
+      <a href="./sistema.html">Arquitetura</a>
+    </p>
   </footer>
 
   <script>

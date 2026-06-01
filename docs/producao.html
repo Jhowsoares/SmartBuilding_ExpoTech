@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eng. Produção — Smart Building</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="container inner">
+      <a class="site-brand" href="./index.html">
+        <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
+        Smart Building
+      </a>
+      <div class="site-links">
+        <a href="./index.html">Apresentação</a>
+        <a href="./engenharias.html">Integrador</a>
+        <a href="./sistema.html">Arquitetura</a>
+        <a href="./api.html" class="nav-cta">API</a>
+        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="eng-subnav">
+    <div class="container inner">
+      <a href="./engenharias.html">Panorama</a>
+      <a href="./civil.html">Civil</a>
+      <a href="./eletrica.html">Elétrica</a>
+      <a href="./producao.html" class="active">Produção</a>
+      <a href="./computacao.html">Computação</a>
+    </div>
+  </div>
+
+  <main class="container page-main">
+    <h1>Engenharia de Produção</h1>
+    <p class="page-sub">Viabilidade econômica do projeto: CAPEX, OPEX, retorno sobre investimento, riscos e cronograma integrado das quatro engenharias.</p>
+
+    <section class="page-section">
+      <h2>Indicadores (resumo)</h2>
+      <div class="kpi-grid">
+        <div class="kpi"><b>R$ 8,2–9k</b><span>CAPEX estimado (implementação real)</span></div>
+        <div class="kpi"><b>20–30%</b><span>Redução potencial no uso do AC</span></div>
+        <div class="kpi"><b>R$ 0</b><span>Versão acadêmica (simulador + Docker)</span></div>
+        <div class="kpi"><b>Viável</b><span>Retorno moderado no contexto institucional</span></div>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <h2>Composição do investimento</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Categoria</th><th>Exemplos</th></tr></thead>
+          <tbody>
+            <tr><td>Equipamentos</td><td>Sensores, microcontroladores, Bluetooth, tablet</td></tr>
+            <tr><td>Infraestrutura civil</td><td>Reparo de vazamento, manta isolante, maquete</td></tr>
+            <tr><td>Automação</td><td>Eletrodutos, integração com ar-condicionado</td></tr>
+            <tr><td>OPEX</td><td>Energia, manutenção preventiva, calibração</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page-section">
+      <h2>Fluxo de valor</h2>
+      <pre class="flow-pre">Sensores → Backend → Dashboard → Operador → AC otimizado
+                ↓
+         /api/v1/consumption (kWh, custo)
+                ↓
+         Justificativa financeira do investimento</pre>
+    </section>
+
+    <section class="page-section">
+      <h2>Entregáveis</h2>
+      <p class="page-sub">Relatório financeiro formal e cronograma Excel compartilhado com todas as engenharias.</p>
+      <iframe
+        class="pdf-viewer"
+        title="Relatório financeiro"
+        src="./engenharias/entregaveis/em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf">
+      </iframe>
+      <div class="doc-links">
+        <a class="btn" href="./engenharias/entregaveis/em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf">Baixar relatório financeiro (PDF)</a>
+        <a class="btn btn-outline" href="./engenharias/entregaveis/cronograma-projeto-faculdade.xlsb">Cronograma integrado (.xlsb)</a>
+        <a class="btn btn-outline" href="./engenharias.html#cronograma">Cronograma na web</a>
+      </div>
+    </section>
+
+    <p class="team-box"><strong>Equipe Produção:</strong> Pedro Henrique Teles Viera · Samuel Cavalcante Cardoso</p>
+  </main>
+
+  <footer class="site-footer">
+    <a href="./engenharias.html">← Voltar ao Integrador</a>
+  </footer>
+</body>
+</html>

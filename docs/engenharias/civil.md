@@ -42,10 +42,9 @@ Contribuição para reduzir consumo identificando:
 - Melhorias construtivas complementares (ex.: **manta isolante** em tubulações)
 - Oportunidades de reduzir tempo de funcionamento do AC
 
-### 5. Maquete de apresentação
+### 5. Maquete de apresentação e vista 3D
 
-Projeto e construção de **maquete física** para a ExpoTech:
-
+Projeto e construção de **maquete física** para a ExpoTech, além do **modelo 3D** do laboratório (PDF *Projeto integrador.pdf* — ver [civil.html](../civil.html#modelo-3d)).
 - Materiais: MDF, acrílico ou PVC
 - Espaços reservados para fiação (Elétrica) e sensores (Computação)
 - QR codes no suporte físico apontando para documentação e dashboard (`tools/qrcode_civil.html`)
@@ -89,4 +88,4 @@ Kayke Rennan Lima Matos · Nicolas Soares Pires · Renan Soares · Lucca Martins
 
 [Projeto integrador — Eng. Civil (PDF)](entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf)
 
-_Texto convertido para revisão no GitHub:_ [entregaveis/civil-projeto-integrador-original.md](entregaveis/civil-projeto-integrador-original.md)
+_Texto convertido para revisão no GitHub:_ [entregaveis/civil/relatorio-integrador.md](entregaveis/civil/relatorio-integrador.md) · [Vista 3D](entregaveis/civil/visao-3d-laboratorio.md)

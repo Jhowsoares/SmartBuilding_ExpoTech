@@ -17,13 +17,22 @@ JSON_PATH = ROOT / "docs" / "engenharias" / "cronograma-data.json"
 OUT_PATH = ROOT / "docs" / "engenharias.html"
 PDF_DIR = "engenharias/entregaveis/em_pdf"
 
-# PDFs oficiais para download (relativos a docs/)
 PDF_ENTREGAVEIS = [
-    ("Projeto integrador - Eng. Civil.pdf", "Eng. Civil", "Relatório integrador"),
-    ("Relatório Finaceiro de Implementação de Projeto.pdf", "Eng. Produção", "Relatório financeiro"),
-    ("Projeto integrador.pdf", "Conceito", "Visão geral do laboratório"),
-    ("Arquitetura do sistema.pdf", "Eng. Computação", "Arquitetura do sistema"),
-    ("Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf", "Eng. Computação", "Escopo e arquitetura funcional"),
+    ("Projeto integrador - Eng. Civil.pdf", "Eng. Civil", "Relatório integrador", "./civil.html"),
+    ("Projeto integrador.pdf", "Eng. Civil", "Vista 3D do laboratório", "./civil.html#modelo-3d"),
+    (
+        "Relatório Finaceiro de Implementação de Projeto.pdf",
+        "Eng. Produção",
+        "Relatório financeiro",
+        "./producao.html",
+    ),
+    ("Arquitetura do sistema.pdf", "Eng. Computação", "Arquitetura do sistema", "./computacao.html"),
+    (
+        "Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf",
+        "Eng. Computação",
+        "Escopo e arquitetura funcional",
+        None,
+    ),
 ]
 
 
@@ -74,24 +83,30 @@ def pdf_href(filename: str) -> str:
     return f"./{PDF_DIR}/{quote(filename)}"
 
 
+def resolve_pdf_filename(filename: str) -> str:
+    path = ROOT / "docs" / PDF_DIR / filename
+    if path.exists():
+        return filename
+    folder = ROOT / "docs" / PDF_DIR
+    match = next((p.name for p in folder.glob("*.pdf") if p.name.lower() == filename.lower()), None)
+    if match:
+        return match
+    match = next(
+        (p.name for p in folder.glob("*.pdf") if filename.split(".")[0][:20] in p.name),
+        filename,
+    )
+    return match if match else filename
+
+
 def build_pdf_rows() -> str:
     rows = []
-    for filename, area, desc in PDF_ENTREGAVEIS:
-        path = ROOT / "docs" / PDF_DIR / filename
-        if not path.exists():
-            # tenta match por nome similar (acentos)
-            folder = ROOT / "docs" / PDF_DIR
-            match = next((p.name for p in folder.glob("*.pdf") if p.name.lower() == filename.lower()), None)
-            if match:
-                filename = match
-            else:
-                match = next((p.name for p in folder.glob("*.pdf") if filename.split(".")[0][:20] in p.name), filename)
-                filename = match if match else filename
+    for filename, area, desc, page in PDF_ENTREGAVEIS:
+        filename = resolve_pdf_filename(filename)
         href = pdf_href(filename)
-        rows.append(
-            f'<tr><td>{desc}</td><td>{area}</td>'
-            f'<td><a href="{href}" style="color:#4d8eff">Baixar PDF</a></td></tr>'
-        )
+        links = f'<a href="{href}" style="color:#4d8eff">Baixar PDF</a>'
+        if page:
+            links += f' · <a href="{page}" style="color:#4d8eff">Página</a>'
+        rows.append(f"<tr><td>{desc}</td><td>{area}</td><td>{links}</td></tr>")
     rows.append(
         f'<tr><td>Cronograma integrado</td><td>Todas</td>'
         f'<td><a href="./engenharias/entregaveis/cronograma-projeto-faculdade.xlsb" style="color:#4d8eff">Baixar Excel (.xlsb)</a></td></tr>'
@@ -122,6 +137,10 @@ def main() -> None:
     </div>"""
 
     pdf_rows = build_pdf_rows()
+    civil_pdf = pdf_href(resolve_pdf_filename("Projeto integrador - Eng. Civil.pdf"))
+    producao_pdf = pdf_href(
+        resolve_pdf_filename("Relatório Finaceiro de Implementação de Projeto.pdf")
+    )
 
     html = f"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -131,54 +150,42 @@ def main() -> None:
   <title>Projeto Integrador — Smart Building</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css" />
   <style>
-    *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
-    :root{{--bg:#0c1322;--card:#191f2f;--border:#424754;--muted:#8c909f;--text:#dce2f7;--accent:#adc6ff;--btn:#4d8eff}}
-    body{{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6}}
-    .container{{max-width:1000px;margin:0 auto;padding:0 20px}}
-    nav{{position:sticky;top:0;z-index:50;background:rgba(12,19,34,.95);border-bottom:1px solid var(--border);padding:14px 0}}
-    nav .inner{{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}}
-    nav a{{color:var(--muted);text-decoration:none;font-size:13px;margin-left:16px}}
-    nav a:hover{{color:var(--text)}}
-    nav .brand{{font-weight:700;color:var(--text)}}
-    .hero{{text-align:center;padding:48px 20px 32px}}
-    .hero h1{{font-size:clamp(22px,4vw,36px);margin-bottom:12px}}
-    .hero p{{color:var(--muted);max-width:640px;margin:0 auto 24px}}
-    .pill{{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;background:rgba(173,198,255,.12);color:var(--accent);border:1px solid rgba(173,198,255,.25);margin:4px}}
-    section{{padding:32px 0}}
-    h2{{font-size:20px;margin-bottom:8px}}
-    .sub{{color:var(--muted);font-size:13px;margin-bottom:20px}}
-    .grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}}
-    .card{{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}}
-    .card h3{{font-size:16px;margin-bottom:8px;color:var(--accent)}}
-    .card p{{font-size:13px;color:var(--muted)}}
-    .card a{{color:var(--btn);font-size:13px;text-decoration:none;margin-right:12px}}
-    .flow{{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;font-family:JetBrains Mono,monospace;font-size:12px;color:var(--muted);overflow-x:auto;white-space:pre;line-height:1.8}}
-    .table-wrap{{overflow-x:auto;border:1px solid var(--border);border-radius:10px}}
-    table{{width:100%;border-collapse:collapse;min-width:400px}}
-    th,td{{padding:10px 14px;text-align:left;border-bottom:1px solid #2e3545;font-size:13px}}
-    th{{background:#232a3a;color:var(--muted);font-size:11px;text-transform:uppercase}}
-    tr.section-row td{{background:rgba(77,142,255,.08);color:var(--accent)}}
     .tabs{{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}}
     .tab-btn{{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}}
     .tab-btn.active{{background:var(--btn);color:#fff;border-color:var(--btn)}}
-    .btn{{display:inline-block;background:var(--btn);color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;margin-top:12px}}
-    .btn-outline{{background:transparent;border:1px solid var(--border);color:var(--text);margin-left:8px}}
-    footer{{border-top:1px solid var(--border);padding:32px 20px;text-align:center;color:var(--muted);font-size:13px;margin-top:40px}}
-    @media(max-width:640px){{nav a{{margin-left:0;margin-right:12px}}}}
+    .sub{{color:var(--muted);font-size:13px;margin-bottom:20px}}
+    .card-links{{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:auto}}
+    .card-links a{{color:var(--btn);font-size:13px;text-decoration:none;font-weight:500}}
+    tr.section-row td{{background:rgba(77,142,255,.08);color:var(--accent)}}
   </style>
 </head>
 <body>
-  <nav><div class="container inner">
-    <span class="brand">Smart Building · Integrador</span>
-    <div>
-      <a href="./index.html">Apresentação</a>
-      <a href="./sistema.html">Arquitetura</a>
-      <a href="./civil.html">Eng. Civil</a>
-      <a href="./api.html">API (ReDoc)</a>
-      <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+  <nav class="site-nav">
+    <div class="container inner">
+      <a class="site-brand" href="./index.html">
+        <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
+        Smart Building · Integrador
+      </a>
+      <div class="site-links">
+        <a href="./index.html">Apresentação</a>
+        <a href="./sistema.html">Arquitetura</a>
+        <a href="./api.html" class="nav-cta">API (ReDoc)</a>
+        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+      </div>
     </div>
-  </div></nav>
+  </nav>
+
+  <div class="eng-subnav">
+    <div class="container inner">
+      <a href="./engenharias.html" class="active">Panorama</a>
+      <a href="./civil.html">Civil</a>
+      <a href="./eletrica.html">Elétrica</a>
+      <a href="./producao.html">Produção</a>
+      <a href="./computacao.html">Computação</a>
+    </div>
+  </div>
 
   <div class="hero container">
     <span class="pill">ExpoTech 2026 · UniFECAF</span>
@@ -187,37 +194,57 @@ def main() -> None:
   </div>
 
   <section class="container" id="engenharias">
-    <h2>As quatro engenharias</h2>
-    <p class="sub">Resumo integrado e entregáveis oficiais em PDF.</p>
+    <h2 class="section-title">As quatro engenharias</h2>
+    <p class="section-sub">Resumo integrado e entregáveis oficiais em PDF.</p>
     <div class="grid">
-      <div class="card">
-        <h3>Eng. Civil</h3>
+      <article class="card">
+        <div class="card-head">
+          <div class="icon-box green"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-4 7 4v12"/></svg></div>
+          <h3>Eng. Civil</h3>
+        </div>
         <p>Infraestrutura, conforto térmico, maquete e modelo 3D.</p>
-        <a href="./civil.html">Página Civil →</a>
-        <a href="{pdf_href('Projeto integrador - Eng. Civil.pdf')}">PDF →</a>
-      </div>
-      <div class="card">
-        <h3>Eng. Elétrica</h3>
+        <div class="card-links">
+          <a href="./civil.html">Página Civil →</a>
+          <a href="./civil.html#modelo-3d">Vista 3D →</a>
+          <a href="{civil_pdf}">PDF →</a>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-head">
+          <div class="icon-box amber"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <h3>Eng. Elétrica</h3>
+        </div>
         <p>Arduino, sensores, Bluetooth, integração MQTT.</p>
-        <a href="{pdf_href('Projeto integrador.pdf')}">PDF conceito →</a>
-      </div>
-      <div class="card">
-        <h3>Eng. Produção</h3>
+        <div class="card-links"><a href="./eletrica.html">Página Elétrica →</a></div>
+      </article>
+      <article class="card">
+        <div class="card-head">
+          <div class="icon-box green"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+          <h3>Eng. Produção</h3>
+        </div>
         <p>CAPEX, OPEX, ROI e cronograma integrado.</p>
-        <a href="{pdf_href('Relatório Finaceiro de Implementação de Projeto.pdf')}">PDF →</a>
-      </div>
-      <div class="card">
-        <h3>Eng. Computação</h3>
+        <div class="card-links">
+          <a href="./producao.html">Página Produção →</a>
+          <a href="{producao_pdf}">PDF →</a>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-head">
+          <div class="icon-box"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <h3>Eng. Computação</h3>
+        </div>
         <p>API REST, MQTT, ML, dashboard React.</p>
-        <a href="./sistema.html">Arquitetura →</a>
-        <a href="{pdf_href('Arquitetura do sistema.pdf')}">PDF →</a>
-      </div>
+        <div class="card-links">
+          <a href="./computacao.html">Página Computação →</a>
+          <a href="./sistema.html">Arquitetura →</a>
+        </div>
+      </article>
     </div>
   </section>
 
   <section class="container" id="cronograma">
-    <h2>Cronograma integrado</h2>
-    <p class="sub">Visualização web (atualizada a partir do Excel). Use o botão para baixar o arquivo original.</p>
+    <h2 class="section-title">Cronograma integrado</h2>
+    <p class="section-sub">Visualização web (atualizada a partir do Excel). Use o botão para baixar o arquivo original.</p>
     <a class="btn" href="./engenharias/entregaveis/cronograma-projeto-faculdade.xlsb">Baixar cronograma (.xlsb)</a>
     <div class="tabs" style="margin-top:24px">
       <button class="tab-btn active" data-tab="civil">Civil</button>
@@ -228,8 +255,8 @@ def main() -> None:
   </section>
 
   <section class="container" id="entregaveis">
-    <h2>Entregáveis oficiais (PDF)</h2>
-    <p class="sub">Documentos formais para download. Após editar o Excel, rode <code style="color:#adc6ff">python tools/build_engenharias_page.py</code> para atualizar as abas abaixo.</p>
+    <h2 class="section-title">Entregáveis oficiais (PDF)</h2>
+    <p class="section-sub">Documentos formais por engenharia. Após editar o Excel, rode <code style="color:#adc6ff">python tools/build_engenharias_page.py</code>.</p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Documento</th><th>Área</th><th>Download</th></tr></thead>
@@ -241,8 +268,8 @@ def main() -> None:
   </section>
 
   <section class="container" id="equipe">
-    <h2>Equipe integradora</h2>
-    <p class="sub"><a href="./index.html" style="color:#4d8eff">Voltar à apresentação</a></p>
+    <h2 class="section-title">Equipe integradora</h2>
+    <p class="section-sub"><a href="./index.html" style="color:#4d8eff">Voltar à apresentação</a></p>
     <div class="grid">
       <div class="card"><h3>Computação</h3><p>Jhonata, João, Rickelmy, Felipe, Claudio</p></div>
       <div class="card"><h3>Civil</h3><p>Kayke, Nicolas, Renan, Lucca, Bruno</p></div>
@@ -251,9 +278,9 @@ def main() -> None:
     </div>
   </section>
 
-  <footer>
+  <footer class="site-footer">
     <p>Smart Building · ExpoTech 2026</p>
-    <p style="margin-top:8px"><a href="./index.html" style="color:#4d8eff">Apresentação</a> · <a href="./sistema.html" style="color:#4d8eff">Arquitetura</a></p>
+    <p style="margin-top:8px"><a href="./index.html">Apresentação</a> · <a href="./documentacao.html">Mapa docs</a> · <a href="./sistema.html">Arquitetura</a></p>
   </footer>
 
   <script>

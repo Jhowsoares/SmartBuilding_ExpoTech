@@ -26,10 +26,10 @@ O ambiente apresenta **condensação, umidade elevada** e **climatização sem c
 
 | Área | Papel no projeto | Documentação |
 |------|------------------|--------------|
-| **Eng. Civil** | Análise da edificação, conforto térmico, maquete de apresentação | [civil.md](civil.md) |
-| **Eng. Elétrica** | Captura física de dados (temperatura, presença), automação do AC | [eletrica.md](eletrica.md) |
-| **Eng. Computação** | Plataforma digital: API REST, MQTT, ML, dashboard web | [computacao.md](computacao.md) |
-| **Eng. Produção** | Análise de custos, ROI, cronograma e riscos | [producao.md](producao.md) |
+| **Eng. Civil** | Análise da edificação, conforto térmico, maquete de apresentação | [civil.md](civil.md) · [civil.html](../civil.html) |
+| **Eng. Elétrica** | Captura física de dados (temperatura, presença), automação do AC | [eletrica.md](eletrica.md) · [eletrica.html](../eletrica.html) |
+| **Eng. Computação** | Plataforma digital: API REST, MQTT, ML, dashboard web | [computacao.md](computacao.md) · [computacao.html](../computacao.html) |
+| **Eng. Produção** | Análise de custos, ROI, cronograma e riscos | [producao.md](producao.md) · [producao.html](../producao.html) |
 
 ---
 
@@ -47,13 +47,13 @@ Para facilitar a avaliação, organizamos a documentação em **dois níveis**:
 | PDF | Área |
 |-----|------|
 | Projeto integrador - Eng. Civil.pdf | Civil |
+| Projeto integrador.pdf | **Civil — vista 3D** |
 | Relatório Financeiro…pdf | Produção |
-| Projeto integrador.pdf | Conceito do laboratório |
 | Arquitetura do sistema.pdf | Computação |
 | Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf | Computação |
 | cronograma-projeto-faculdade.xlsb | Cronograma Excel |
 
-Os arquivos `.md` em `entregaveis/` são **conversões para leitura no GitHub**, não substituem os PDFs.
+Markdown convertido: [`entregaveis/civil/`](entregaveis/civil/) · [`entregaveis/producao/`](entregaveis/producao/)
 
 > Detalhes: [entregaveis/README.md](entregaveis/README.md)
 

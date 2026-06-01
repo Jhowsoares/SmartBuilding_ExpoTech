@@ -90,4 +90,4 @@ HUM:65.2
 ## Documentos relacionados
 
 - [Hardware ESP32](../sistema/hardware-esp32.md)
-- [Conceito visual do laboratório (original)](entregaveis/visao-geral-laboratorio-original.md)
+- [Vista 3D do laboratório (entrega Civil)](entregaveis/civil/visao-3d-laboratorio.md) · [civil.html](../civil.html)

@@ -58,6 +58,7 @@ Este repositório reúne **Civil, Elétrica, Produção e Computação** em torn
 | Documento | Conteúdo |
 |-----------|----------|
 | **[Índice completo](docs/README.md)** | Todos os guias e referências |
+| **[Mapa docs → páginas](docs/documentacao.html)** | Markdown organizado por pasta |
 | **[Setup](docs/guias/setup.md)** | Docker para iniciantes |
 | **[Arquitetura](docs/sistema/architecture.md)** | Stack, diagrama, fluxo de dados |
 | **[API](docs/sistema/api.md)** | Swagger, endpoints, exemplos |

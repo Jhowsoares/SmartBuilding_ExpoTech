@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eng. Elétrica — Smart Building</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="container inner">
+      <a class="site-brand" href="./index.html">
+        <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
+        Smart Building
+      </a>
+      <div class="site-links">
+        <a href="./index.html">Apresentação</a>
+        <a href="./engenharias.html">Integrador</a>
+        <a href="./sistema.html">Arquitetura</a>
+        <a href="./api.html" class="nav-cta">API</a>
+        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="eng-subnav">
+    <div class="container inner">
+      <a href="./engenharias.html">Panorama</a>
+      <a href="./civil.html">Civil</a>
+      <a href="./eletrica.html" class="active">Elétrica</a>
+      <a href="./producao.html">Produção</a>
+      <a href="./computacao.html">Computação</a>
+    </div>
+  </div>
+
+  <main class="container page-main">
+    <h1>Engenharia Elétrica</h1>
+    <p class="page-sub">Camada física do Smart Building: sensores, microcontroladores, comunicação sem fio e base para automação do ar-condicionado no laboratório de elétrica.</p>
+
+    <section class="page-section">
+      <h2>Arquitetura elétrica</h2>
+      <pre class="flow-pre">Sensor (DHT/NTC) → Arduino Uno → Bluetooth HC-05 → bt_bridge.py
+                                                          ↓
+                                                    MQTT Mosquitto
+                                                          ↓
+                                                    Backend FastAPI
+
+Alternativa: ESP32 + BME280 + PIR → Wi-Fi/MQTT direto (firmware no repositório)</pre>
+    </section>
+
+    <section class="page-section">
+      <h2>Componentes e integração</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Componente</th><th>Função</th></tr></thead>
+          <tbody>
+            <tr><td>Sensor de temperatura / umidade</td><td>Telemetria para regras RN01–RN03</td></tr>
+            <tr><td>Arduino Uno + HC-05</td><td>Leitura e envio via Bluetooth</td></tr>
+            <tr><td>ESP32 (opcional)</td><td>MQTT nativo + controle IR do AC</td></tr>
+            <tr><td>Eletrodutos aparentes</td><td>Organização de cabos (ver maquete Civil)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="page-sub" style="margin-top:16px">Formato serial esperado: <code style="color:var(--accent)">TEMP:24.5</code> · <code style="color:var(--accent)">PRES:1</code> · <code style="color:var(--accent)">HUM:65.2</code></p>
+    </section>
+
+    <section class="page-section">
+      <h2>No repositório</h2>
+      <ul class="page-list">
+        <li><a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech/tree/main/tools/bt_bridge.py" style="color:var(--btn)">tools/bt_bridge.py</a> — ponte Bluetooth → MQTT</li>
+        <li><a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech/tree/main/firmware/esp32_smartbuilding" style="color:var(--btn)">firmware/esp32_smartbuilding/</a> — firmware ESP32</li>
+        <li><a href="./sistema.html#mqtt" style="color:var(--btn)">Tópicos MQTT</a> — <code>sensors/room/{id}/temperature</code></li>
+        <li><a href="./sistema.html#hardware" style="color:var(--btn)">Hardware ESP32</a> — pinagem e calibração</li>
+      </ul>
+    </section>
+
+    <section class="page-section">
+      <h2>Integração multidisciplinar</h2>
+      <ul class="page-list">
+        <li><strong>Civil:</strong> maquete com passagens para cabos — <a href="./civil.html" style="color:var(--btn)">ver entregas Civil</a> (inclui vista 3D)</li>
+        <li><strong>Produção:</strong> sensores e módulos entram no CAPEX — <a href="./producao.html" style="color:var(--btn)">análise financeira</a></li>
+        <li><strong>Computação:</strong> consome telemetria MQTT e envia comandos REST/MQTT</li>
+      </ul>
+    </section>
+
+    <section class="page-section">
+      <h2>Entregável formal</h2>
+      <p class="page-sub">O PDF dedicado da equipe Elétrica ainda será publicado em <code style="color:var(--accent);font-size:12px">docs/engenharias/entregaveis/em_pdf/</code>. O cronograma integrado registra montagem Arduino, testes e integração com a maquete.</p>
+      <div class="doc-links">
+        <a class="btn" href="./engenharias.html#cronograma">Ver cronograma Elétrica</a>
+        <a class="btn btn-outline" href="./engenharias/entregaveis/eletrica/">Pasta de entregáveis</a>
+      </div>
+    </section>
+
+    <p class="team-box"><strong>Equipe Elétrica:</strong> a confirmar no entregável formal · ver <a href="./engenharias.html#equipe" style="color:var(--btn)">equipe integradora</a></p>
+  </main>
+
+  <footer class="site-footer">
+    <a href="./engenharias.html">← Voltar ao Integrador</a>
+  </footer>
+</body>
+</html>

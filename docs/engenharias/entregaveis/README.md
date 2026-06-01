@@ -1,28 +1,24 @@
 # Entregáveis oficiais
 
-## PDFs (download para banca e visitantes)
+Documentos organizados **por engenharia**. Os PDFs em `em_pdf/` são o formato formal; os `.md` em subpastas são conversões para leitura no GitHub.
 
-Os documentos formais estão em **`em_pdf/`**:
+| Pasta | Conteúdo |
+|-------|----------|
+| [civil/](civil/) | Relatório integrador + **vista 3D do laboratório** |
+| [eletrica/](eletrica/) | Placeholder — PDF formal pendente; código no repositório |
+| [producao/](producao/) | Relatório financeiro (CAPEX/OPEX/ROI) |
+| [computacao/](computacao/) | Arquitetura, escopo funcional, links para API |
+| [em_pdf/](em_pdf/) | Todos os PDFs para download |
 
-| PDF | Área |
-|-----|------|
-| [Projeto integrador - Eng. Civil.pdf](em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf) | Eng. Civil |
-| [Relatório Financeiro de Implementação de Projeto.pdf](em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf) | Eng. Produção |
-| [Projeto integrador.pdf](em_pdf/Projeto%20integrador.pdf) | Conceito / laboratório |
-| [Arquitetura do sistema.pdf](em_pdf/Arquitetura%20do%20sistema.pdf) | Eng. Computação |
-| [Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf](em_pdf/Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf) | Eng. Computação |
-| [cronograma-projeto-faculdade.xlsb](../cronograma-projeto-faculdade.xlsb) | Cronograma (Excel) |
+## PDFs (download)
 
-> No GitHub Pages: [seção de entregáveis](https://jhowsoares.github.io/SmartBuilding_ExpoTech/engenharias.html#entregaveis)
+| PDF | Área | Página na feira |
+|-----|------|-----------------|
+| [Projeto integrador - Eng. Civil.pdf](em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf) | Civil | [civil.html](../../civil.html) |
+| [Projeto integrador.pdf](em_pdf/Projeto%20integrador.pdf) | **Civil — vista 3D** | [civil.html](../../civil.html#modelo-3d) |
+| [Relatório Financeiro…pdf](em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf) | Produção | [producao.html](../../producao.html) |
+| [Arquitetura do sistema.pdf](em_pdf/Arquitetura%20do%20sistema.pdf) | Computação | [computacao.html](../../computacao.html) |
+| [Relatorio_de_Escopo…pdf](em_pdf/Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf) | Computação | [computacao.html](../../computacao.html) |
+| [cronograma-projeto-faculdade.xlsb](cronograma-projeto-faculdade.xlsb) | Integrador | [engenharias.html](../../engenharias.html#cronograma) |
 
-## Markdown (apenas leitura no GitHub)
-
-Os arquivos `.md` nesta pasta são **conversões** dos PDFs/Word para facilitar revisão no repositório. **Não são o formato oficial de entrega** — use os PDFs acima para download.
-
-| Arquivo `.md` | Corresponde a |
-|---------------|---------------|
-| `civil-projeto-integrador-original.md` | PDF Civil |
-| `producao-relatorio-financeiro-original.md` | PDF Produção |
-| `visao-geral-laboratorio-original.md` | PDF Projeto integrador |
-
-Versões integradas e resumidas: [documentação curada](../README.md) na pasta pai.
+> **Correção (jun/2026):** o PDF *Projeto integrador.pdf* (vista 3D) é entrega da **Eng. Civil**, não da Elétrica.
