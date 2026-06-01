@@ -25,6 +25,51 @@ paths:
           content:
             application/json:
               schema: {}
+        '422':
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
+          content:
+            application/problem+json:
+              schema: &id001
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id002
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id001
+              example: *id002
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id003
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id004
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id003
+              example: *id004
+        '503':
+          description: Serviço indisponível ou operação bloqueada por degradação controlada.
+          content:
+            application/problem+json:
+              schema: &id005
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id006
+                type: https://smartbuilding.local/errors/service-unavailable
+                title: Serviço indisponível
+                status: 503
+                detail: Subsistema dependente indisponível ou operação já em andamento.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id005
+              example: *id006
   /api/v1/auth/login:
     post:
       tags:
@@ -56,11 +101,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id007
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id008
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id007
+              example: *id008
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id009
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id010
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id009
+              example: *id010
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id011
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id012
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id011
+              example: *id012
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id013
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id014
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id013
+              example: *id014
+        '401':
+          description: Credenciais inválidas.
+          content:
+            application/problem+json:
+              schema: &id015
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id016
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: E-mail ou senha incorretos.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id015
+              example: *id016
   /api/v1/auth/refresh:
     post:
       tags:
@@ -81,11 +195,79 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id017
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id018
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id017
+              example: *id018
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id019
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id020
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id019
+              example: *id020
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id021
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id022
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id021
+              example: *id022
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id023
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id024
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id023
+              example: *id024
+        '401':
+          description: Refresh token inválido, expirado ou revogado.
+          content:
+            application/problem+json:
+              schema: *id015
+              example: &id025
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Renove a sessão com login ou use um refresh token válido.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id015
+              example: *id025
   /api/v1/auth/logout:
     post:
       tags:
@@ -100,6 +282,96 @@ paths:
               schema:
                 type: object
                 title: Response Logout Api V1 Auth Logout Post
+        '422':
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
+          content:
+            application/problem+json:
+              schema: &id026
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id027
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id026
+              example: *id027
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id028
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id029
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id028
+              example: *id029
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id030
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id031
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id030
+              example: *id031
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id032
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id033
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id032
+              example: *id033
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id034
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id035
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id034
+              example: *id035
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id036
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id037
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id036
+              example: *id037
       security:
       - HTTPBearer: []
   /api/v1/sensors/data:
@@ -131,11 +403,95 @@ paths:
               schema:
                 $ref: '#/components/schemas/SensorDataResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id038
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id039
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id038
+              example: *id039
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id040
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id041
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id040
+              example: *id041
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id042
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id043
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id042
+              example: *id043
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id044
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id045
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id044
+              example: *id045
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id046
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id047
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id046
+              example: *id047
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id048
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id049
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id048
+              example: *id049
       security:
       - HTTPBearer: []
   /api/v1/sensors:
@@ -180,11 +536,65 @@ paths:
               schema:
                 $ref: '#/components/schemas/SensorListResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id050
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id051
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id050
+              example: *id051
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id052
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id053
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id052
+              example: *id053
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id054
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id055
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id054
+              example: *id055
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id056
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id057
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id056
+              example: *id057
   /api/v1/sensors/{sensor_id}:
     get:
       tags:
@@ -208,11 +618,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/SensorResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id058
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id059
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id058
+              example: *id059
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id060
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id061
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id060
+              example: *id061
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id062
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id063
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id062
+              example: *id063
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id064
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id065
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id064
+              example: *id065
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id066
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id067
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id066
+              example: *id067
   /api/v1/sensors/{sensor_id}/data:
     get:
       tags:
@@ -278,11 +757,80 @@ paths:
             application/json:
               schema: {}
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id068
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id069
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id068
+              example: *id069
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id070
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id071
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id070
+              example: *id071
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id072
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id073
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id072
+              example: *id073
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id074
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id075
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id074
+              example: *id075
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id076
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id077
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id076
+              example: *id077
   /api/v1/sensors/{sensor_id}/latest:
     get:
       tags:
@@ -306,11 +854,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/SensorLatestResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id078
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id079
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id078
+              example: *id079
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id080
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id081
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id080
+              example: *id081
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id082
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id083
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id082
+              example: *id083
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id084
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id085
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id084
+              example: *id085
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id086
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id087
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id086
+              example: *id087
   /api/v1/devices:
     get:
       tags:
@@ -363,11 +980,65 @@ paths:
                 type: object
                 title: Response List Devices Api V1 Devices Get
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id088
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id089
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id088
+              example: *id089
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id090
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id091
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id090
+              example: *id091
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id092
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id093
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id092
+              example: *id093
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id094
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id095
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id094
+              example: *id095
     post:
       tags:
       - Devices
@@ -389,11 +1060,95 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id096
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id097
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id096
+              example: *id097
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id098
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id099
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id098
+              example: *id099
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id100
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id101
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id100
+              example: *id101
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id102
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id103
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id102
+              example: *id103
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id104
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id105
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id104
+              example: *id105
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id106
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id107
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id106
+              example: *id107
   /api/v1/devices/{device_id}:
     get:
       tags:
@@ -418,11 +1173,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id108
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id109
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id108
+              example: *id109
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id110
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id111
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id110
+              example: *id111
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id112
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id113
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id112
+              example: *id113
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id114
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id115
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id114
+              example: *id115
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id116
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id117
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id116
+              example: *id117
     patch:
       tags:
       - Devices
@@ -452,11 +1276,110 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id118
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id119
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id118
+              example: *id119
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id120
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id121
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id120
+              example: *id121
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id122
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id123
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id122
+              example: *id123
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id124
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id125
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id124
+              example: *id125
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id126
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id127
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id126
+              example: *id127
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id128
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id129
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id128
+              example: *id129
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id130
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id131
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id130
+              example: *id131
     delete:
       tags:
       - Devices
@@ -476,11 +1399,95 @@ paths:
         '204':
           description: Successful Response
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id132
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id133
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id132
+              example: *id133
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id134
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id135
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id134
+              example: *id135
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id136
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id137
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id136
+              example: *id137
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id138
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id139
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id138
+              example: *id139
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id140
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id141
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id140
+              example: *id141
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id142
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id143
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id142
+              example: *id143
   /api/v1/devices/{device_id}/control:
     post:
       tags:
@@ -511,11 +1518,110 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceControlResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id144
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id145
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id144
+              example: *id145
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id146
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id147
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id146
+              example: *id147
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id148
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id149
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id148
+              example: *id149
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id150
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id151
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id150
+              example: *id151
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id152
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id153
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id152
+              example: *id153
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id154
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id155
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id154
+              example: *id155
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id156
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id157
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id156
+              example: *id157
   /api/v1/rooms:
     get:
       tags:
@@ -560,11 +1666,65 @@ paths:
                 type: object
                 title: Response List Rooms Api V1 Rooms Get
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id158
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id159
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id158
+              example: *id159
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id160
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id161
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id160
+              example: *id161
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id162
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id163
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id162
+              example: *id163
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id164
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id165
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id164
+              example: *id165
     post:
       tags:
       - Rooms
@@ -586,11 +1746,95 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoomResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id166
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id167
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id166
+              example: *id167
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id168
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id169
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id168
+              example: *id169
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id170
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id171
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id170
+              example: *id171
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id172
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id173
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id172
+              example: *id173
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id174
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id175
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id174
+              example: *id175
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id176
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id177
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id176
+              example: *id177
   /api/v1/rooms/{room_id}:
     get:
       tags:
@@ -615,11 +1859,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoomResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id178
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id179
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id178
+              example: *id179
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id180
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id181
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id180
+              example: *id181
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id182
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id183
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id182
+              example: *id183
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id184
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id185
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id184
+              example: *id185
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id186
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id187
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id186
+              example: *id187
     patch:
       tags:
       - Rooms
@@ -649,11 +1962,110 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoomResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id188
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id189
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id188
+              example: *id189
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id190
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id191
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id190
+              example: *id191
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id192
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id193
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id192
+              example: *id193
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id194
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id195
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id194
+              example: *id195
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id196
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id197
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id196
+              example: *id197
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id198
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id199
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id198
+              example: *id199
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id200
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id201
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id200
+              example: *id201
     delete:
       tags:
       - Rooms
@@ -673,11 +2085,95 @@ paths:
         '204':
           description: Successful Response
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id202
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id203
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id202
+              example: *id203
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id204
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id205
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id204
+              example: *id205
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id206
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id207
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id206
+              example: *id207
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id208
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id209
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id208
+              example: *id209
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id210
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id211
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id210
+              example: *id211
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id212
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id213
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id212
+              example: *id213
   /api/v1/alerts:
     get:
       tags:
@@ -739,11 +2235,65 @@ paths:
                 type: object
                 title: Response List Alerts Api V1 Alerts Get
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id214
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id215
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id214
+              example: *id215
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id216
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id217
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id216
+              example: *id217
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id218
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id219
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id218
+              example: *id219
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id220
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id221
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id220
+              example: *id221
     post:
       tags:
       - Alerts
@@ -765,11 +2315,95 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlertResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id222
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id223
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id222
+              example: *id223
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id224
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id225
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id224
+              example: *id225
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id226
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id227
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id226
+              example: *id227
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id228
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id229
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id228
+              example: *id229
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id230
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id231
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id230
+              example: *id231
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id232
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id233
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id232
+              example: *id233
   /api/v1/alerts/history:
     get:
       tags:
@@ -814,11 +2448,65 @@ paths:
                 type: object
                 title: Response Get Alert History Api V1 Alerts History Get
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id234
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id235
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id234
+              example: *id235
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id236
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id237
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id236
+              example: *id237
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id238
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id239
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id238
+              example: *id239
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id240
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id241
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id240
+              example: *id241
   /api/v1/alerts/{alert_id}:
     get:
       tags:
@@ -843,11 +2531,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlertResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id242
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id243
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id242
+              example: *id243
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id244
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id245
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id244
+              example: *id245
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id246
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id247
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id246
+              example: *id247
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id248
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id249
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id248
+              example: *id249
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id250
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id251
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id250
+              example: *id251
   /api/v1/alerts/{alert_id}/acknowledge:
     post:
       tags:
@@ -872,11 +2629,110 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlertResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id252
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id253
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id252
+              example: *id253
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id254
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id255
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id254
+              example: *id255
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id256
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id257
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id256
+              example: *id257
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id258
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id259
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id258
+              example: *id259
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id260
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id261
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id260
+              example: *id261
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id262
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id263
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id262
+              example: *id263
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id264
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id265
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id264
+              example: *id265
   /api/v1/alerts/{alert_id}/resolve:
     post:
       tags:
@@ -901,11 +2757,110 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlertResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id266
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id267
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id266
+              example: *id267
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id268
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id269
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id268
+              example: *id269
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id270
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id271
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id270
+              example: *id271
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id272
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id273
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id272
+              example: *id273
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id274
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id275
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id274
+              example: *id275
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id276
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id277
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id276
+              example: *id277
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id278
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id279
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id278
+              example: *id279
   /api/v1/users:
     get:
       tags:
@@ -941,11 +2896,65 @@ paths:
                 type: object
                 title: Response List Users Api V1 Users Get
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id280
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id281
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id280
+              example: *id281
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id282
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id283
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id282
+              example: *id283
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id284
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id285
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id284
+              example: *id285
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id286
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id287
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id286
+              example: *id287
     post:
       tags:
       - Users
@@ -967,11 +2976,95 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id288
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id289
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id288
+              example: *id289
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id290
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id291
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id290
+              example: *id291
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id292
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id293
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id292
+              example: *id293
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id294
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id295
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id294
+              example: *id295
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id296
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id297
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id296
+              example: *id297
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id298
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id299
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id298
+              example: *id299
   /api/v1/users/me:
     get:
       tags:
@@ -985,6 +3078,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
+          content:
+            application/problem+json:
+              schema: &id300
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id301
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id300
+              example: *id301
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id302
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id303
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id302
+              example: *id303
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id304
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id305
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id304
+              example: *id305
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id306
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id307
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id306
+              example: *id307
       security:
       - HTTPBearer: []
   /api/v1/users/{user_id}:
@@ -1011,11 +3164,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id308
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id309
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id308
+              example: *id309
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id310
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id311
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id310
+              example: *id311
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id312
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id313
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id312
+              example: *id313
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id314
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id315
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id314
+              example: *id315
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id316
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id317
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id316
+              example: *id317
     patch:
       tags:
       - Users
@@ -1045,11 +3267,110 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id318
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id319
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id318
+              example: *id319
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id320
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id321
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id320
+              example: *id321
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id322
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id323
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id322
+              example: *id323
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id324
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id325
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id324
+              example: *id325
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id326
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id327
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id326
+              example: *id327
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id328
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id329
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id328
+              example: *id329
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id330
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id331
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id330
+              example: *id331
     delete:
       tags:
       - Users
@@ -1069,11 +3390,95 @@ paths:
         '204':
           description: Successful Response
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id332
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id333
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id332
+              example: *id333
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id334
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id335
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id334
+              example: *id335
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id336
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id337
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id336
+              example: *id337
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id338
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id339
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id338
+              example: *id339
+        '404':
+          description: Recurso não encontrado.
+          content:
+            application/problem+json:
+              schema: &id340
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id341
+                type: https://smartbuilding.local/errors/not-found
+                title: Recurso não encontrado
+                status: 404
+                detail: O identificador informado não corresponde a um recurso existente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id340
+              example: *id341
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id342
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id343
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id342
+              example: *id343
   /api/v1/consumption:
     get:
       tags:
@@ -1108,11 +3513,65 @@ paths:
                 type: object
                 title: Response Get Consumption Api V1 Consumption Get
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id344
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id345
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id344
+              example: *id345
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id346
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id347
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id346
+              example: *id347
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id348
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id349
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id348
+              example: *id349
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id350
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id351
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id350
+              example: *id351
   /api/v1/consumption/summary:
     get:
       tags:
@@ -1140,11 +3599,65 @@ paths:
                 title: Response Get Consumption Summary Api V1 Consumption Summary
                   Get
         '422':
-          description: Validation Error
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
           content:
+            application/problem+json:
+              schema: &id352
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id353
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
             application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
+              schema: *id352
+              example: *id353
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id354
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id355
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id354
+              example: *id355
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id356
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id357
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id356
+              example: *id357
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id358
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id359
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id358
+              example: *id359
   /api/v1/predictions/24h:
     get:
       tags:
@@ -1159,6 +3672,66 @@ paths:
               schema:
                 type: object
                 title: Response Get Predictions 24H Api V1 Predictions 24H Get
+        '422':
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
+          content:
+            application/problem+json:
+              schema: &id360
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id361
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id360
+              example: *id361
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id362
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id363
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id362
+              example: *id363
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id364
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id365
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id364
+              example: *id365
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id366
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id367
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id366
+              example: *id367
       security:
       - HTTPBearer: []
   /api/v1/predictions/train:
@@ -1181,6 +3754,112 @@ paths:
               schema:
                 type: object
                 title: Response Trigger Retrain Api V1 Predictions Train Post
+        '422':
+          description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
+          content:
+            application/problem+json:
+              schema: &id368
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id369
+                type: https://smartbuilding.local/errors/validation-error
+                title: Erro de validação
+                status: 422
+                detail: 'page: ensure this value is greater than or equal to 1'
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id368
+              example: *id369
+        '429':
+          description: Limite de requisições excedido (rate limiting via Redis/IP).
+          content:
+            application/problem+json:
+              schema: &id370
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id371
+                type: https://smartbuilding.local/errors/rate-limit-exceeded
+                title: Limite de requisições atingido
+                status: 429
+                detail: Aguarde antes de tentar novamente.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id370
+              example: *id371
+        '401':
+          description: Não autenticado — token JWT ausente, expirado ou inválido.
+          content:
+            application/problem+json:
+              schema: &id372
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id373
+                type: https://smartbuilding.local/errors/unauthorized
+                title: Não autenticado
+                status: 401
+                detail: Forneça um Bearer token válido no header Authorization.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id372
+              example: *id373
+        '403':
+          description: Acesso negado — autenticado, mas sem permissão (RBAC/BOPLA).
+          content:
+            application/problem+json:
+              schema: &id374
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id375
+                type: https://smartbuilding.local/errors/forbidden
+                title: Acesso negado
+                status: 403
+                detail: Seu perfil não possui permissão para esta operação.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id374
+              example: *id375
+        '409':
+          description: Conflito de regra de negócio ou estado do recurso.
+          content:
+            application/problem+json:
+              schema: &id376
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id377
+                type: https://smartbuilding.local/errors/business-rule-violation
+                title: Conflito de estado
+                status: 409
+                detail: A operação conflita com o estado atual do servidor.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id376
+              example: *id377
+        '500':
+          description: Erro interno inesperado.
+          content:
+            application/problem+json:
+              schema: &id378
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id379
+                type: https://smartbuilding.local/errors/internal-error
+                title: Erro interno do servidor
+                status: 500
+                detail: Um erro inesperado ocorreu. Tente novamente mais tarde.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id378
+              example: *id379
+        '503':
+          description: Retreinamento já em andamento (throttling por semáforo) ou
+            subsistema indisponível.
+          content:
+            application/problem+json:
+              schema: &id380
+                $ref: '#/components/schemas/ProblemDetail'
+              example: &id381
+                type: https://smartbuilding.local/errors/service-unavailable
+                title: Serviço indisponível
+                status: 503
+                detail: Subsistema dependente indisponível ou operação já em andamento.
+                instance: /api/v1/exemplo
+            application/json:
+              schema: *id380
+              example: *id381
       security:
       - HTTPBearer: []
 components:
@@ -1941,6 +4620,48 @@ components:
       - msg
       - type
       title: ValidationError
+    ProblemDetail:
+      type: object
+      title: ProblemDetail
+      description: RFC 7807 — Problem Details for HTTP APIs.
+      required:
+      - type
+      - title
+      - status
+      - detail
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI que identifica o tipo do problema.
+          example: https://smartbuilding.local/errors/unauthorized
+        title:
+          type: string
+          description: Resumo legível do erro.
+          example: Não autenticado
+        status:
+          type: integer
+          description: Código HTTP da resposta.
+          example: 401
+        detail:
+          type: string
+          description: Explicação específica desta ocorrência.
+          example: Token ausente ou inválido.
+        instance:
+          type: string
+          description: URI da requisição que gerou o erro.
+          example: /api/v1/rooms
+        errors:
+          type: array
+          description: 'Detalhes adicionais (ex.: campos inválidos em 422).'
+          items:
+            type: object
+        rule:
+          type: string
+          description: Identificador da regra de negócio (409).
+        subsystems:
+          type: object
+          description: Estado dos subsistemas (503 no health check).
   securitySchemes:
     HTTPBearer:
       type: http
