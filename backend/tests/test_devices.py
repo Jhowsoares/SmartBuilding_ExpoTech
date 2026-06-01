@@ -69,5 +69,5 @@ async def test_predictions_endpoint_requires_auth(client: AsyncClient) -> None:
 
     Predições são baseadas em dados proprietários do modelo ML.
     """
-    response = await client.get("/api/v1/predictions")
+    response = await client.get("/api/v1/predictions/24h")
     assert response.status_code == 401

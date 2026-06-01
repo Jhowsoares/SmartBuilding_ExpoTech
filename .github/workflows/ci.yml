@@ -25,7 +25,7 @@ jobs:
         run: npm install -g @stoplight/spectral-cli
 
       - name: Lint openapi.yaml
-        run: spectral lint docs/openapi.yaml --ruleset .spectral.yml --fail-severity warn
+        run: spectral lint docs/openapi.yaml --ruleset spectral.yml --fail-severity error
 
   # -------------------------------------------------------
   # 2. Testes de backend (pytest)
@@ -73,7 +73,19 @@ jobs:
           alembic upgrade head
         env:
           DATABASE_URL: postgresql+asyncpg://smartbuilding:smartbuilding@localhost:5432/smartbuilding_test
+          SYNC_DATABASE_URL: postgresql+psycopg2://smartbuilding:smartbuilding@localhost:5432/smartbuilding_test
           REDIS_URL: redis://localhost:6379
+
+      - name: Seed mínimo (usuários para testes RBAC)
+        run: |
+          cd backend
+          python -m scripts.seed_db
+        env:
+          DATABASE_URL: postgresql+asyncpg://smartbuilding:smartbuilding@localhost:5432/smartbuilding_test
+          SYNC_DATABASE_URL: postgresql+psycopg2://smartbuilding:smartbuilding@localhost:5432/smartbuilding_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: ci-test-secret-key-nao-use-em-producao-min-32
+          ENVIRONMENT: development
 
       - name: Executar testes
         run: |
@@ -82,8 +94,8 @@ jobs:
         env:
           DATABASE_URL: postgresql+asyncpg://smartbuilding:smartbuilding@localhost:5432/smartbuilding_test
           REDIS_URL: redis://localhost:6379
-          JWT_SECRET_KEY: ci-test-secret-key-nao-use-em-producao
-          ENVIRONMENT: test
+          JWT_SECRET: ci-test-secret-key-nao-use-em-producao-min-32
+          ENVIRONMENT: development
 
       - name: Upload cobertura
         uses: actions/upload-artifact@v4

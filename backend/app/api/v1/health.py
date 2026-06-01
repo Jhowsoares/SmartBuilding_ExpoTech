@@ -84,7 +84,9 @@ async def health_check():
                 "status": 503,
                 "detail": "O subsistema de banco de dados está indisponível.",
                 "instance": "/api/v1/health",
-                **payload,
+                "version": payload["version"],
+                "environment": payload["environment"],
+                "subsystems": payload["subsystems"],
             },
             headers={"Content-Type": "application/problem+json"},
         )
