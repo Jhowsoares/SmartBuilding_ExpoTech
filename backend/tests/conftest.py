@@ -14,7 +14,7 @@ from httpx import AsyncClient, ASGITransport
 # Variáveis mínimas de ambiente para os testes não falharem na importação
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
-os.environ.setdefault("SECRET_KEY", "test-secret-key-for-automated-tests")
+os.environ.setdefault("JWT_SECRET", "test-secret-key-for-automated-tests-min-32-chars")
 os.environ.setdefault("MQTT_BROKER", "localhost")
 
 from app.main import app  # noqa: E402 — importa depois das envvars

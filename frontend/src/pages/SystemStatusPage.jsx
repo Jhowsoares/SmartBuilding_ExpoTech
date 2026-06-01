@@ -46,6 +46,10 @@ const MOCK_SENSORS = [
   { room: 'Reunião B', time: '10:42:01', temp: '26.1°C', hum: '42%', status: 'ALERTA TEMP', statusColor: 'yellow' },
 ]
 
+function subsystemOk(value) {
+  return value === 'ok' || value === true
+}
+
 export default function SystemStatusPage() {
   const [health, setHealth] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -57,7 +61,7 @@ export default function SystemStatusPage() {
       setHealth(res.data)
       setLastRefresh(new Date())
     } catch {
-      setHealth({ status: 'degraded', database: false, redis: false })
+      setHealth({ status: 'degraded', subsystems: { database: 'unavailable', redis: 'unavailable' } })
     } finally {
       setLoading(false)
     }
@@ -69,33 +73,34 @@ export default function SystemStatusPage() {
     return () => clearInterval(interval)
   }, [fetchHealth])
 
+  const subs = health?.subsystems || {}
   const services = health ? [
     {
       name: 'Backend API',
-      status: 'operational',
+      status: health.status === 'healthy' ? 'operational' : health.status === 'degraded' ? 'degraded' : 'offline',
       latency: 42,
       lastCheck: 'Agora',
       icon: <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>,
     },
     {
       name: 'PostgreSQL',
-      status: health.database ? 'operational' : 'offline',
-      latency: health.database ? 18 : null,
-      lastCheck: health.database ? 'Há 2s' : 'Falha',
+      status: subsystemOk(subs.database) ? 'operational' : 'offline',
+      latency: subsystemOk(subs.database) ? 18 : null,
+      lastCheck: subsystemOk(subs.database) ? 'Há 2s' : 'Falha',
       icon: <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" /></svg>,
     },
     {
       name: 'Redis Cache',
-      status: health.redis ? 'operational' : 'offline',
-      latency: health.redis ? 8 : null,
-      lastCheck: health.redis ? 'Agora' : 'Falha 1m atrás',
+      status: subsystemOk(subs.redis) ? 'operational' : 'offline',
+      latency: subsystemOk(subs.redis) ? 8 : null,
+      lastCheck: subsystemOk(subs.redis) ? 'Agora' : 'Falha',
       icon: <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
     },
     {
       name: 'MQTT Broker',
-      status: 'operational',
-      latency: 8,
-      lastCheck: 'Agora',
+      status: subsystemOk(subs.mqtt) ? 'operational' : 'offline',
+      latency: subsystemOk(subs.mqtt) ? 8 : null,
+      lastCheck: subsystemOk(subs.mqtt) ? 'Agora' : 'Offline',
       icon: <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" /></svg>,
     },
   ] : []

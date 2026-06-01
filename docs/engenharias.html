@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projeto Integrador — Smart Building</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0c1322;--card:#191f2f;--border:#424754;--muted:#8c909f;--text:#dce2f7;--accent:#adc6ff;--btn:#4d8eff}
+    body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6}
+    .container{max-width:1000px;margin:0 auto;padding:0 20px}
+    nav{position:sticky;top:0;z-index:50;background:rgba(12,19,34,.95);border-bottom:1px solid var(--border);padding:14px 0}
+    nav .inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    nav a{color:var(--muted);text-decoration:none;font-size:13px;margin-left:16px}
+    nav a:hover{color:var(--text)}
+    nav .brand{font-weight:700;color:var(--text)}
+    .hero{text-align:center;padding:48px 20px 32px}
+    .hero h1{font-size:clamp(22px,4vw,36px);margin-bottom:12px}
+    .hero p{color:var(--muted);max-width:640px;margin:0 auto 24px}
+    .pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;background:rgba(173,198,255,.12);color:var(--accent);border:1px solid rgba(173,198,255,.25);margin:4px}
+    section{padding:32px 0}
+    h2{font-size:20px;margin-bottom:8px}
+    .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .card h3{font-size:16px;margin-bottom:8px;color:var(--accent)}
+    .card p{font-size:13px;color:var(--muted)}
+    .card a{color:var(--btn);font-size:13px;text-decoration:none;margin-right:12px}
+    .flow{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;font-family:JetBrains Mono,monospace;font-size:12px;color:var(--muted);overflow-x:auto;white-space:pre;line-height:1.8}
+    .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+    table{width:100%;border-collapse:collapse;min-width:400px}
+    th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #2e3545;font-size:13px}
+    th{background:#232a3a;color:var(--muted);font-size:11px;text-transform:uppercase}
+    tr.section-row td{background:rgba(77,142,255,.08);color:var(--accent)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .tab-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+    .tab-btn.active{background:var(--btn);color:#fff;border-color:var(--btn)}
+    .btn{display:inline-block;background:var(--btn);color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;margin-top:12px}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-left:8px}
+    footer{border-top:1px solid var(--border);padding:32px 20px;text-align:center;color:var(--muted);font-size:13px;margin-top:40px}
+    @media(max-width:640px){nav a{margin-left:0;margin-right:12px}}
+  </style>
+</head>
+<body>
+  <nav><div class="container inner">
+    <span class="brand">Smart Building · Integrador</span>
+    <div>
+      <a href="./index.html">Apresentação</a>
+      <a href="./sistema.html">Arquitetura</a>
+      <a href="./civil.html">Eng. Civil</a>
+      <a href="./api.html">API (ReDoc)</a>
+      <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+    </div>
+  </div></nav>
+
+  <div class="hero container">
+    <span class="pill">ExpoTech 2026 · UniFECAF</span>
+    <h1>Projeto Integrador Multidisciplinar</h1>
+    <p>Automação inteligente de climatização no laboratório de elétrica (subsolo). Quatro engenharias — Civil, Elétrica, Produção e Computação — em um único ecossistema.</p>
+  </div>
+
+  <section class="container" id="engenharias">
+    <h2>As quatro engenharias</h2>
+    <p class="sub">Resumo integrado e entregáveis oficiais em PDF.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Eng. Civil</h3>
+        <p>Infraestrutura, conforto térmico, maquete e modelo 3D.</p>
+        <a href="./civil.html">Página Civil →</a>
+        <a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf">PDF →</a>
+      </div>
+      <div class="card">
+        <h3>Eng. Elétrica</h3>
+        <p>Arduino, sensores, Bluetooth, integração MQTT.</p>
+        <a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf">PDF conceito →</a>
+      </div>
+      <div class="card">
+        <h3>Eng. Produção</h3>
+        <p>CAPEX, OPEX, ROI e cronograma integrado.</p>
+        <a href="./engenharias/entregaveis/em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf">PDF →</a>
+      </div>
+      <div class="card">
+        <h3>Eng. Computação</h3>
+        <p>API REST, MQTT, ML, dashboard React.</p>
+        <a href="./sistema.html">Arquitetura →</a>
+        <a href="./engenharias/entregaveis/em_pdf/Arquitetura%20do%20sistema.pdf">PDF →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" id="cronograma">
+    <h2>Cronograma integrado</h2>
+    <p class="sub">Visualização web (atualizada a partir do Excel). Use o botão para baixar o arquivo original.</p>
+    <a class="btn" href="./engenharias/entregaveis/cronograma-projeto-faculdade.xlsb">Baixar cronograma (.xlsb)</a>
+    <div class="tabs" style="margin-top:24px">
+      <button class="tab-btn active" data-tab="civil">Civil</button>
+      <button class="tab-btn" data-tab="comp">Computação</button>
+      <button class="tab-btn" data-tab="elec">Elétrica</button>
+    </div>
+    
+    <div id="tab-civil" class="cron-tab" style="display:block">
+      <h3 style="margin-bottom:12px;color:#adc6ff">Eng. Civil</h3>
+      <div class="table-wrap">
+        <table><thead><tr><th>#</th><th>Tarefa</th></tr></thead><tbody>
+        <tr><td>1</td><td>Analisar a causa raiz da condensação/vazamento (falha de isolamento térmico? Rachadura na tubulação?). Pesquisar materiais ideais para o reparo.</td></tr>
+<tr><td>2</td><td>Definir e orçar os materiais de reparo (ex: silicone de alta performance, isolantes térmicos).</td></tr>
+<tr><td>3</td><td>Fazer o projeto da maquete (escalonamento, escolha de materiais como MDF, acrílico ou PVC para simular a parede/teto onde o ar fica).</td></tr>
+<tr><td>4</td><td>Aplicar os materiais de reparo no local do vazamento real (se houver) ou montar o protótipo de contenção.</td></tr>
+<tr><td>5</td><td>Construção da maquete física para a apresentação, deixando os espaços certinhos para a galera da Elétrica/Computação passar a fiação e os sensores.</td></tr>
+<tr><td>6</td><td>Finalização estética da maquete, testes de estanqueidade (garantir que nada vai vazando na hora de apresentar) e preparação dos slides sobre a escolha dos materiais.</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div id="tab-comp" class="cron-tab" style="display:none">
+      <h3 style="margin-bottom:12px;color:#adc6ff">Eng. Computação</h3>
+      <div class="table-wrap">
+        <table><thead><tr><th>#</th><th>Tarefa</th></tr></thead><tbody>
+        <tr class="section-row"><td colspan="2"><strong>DEV1 – JHONATA (Backend Lead)</strong></td></tr>
+<tr><td>1</td><td>Configurar estrutura FastAPI | Criar diretórios (models, schemas, api, services, core), main.py funcional com Swagger</td></tr>
+<tr><td>2</td><td>Criar modelos SQLAlchemy | Implementar 8 tabelas (users, rooms, devices, sensor_data, commands, alerts, predictions, audit_log) com enums e relacionamentos</td></tr>
+<tr><td>3</td><td>Configurar PostgreSQL e Alembic | Subir PostgreSQL via Docker, configurar conexão async, gerar migração inicial</td></tr>
+<tr><td>4</td><td>Implementar autenticação JWT | Endpoints /auth/login, /auth/refresh. Middleware de proteção de rotas. Hash bcrypt</td></tr>
+<tr><td>5</td><td>Criar endpoints de dispositivos | CRUD devices, POST control (ligar/desligar/setpoint), GET status</td></tr>
+<tr><td>6</td><td>Criar endpoints de sensores | GET list, GET by id, GET data com filtro de período, GET latest</td></tr>
+<tr><td>7</td><td>Criar endpoints de alertas | GET list com filtros, POST acknowledge, GET history</td></tr>
+<tr><td>8</td><td>Criar endpoints de consumo e predições | GET consumption, GET predictions/24h (placeholder), GET reports</td></tr>
+<tr><td>9</td><td>Criar endpoints de salas e usuários | CRUD rooms, CRUD users (admin only)</td></tr>
+<tr><td>10</td><td>Integrar módulo MQTT | Conectar mqtt_client do Dev2 nos eventos startup/shutdown do FastAPI</td></tr>
+<tr><td>11</td><td>Implementar callbacks MQTT → banco | Funções que salvam telemetria e feedback no PostgreSQL</td></tr>
+<tr><td>12</td><td>Testes unitários básicos | Pytest para auth e endpoints principais</td></tr>
+<tr class="section-row"><td colspan="2"><strong>DEV2 – JOÃO ARNALDO (IoT &amp; MQTT)</strong></td></tr>
+<tr><td>13</td><td>Subir broker Mosquitto | Docker compose com mosquitto.conf, testar com MQTT Explorer</td></tr>
+<tr><td>14</td><td>Criar módulo MQTT do backend | app/mqtt/client.py com classe MQTTClient, reconexão automática, publish_command</td></tr>
+<tr><td>15</td><td>Criar simulador de sensores | Script Python simulando 14 salas publicando temperatura, umidade e presença a cada 5s</td></tr>
+<tr><td>16</td><td>Testar integração MQTT ↔ Backend | Validar que mensagens do simulador chegam no backend e são logadas</td></tr>
+<tr><td>17</td><td>Documentar tópicos MQTT | Lista completa de tópicos usados, exemplos de payload</td></tr>
+<tr><td>18</td><td>Firmware ESP32 (leitura de sensores) | Código Arduino para ler BME280 e PIR, publicar via WiFi/MQTT</td></tr>
+<tr><td>19</td><td>Firmware ESP32 (receber comandos)  | Callback MQTT para setpoint e power, controlar LED IR</td></tr>
+<tr><td>20</td><td>Firmware ESP32 (Offline Fallback) | Termostato local se perder conexão</td></tr>
+<tr><td>21</td><td>Testes de latência | Script Python medindo tempo publish→subscribe</td></tr>
+<tr class="section-row"><td colspan="2"><strong>DEV3 – RICKELMY (IA &amp; Dados)</strong></td></tr>
+<tr><td>22</td><td>Criar pipeline de features | Extrair dados históricos simulados, criar features (hora, dia, temperatura, presença)</td></tr>
+<tr><td>23</td><td>Treinar modelo de regressão | LinearRegression ou RandomForest para predição de consumo. Validar métricas (MAE, R²)</td></tr>
+<tr><td>24</td><td>Criar endpoint de predições | GET /predictions/24h retornando array de 24 valores</td></tr>
+<tr><td>25</td><td>Implementar regras de negócio RN01RN05 | Desligamento por ausência, bloqueio janela, faixa setpoint, prioridade manual, alerta consumo</td></tr>
+<tr><td>26</td><td>Implementar regras de negócio RN06RN10 | Horários funcionamento, retreinamento, validação dados, auditoria, eficiência</td></tr>
+<tr><td>27</td><td>Detecção de anomalias simples | Isolation Forest básico ou regra de limiar (temp > 35°C = anomalia)</td></tr>
+<tr><td>28</td><td>Recomendações de economia | Cards de sugestão baseados em regras simples</td></tr>
+<tr><td>29</td><td>Inicializar projeto React | Vite + TailwindCSS + React Router + Zustand, estrutura de pastas</td></tr>
+<tr><td>30</td><td>Criar tela de login | Formulário, chamada API /auth/login, armazenar token JWT, redirecionamento</td></tr>
+<tr><td>31</td><td>Criar layout base | Sidebar com navegação, header com info do usuário, área de conteúdo</td></tr>
+<tr><td>32</td><td>Criar dashboard principal | Cards de resumo (total dispositivos, média temp, consumo), gráfico de linha com Recharts</td></tr>
+<tr><td>33</td><td>Criar painel de controle | Lista de salas com card para cada, slider de setpoint, botão ligar/desligar, indicador de status</td></tr>
+<tr><td>34</td><td>Criar painel de alertas | Tabela de alertas com badge de severidade, filtros, botão acknowledge</td></tr>
+<tr><td>35</td><td>Tabela de alertas com badge de severidade, filtros, botão acknowledge | Gráfico de consumo histórico, exportação CSV, comparativo com predições</td></tr>
+<tr><td>36</td><td>Tela de predições 24h | Gráfico de barras com consumo previsto por hora</td></tr>
+<tr><td>37</td><td>Responsividade | daptar layout para mobile (menu hamburguer, cards empilhados)</td></tr>
+<tr><td>39</td><td>Inicializar projeto React | Vite + TailwindCSS + React Router + Zustand, estrutura de pastas</td></tr>
+<tr><td>40</td><td>Criar tela de login | Formulário, chamada API /auth/login, armazenar token JWT, redirecionamento</td></tr>
+<tr><td>41</td><td>Criar layout base | Sidebar com navegação, header com info do usuário, área de conteúdo</td></tr>
+<tr><td>42</td><td>Criar dashboard principal | Cards de resumo (total dispositivos, média temp, consumo), gráfico de linha com Recharts</td></tr>
+<tr><td>43</td><td>Criar painel de controle | Lista de salas com card para cada, slider de setpoint, botão ligar/desligar, indicador de status</td></tr>
+<tr><td>44</td><td>Criar painel de alertas | Tabela de alertas com badge de severidade, filtros, botão acknowledge</td></tr>
+<tr><td>45</td><td>Criar tela de relatórios | Gráfico de consumo histórico, exportação CSV, comparativo com predições</td></tr>
+<tr><td>46</td><td>Tela de predições 24h | Gráfico de barras com consumo previsto por hora</td></tr>
+<tr><td>47</td><td>Responsividade | Adaptar layout para mobile (menu hamburguer, cards empilhados)</td></tr>
+<tr class="section-row"><td colspan="2"><strong>DEV5 – CLAUDIO RODRIGUES (DevOps &amp; QA)</strong></td></tr>
+<tr><td>48</td><td>Configurar Docker Compose completo | Serviços: backend, frontend, db, mqtt, redis. Comunicação entre containers</td></tr>
+<tr><td>49</td><td>Criar Dockerfiles | Dockerfile para backend (Python 3.11) e frontend (Node + Nginx)</td></tr>
+<tr><td>50</td><td>Configurar GitHub Actions | Pipeline CI: lint, testes unitários, build. CD: deploy hooks</td></tr>
+<tr><td>51</td><td>Criar seed database | Script para popular banco com dados de teste (usuário admin, 14 salas, dispositivos)</td></tr>
+<tr><td>52</td><td>Criar documentação README | Setup local passo a passo, prérequisitos, comandos para subir</td></tr>
+<tr><td>53</td><td>Criar diagramas atualizados | C4 contexto e contêineres, DER do banco, fluxo MQTT (Draw.io)</td></tr>
+<tr><td>54</td><td>Testes de integração | Validar fluxo ponta a ponta: simulador → MQTT → backend → API → frontend</td></tr>
+<tr><td>55</td><td>Testes de aceitação (UAT) | Executar cenários UAT01 a UAT06, documentar resultados</td></tr>
+<tr><td>56</td><td>Configurar logs estruturados | Substituir prints por structlog no backend</td></tr>
+<tr><td>57</td><td>Preparar slides de apresentação | Template, arquitetura, demonstração do sistema</td></tr>
+<tr><td>58</td><td>Gravar vídeo pitch | Template, arquitetura, demonstração do sistema</td></tr>
+<tr><td>59</td><td>Gravar vídeo pitch | Roteiro, gravação de tela demonstrando funcionalidades</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div id="tab-elec" class="cron-tab" style="display:none">
+      <h3 style="margin-bottom:12px;color:#adc6ff">Eng. Elétrica</h3>
+      <div class="table-wrap">
+        <table><thead><tr><th>#</th><th>Tarefa</th></tr></thead><tbody>
+        <tr><td>1</td><td>Ligação dos componentes no protoboard/ preparação para maquete</td></tr>
+<tr><td>2</td><td>Programação/testes iniciais do arduino</td></tr>
+<tr><td>3</td><td>Fazer o projeto da maquete (escalonamento, escolha de materiais como MDF, acrílico ou PVC para simular a parede/teto onde o ar fica).</td></tr>
+<tr><td>4</td><td>Entrega do arduino montado para computação compatibilizar com o Dashboard</td></tr>
+<tr><td>5</td><td>Ajustes finais na maquete com o pessoal de civil</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" id="entregaveis">
+    <h2>Entregáveis oficiais (PDF)</h2>
+    <p class="sub">Documentos formais para download. Após editar o Excel, rode <code style="color:#adc6ff">python tools/build_engenharias_page.py</code> para atualizar as abas abaixo.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Documento</th><th>Área</th><th>Download</th></tr></thead>
+        <tbody>
+        <tr><td>Relatório integrador</td><td>Eng. Civil</td><td><a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
+<tr><td>Relatório financeiro</td><td>Eng. Produção</td><td><a href="./engenharias/entregaveis/em_pdf/Relat%C3%B3rio%20Finaceiro%20de%20Implementa%C3%A7%C3%A3o%20de%20Projeto.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
+<tr><td>Visão geral do laboratório</td><td>Conceito</td><td><a href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
+<tr><td>Arquitetura do sistema</td><td>Eng. Computação</td><td><a href="./engenharias/entregaveis/em_pdf/Arquitetura%20do%20sistema.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
+<tr><td>Escopo e arquitetura funcional</td><td>Eng. Computação</td><td><a href="./engenharias/entregaveis/em_pdf/Relatorio_de_Escopo_e_Arquitetura_Funcional.pdf" style="color:#4d8eff">Baixar PDF</a></td></tr>
+<tr><td>Cronograma integrado</td><td>Todas</td><td><a href="./engenharias/entregaveis/cronograma-projeto-faculdade.xlsb" style="color:#4d8eff">Baixar Excel (.xlsb)</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="container" id="equipe">
+    <h2>Equipe integradora</h2>
+    <p class="sub"><a href="./index.html" style="color:#4d8eff">Voltar à apresentação</a></p>
+    <div class="grid">
+      <div class="card"><h3>Computação</h3><p>Jhonata, João, Rickelmy, Felipe, Claudio</p></div>
+      <div class="card"><h3>Civil</h3><p>Kayke, Nicolas, Renan, Lucca, Bruno</p></div>
+      <div class="card"><h3>Produção</h3><p>Pedro Henrique, Samuel</p></div>
+      <div class="card"><h3>Elétrica</h3><p>Equipe a confirmar no entregável formal</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Smart Building · ExpoTech 2026</p>
+    <p style="margin-top:8px"><a href="./index.html" style="color:#4d8eff">Apresentação</a> · <a href="./sistema.html" style="color:#4d8eff">Arquitetura</a></p>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.cron-tab').forEach(t => t.style.display = 'none');
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+      });
+    });
+  </script>
+</body>
+</html>

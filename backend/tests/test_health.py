@@ -1,37 +1,43 @@
-"""Testes: endpoint público de health-check.
-
-Verifica que o endpoint /health responde 200 e que o header
-Cache-Control injeta corretamente o valor 'private, no-store'
-para endpoints da API (middleware implementado em main.py).
-"""
+"""Testes: health check, falha parcial e 503 quando DB indisponível."""
 from __future__ import annotations
+
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_health_returns_200(client: AsyncClient) -> None:
-    """GET /health deve retornar HTTP 200."""
-    response = await client.get("/health")
+async def test_health_returns_200_when_db_ok(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/health")
     assert response.status_code == 200
+    body = response.json()
+    assert body["status"] in ("healthy", "degraded")
+    assert "subsystems" in body
+    assert "database" in body["subsystems"]
 
 
 @pytest.mark.asyncio
-async def test_health_response_has_status_field(client: AsyncClient) -> None:
-    """Resposta do /health deve conter o campo 'status'."""
-    response = await client.get("/health")
+async def test_health_reports_subsystems(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/health")
+    subs = response.json()["subsystems"]
+    assert set(subs.keys()) >= {"database", "redis", "mqtt", "simulator"}
+
+
+@pytest.mark.asyncio
+async def test_health_returns_503_rfc7807_when_db_down(client: AsyncClient) -> None:
+    with patch("app.api.v1.health.ping_db", new=AsyncMock(return_value=False)):
+        response = await client.get("/api/v1/health")
+    assert response.status_code == 503
+    assert response.headers["content-type"].startswith("application/problem+json")
     body = response.json()
-    assert "status" in body
+    assert body["status"] == 503
+    assert body["title"] == "Serviço indisponível"
+    assert "subsystems" in body
 
 
 @pytest.mark.asyncio
 async def test_api_responses_have_cache_control_header(client: AsyncClient) -> None:
-    """Respostas da API /api/ devem incluir Cache-Control: private, no-store (LGPD).
-
-    Este teste valida o middleware de Cache-Control adicionado em main.py.
-    Mesmo que o endpoint retorne 401, o header deve estar presente.
-    """
     response = await client.get("/api/v1/rooms")
     assert "cache-control" in response.headers
     assert "no-store" in response.headers["cache-control"]

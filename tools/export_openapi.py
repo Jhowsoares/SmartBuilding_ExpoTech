@@ -1,45 +1,70 @@
 #!/usr/bin/env python3
 """
-Exporta o openapi.yaml estático a partir do app FastAPI.
-
-Por quê isso existe:
-  O FastAPI gera o schema OpenAPI dinamicamente em /openapi.json.
-  A avaliação exige o arquivo openapi.yaml versionado no repositório
-  como evidência de Design-first e para o Spectral lint no CI/CD.
-
-Uso:
-  python tools/export_openapi.py            # salva em docs/openapi.yaml
-  python tools/export_openapi.py --check    # só verifica se está atualizado (usado no CI)
-
-No CI (.github/workflows/ci.yml), este script roda após os testes
-para garantir que o contrato está sincronizado com o código.
+Exporta o openapi.yaml estático a partir do app FastAPI e enriquece metadados
+de DX exigidos pela avaliação (exemplos de login, contato, depreciação).
 """
 from __future__ import annotations
 
 import argparse
-import json
-import subprocess
+import copy
 import sys
 from pathlib import Path
 
 import yaml
 
-ROOT = Path(__file__).parent.parent  # pasta backend/
-DOCS = ROOT.parent / "docs"
+ROOT = Path(__file__).parent.parent
+BACKEND = ROOT / "backend"
+DOCS = ROOT / "docs"
 OUTPUT = DOCS / "openapi.yaml"
 
 
 def get_openapi_schema() -> dict:
-    """Importa o app FastAPI e retorna o schema OpenAPI como dict."""
-    sys.path.insert(0, str(ROOT))
-    # Importa sem iniciar o servidor
+    sys.path.insert(0, str(BACKEND))
     from app.main import app  # noqa: PLC0415
 
     return app.openapi()
 
 
+def enrich_openapi(schema: dict) -> dict:
+    """Camada editorial sobre o schema gerado pelo FastAPI (design-first + DX)."""
+    out = copy.deepcopy(schema)
+    info = out.setdefault("info", {})
+    info.setdefault("contact", {"name": "Smart Building ExpoTech", "email": "suporte@smartbuilding.local"})
+    info.setdefault(
+        "description",
+        "Sistema de controle inteligente de ar-condicionado — contrato sincronizado "
+        "com o código via CI (contract-check).",
+    )
+
+    paths = out.get("paths", {})
+    login_op = paths.get("/api/v1/auth/login", {}).get("post")
+    if login_op:
+        content = login_op.setdefault("requestBody", {}).setdefault("content", {})
+        json_body = content.setdefault("application/json", {})
+        json_body.setdefault("examples", {
+            "admin": {
+                "summary": "Login como administrador",
+                "value": {"email": "admin@smartbuilding.local", "password": "admin123"},
+            },
+            "operador": {
+                "summary": "Login como operador",
+                "value": {"email": "operador@smartbuilding.local", "password": "op123"},
+            },
+        })
+
+    history_path = "/api/v1/sensors/{sensor_id}/data"
+    history_op = paths.get(history_path, {}).get("get")
+    if history_op:
+        history_op["deprecated"] = True
+        history_op.setdefault(
+            "description",
+            "Endpoint legado. Depreciado em 2027-01-01; sunset em 2027-06-01.",
+        )
+
+    return out
+
+
 def dict_to_yaml(schema: dict) -> str:
-    """Converte o schema dict para YAML com formatação limpa."""
     return yaml.dump(
         schema,
         allow_unicode=True,
@@ -59,7 +84,7 @@ def main() -> None:
     args = parser.parse_args()
 
     print("Carregando schema OpenAPI do FastAPI...")
-    schema = get_openapi_schema()
+    schema = enrich_openapi(get_openapi_schema())
     yaml_content = dict_to_yaml(schema)
 
     if args.check:
@@ -78,14 +103,13 @@ def main() -> None:
     else:
         DOCS.mkdir(parents=True, exist_ok=True)
         OUTPUT.write_text(yaml_content, encoding="utf-8")
-        print(f"openapi.yaml exportado para {OUTPUT}")
-        # Conta endpoints como evidência
         paths = schema.get("paths", {})
         total = sum(
-            len([m for m in methods if m in {"get","post","put","patch","delete"}])
+            len([m for m in methods if m in {"get", "post", "put", "patch", "delete"}])
             for methods in paths.values()
         )
-        print(f"  {len(paths)} paths · {total} operações · versão {schema.get('info',{}).get('version','?')}")
+        print(f"openapi.yaml exportado para {OUTPUT}")
+        print(f"  {len(paths)} paths · {total} operações · versão {schema.get('info', {}).get('version', '?')}")
 
 
 if __name__ == "__main__":

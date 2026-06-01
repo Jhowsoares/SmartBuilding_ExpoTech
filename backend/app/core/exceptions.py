@@ -43,6 +43,11 @@ class BusinessRuleError(SmartBuildingError):
     title = "Regra de negócio violada"
 
 
+class ServiceUnavailableError(SmartBuildingError):
+    status_code = 503
+    title = "Serviço indisponível"
+
+
 def _problem(status_code: int, title: str, detail: str, instance: str = "") -> JSONResponse:
     return JSONResponse(
         status_code=status_code,

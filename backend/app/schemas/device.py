@@ -58,7 +58,6 @@ class DeviceResponse(BaseModel):
         return [
             HateoasLink(rel="self", href=base),
             HateoasLink(rel="control", href=f"{base}/control", method="POST"),
-            HateoasLink(rel="status", href=f"{base}/status"),
         ]
 
 

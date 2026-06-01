@@ -38,5 +38,5 @@ class RoomResponse(BaseModel):
         base = f"/api/v1/rooms/{room_id}"
         return [
             HateoasLink(rel="self", href=base),
-            HateoasLink(rel="devices", href=f"{base}/devices"),
+            HateoasLink(rel="devices", href=f"/api/v1/devices?room_id={room_id}"),
         ]

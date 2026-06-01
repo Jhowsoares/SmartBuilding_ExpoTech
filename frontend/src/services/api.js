@@ -41,11 +41,9 @@ export const getRooms = () => api.get('/rooms')
 export const getRoom = (id) => api.get(`/rooms/${id}`)
 export const createRoom = (payload) => api.post('/rooms', payload)
 export const deleteRoom = (id) => api.delete(`/rooms/${id}`)
-export const getRoomCommands = (id, params) => api.get(`/rooms/${id}/commands`, { params })
 
 // ─── Devices ────────────────────────────────────────────────────────────────
 export const getDevices = (params) => api.get('/devices', { params })
-export const getDevice = (id) => api.get(`/devices/${id}`)
 export const createDevice = (payload) => api.post('/devices', payload)
 export const updateDevice = (id, payload) => api.patch(`/devices/${id}`, payload)
 export const deleteDevice = (id) => api.delete(`/devices/${id}`)
@@ -75,7 +73,7 @@ export const trainModel = () => api.post('/predictions/train')
 // ─── Users ──────────────────────────────────────────────────────────────────
 export const getUsers = (params) => api.get('/users', { params })
 export const createUser = (payload) => api.post('/users', payload)
-export const updateUser = (id, payload) => api.put(`/users/${id}`, payload)
+export const updateUser = (id, payload) => api.patch(`/users/${id}`, payload)
 export const deleteUser = (id) => api.delete(`/users/${id}`)
 
 // ─── Health / System Status ──────────────────────────────────────────────────

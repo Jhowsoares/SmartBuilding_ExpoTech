@@ -5,11 +5,13 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi.responses import JSONResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.api_lifecycle import DEPRECATION_HEADERS
 from app.core.deps import get_current_user, get_db
 from app.core.exceptions import ResourceNotFoundError
 from app.schemas.base import HateoasLink, PaginationMeta
@@ -25,8 +27,32 @@ _SENSOR_RE = re.compile(r"^sensor-(temperature|humidity|presence)-.+$")
 _limiter = Limiter(key_func=get_remote_address)
 
 
-@router.post("/data", response_model=SensorDataResponse, status_code=status.HTTP_201_CREATED,
-             summary="Ingerir leitura de sensor IoT")
+@router.post(
+    "/data",
+    response_model=SensorDataResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Ingerir leitura de sensor IoT",
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "examples": {
+                        "temperature": {
+                            "summary": "Leitura de temperatura",
+                            "value": {
+                                "sensor_id": "sensor-temperature-room-101",
+                                "tipo": "temperature",
+                                "valor": 24.3,
+                                "tick": 42,
+                                "timestamp": "2026-06-01T12:00:00Z",
+                            },
+                        }
+                    }
+                }
+            }
+        }
+    },
+)
 @_limiter.limit(settings.RATE_LIMIT_SENSOR_INGEST)
 async def ingest_sensor_data(
     payload: SensorDataIngest,
@@ -85,27 +111,49 @@ async def get_sensor(
                           links=SensorResponse.build_links(sensor_id))
 
 
-@router.get("/{sensor_id}/data", status_code=200, summary="Histórico de leituras", name="get_sensor_history")
+@router.get(
+    "/{sensor_id}/data",
+    status_code=200,
+    summary="Histórico de leituras (legado — use paginação em /sensors)",
+    name="get_sensor_history",
+    deprecated=True,
+    description=(
+        "Endpoint legado mantido para compatibilidade. "
+        "Depreciado em 2027-01-01; desligamento previsto em 2027-06-01."
+    ),
+)
 @_limiter.limit(settings.RATE_LIMIT_DEFAULT)
 async def get_sensor_history(
     sensor_id: str,
     request: Request,
-    period: str = Query("24h", pattern="^(1h|24h|7d|30d)$"),
-    page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100),
-    anomalies_only: bool = Query(False),
+    period: str = Query("24h", pattern="^(1h|24h|7d|30d)$", description="Janela temporal"),
+    page: int = Query(1, ge=1, description="Número da página"),
+    size: int = Query(20, ge=1, le=100, description="Itens por página (máx. 100)"),
+    anomalies_only: bool = Query(False, description="Filtrar apenas anomalias"),
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(get_current_user),
-) -> dict:
+) -> JSONResponse:
     if not _SENSOR_RE.match(sensor_id):
         raise ResourceNotFoundError("Sensor", sensor_id)
     service = SensorService(db)
     records, total = await service.get_history(sensor_id, period, page, size, anomalies_only)
     total_pages = max(1, -(-total // size)) if total else 0
-    return {
-        "data": [{"id": r.id, "sensor_id": r.sensor_id, "tipo": r.tipo, "valor": r.valor,
-                  "tick": r.tick, "timestamp": r.timestamp.isoformat(), "is_anomaly": r.is_anomaly} for r in records],
+    body = {
+        "data": [
+            {
+                "id": r.id,
+                "sensor_id": r.sensor_id,
+                "tipo": r.tipo,
+                "valor": r.valor,
+                "tick": r.tick,
+                "timestamp": r.timestamp.isoformat(),
+                "is_anomaly": r.is_anomaly,
+            }
+            for r in records
+        ],
         "meta": {"total": total, "page": page, "size": size, "total_pages": total_pages},
     }
+    return JSONResponse(content=body, headers=dict(DEPRECATION_HEADERS))
 
 
 @router.get("/{sensor_id}/latest", response_model=SensorLatestResponse, status_code=200,

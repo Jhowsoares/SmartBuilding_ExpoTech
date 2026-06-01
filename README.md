@@ -3,10 +3,10 @@
 # Smart Building
 ### Sistema de Controle Inteligente de Ar-Condicionado
 
-**ExpoTech 2026 · Engenharia da Computação**
+**ExpoTech 2026 · Projeto Integrador (4 Engenharias)**
 
 [![API Docs](https://img.shields.io/badge/API-Swagger_UI-85ea2d?logo=swagger)](http://localhost:8000/api/docs)
-[![ReDoc](https://img.shields.io/badge/Docs-GitHub_Pages-orange?logo=readme)](https://jhowsoares.github.io/SmartBuilding_ExpoTech/)
+[![Docs](https://img.shields.io/badge/Docs-GitHub_Pages-orange?logo=readme)](https://jhowsoares.github.io/SmartBuilding_ExpoTech/)
 [![Docker](https://img.shields.io/badge/Deploy-Docker_Compose-2496ed?logo=docker)](https://www.docker.com/)
 
 > *"Economize energia, respeite o conforto, automatize com inteligência."*
@@ -17,11 +17,9 @@
 
 ## Comece aqui
 
-**Primeira vez no projeto?** Siga o guia passo a passo (inclui instalação do Docker, primeiros comandos e solução de problemas comuns):
+**Primeira vez no projeto?** Siga o guia passo a passo (Docker, primeiros comandos, troubleshooting):
 
-**[Configuração e Primeiro Uso → docs/setup.md](docs/setup.md)**
-
-Em três comandos, após instalar o Docker Desktop:
+**[Configuração e Primeiro Uso → docs/guias/setup.md](docs/guias/setup.md)**
 
 ```bash
 git clone https://github.com/Jhowsoares/SmartBuilding_ExpoTech.git
@@ -33,72 +31,65 @@ docker compose up -d --build
 |-------|-----|
 | Dashboard | http://localhost:3000 |
 | Swagger (testar API) | http://localhost:8000/api/docs |
-| Documentação pública | https://jhowsoares.github.io/SmartBuilding_ExpoTech/ |
+| Documentação técnica (Pages) | https://jhowsoares.github.io/SmartBuilding_ExpoTech/ |
+| **Panorama integrador (Pages)** | https://jhowsoares.github.io/SmartBuilding_ExpoTech/engenharias.html |
 
 Login padrão: `admin@smartbuilding.local` / `admin123`
 
 ---
 
-## Documentação completa
+## Projeto integrador (visão geral)
 
-A documentação foi dividida em arquivos menores para facilitar a leitura e a manutenção.
+Este repositório reúne **Civil, Elétrica, Produção e Computação** em torno da automação de climatização no laboratório de elétrica (subsolo).
+
+| Área | Resumo |
+|------|--------|
+| **Civil** | Infraestrutura, conforto térmico, maquete |
+| **Elétrica** | Sensores, Arduino/Bluetooth, automação física |
+| **Produção** | CAPEX/OPEX, ROI, cronograma |
+| **Computação** | API, MQTT, ML, dashboard (este repositório) |
+
+**[Visão completa das engenharias → docs/engenharias/README.md](docs/engenharias/README.md)**
+
+---
+
+## Documentação do sistema
 
 | Documento | Conteúdo |
 |-----------|----------|
-| **[Setup e primeiro uso](docs/setup.md)** | Docker para iniciantes, passo a passo, troubleshooting |
-| **[Arquitetura](docs/architecture.md)** | Stack, diagrama, fluxo de dados, Redis, monorepo |
-| **[Hardware ESP32](docs/hardware-esp32.md)** | Pinagem, firmware, IR, ponte Bluetooth |
-| **[Rede / ExpoTech](docs/network-expotech.md)** | Ngrok, ESP32 remoto, IP local |
-| **[API](docs/api.md)** | Swagger, credenciais, endpoints, exemplos |
-| **[Regras de negócio](docs/business-rules.md)** | RN01–RN10 e ML |
-| **[Estrutura do projeto](docs/project-structure.md)** | Pastas, serviços Docker |
-| **[MQTT](docs/mqtt.md)** | Tópicos e payloads |
-| **[Variáveis de ambiente](docs/environment.md)** | `.env` e configurações |
-| **[Equipe](docs/team.md)** | Integrantes e papéis |
-| **[Repositório — tamanho](docs/repositorio.md)** | Por que o clone parece pesado, como limpar |
+| **[Índice completo](docs/README.md)** | Todos os guias e referências |
+| **[Setup](docs/guias/setup.md)** | Docker para iniciantes |
+| **[Arquitetura](docs/sistema/architecture.md)** | Stack, diagrama, fluxo de dados |
+| **[API](docs/sistema/api.md)** | Swagger, endpoints, exemplos |
+| **[MQTT](docs/sistema/mqtt.md)** | Tópicos e payloads |
+| **[Regras de negócio](docs/sistema/business-rules.md)** | RN01–RN10 |
+| **[Hardware ESP32](docs/sistema/hardware-esp32.md)** | Firmware e pinagem |
+| **[Equipe CS](docs/sistema/team.md)** | Integrantes de Computação |
+| **[Repositório — tamanho](docs/guias/repositorio.md)** | Clone pesado, como limpar |
+| **[Depreciação API](docs/sistema/deprecation-policy.md)** | Ciclo de vida `/v1` |
 
 ---
 
-## Visão geral (resumo)
+## Visão geral técnica (resumo)
 
-O **Smart Building** é uma plataforma IoT para monitoramento e automação de climatização em edifícios corporativos:
+- **14 salas simuladas** via MQTT (telemetria a cada 5s)
+- **10 regras de negócio** + predição ML 24h
+- **Dashboard React** + **API REST** OpenAPI 3.1
+- **Docker Compose** — 6 serviços
 
-- **14 salas simuladas** publicando temperatura, umidade e presença via MQTT a cada 5s
-- **10 regras de negócio** (desligamento por ausência, horário comercial, alertas de consumo…)
-- **Predição de consumo 24h** com scikit-learn
-- **Dashboard React** com controle de AC, relatórios e alertas
-- **API REST** documentada (OpenAPI 3, Swagger, ReDoc)
-
-### Stack
-
-FastAPI · PostgreSQL · Redis · Mosquitto MQTT · React 18 · Docker Compose · scikit-learn
-
----
-
-## ⚡ Performance e Acordo de Nível de Serviço (SLA)
-
-Para garantir a alta disponibilidade e a eficiência na ingestão de dados IoT e controle predial, o sistema foi projetado seguindo rígidos critérios de performance.
-
-* **SLO (Objetivo de Nível de Serviço):** 99% das respostas em < 300ms em ambiente local.
+**Stack:** FastAPI · PostgreSQL · Redis · Mosquitto · React · scikit-learn
 
 ---
 
 ## Repositório pesado?
 
-Se o clone ou a pasta parecem ter **vários GB**, leia **[docs/repositorio.md](docs/repositorio.md)**.
-| **[Repositório — tamanho](docs/repositorio.md)** | Por que o clone parece pesado, como limpar |
-| **[Política de Depreciação](docs/deprecation-policy.md)** | Diretrizes de ciclo de vida e desativação de endpoints legados (Critério 5) |
-Resumo:
-
-- O **Git** tinha modelos ML (`.pkl` ~50 MB) versionados — agora estão no `.gitignore`.
-- **Imagens Docker** (2–8 GB) não fazem parte do Git; são baixadas no primeiro `docker compose up`.
-- Para limpar o histórico Git de arquivos antigos, siga o guia em `docs/repositorio.md`.
+Leia **[docs/guias/repositorio.md](docs/guias/repositorio.md)** — modelos `.pkl` saíram do Git; imagens Docker são baixadas no primeiro `docker compose up`.
 
 ---
 
 ## Links rápidos
 
-[Swagger UI](http://localhost:8000/api/docs) · [GitHub Pages](https://jhowsoares.github.io/SmartBuilding_ExpoTech/) · [GitHub](https://github.com/Jhowsoares/SmartBuilding_ExpoTech)
+[Swagger UI](http://localhost:8000/api/docs) · [GitHub Pages](https://jhowsoares.github.io/SmartBuilding_ExpoTech/) · [Engenharias (Pages)](https://jhowsoares.github.io/SmartBuilding_ExpoTech/engenharias.html) · [GitHub](https://github.com/Jhowsoares/SmartBuilding_ExpoTech)
 
 ---
 

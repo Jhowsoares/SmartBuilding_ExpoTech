@@ -3,12 +3,24 @@ import { getUsers, createUser, updateUser, deleteUser } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { format } from 'date-fns'
 
-const ROLE_LABELS = { admin: 'Administrador', operador: 'Operador', viewer: 'Visualizador' }
+const ROLE_LABELS = {
+  admin: 'Administrador',
+  operador: 'Operador',
+  visualizador: 'Visualizador',
+  viewer: 'Visualizador',
+}
 const ROLE_COLORS = {
   admin: 'text-red-400 bg-red-900/30 border-red-700',
   operador: 'text-yellow-400 bg-yellow-900/30 border-yellow-700',
+  visualizador: 'text-blue-400 bg-blue-900/30 border-blue-700',
   viewer: 'text-blue-400 bg-blue-900/30 border-blue-700',
 }
+
+const API_ROLES = [
+  { value: 'visualizador', label: 'Visualizador' },
+  { value: 'operador', label: 'Operador' },
+  { value: 'admin', label: 'Administrador' },
+]
 
 function Avatar({ name, email }) {
   const initials = (name || email || 'U').split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -32,7 +44,7 @@ function Toast({ message, type, onClose }) {
 }
 
 function InviteModal({ onClose, onSave }) {
-  const [form, setForm] = useState({ name: '', email: '', role: 'viewer', password: '' })
+  const [form, setForm] = useState({ name: '', email: '', role: 'visualizador', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -41,7 +53,7 @@ function InviteModal({ onClose, onSave }) {
     if (!form.email || !form.password) { setError('E-mail e senha são obrigatórios.'); return }
     setLoading(true)
     try {
-      await createUser(form)
+      await createUser({ email: form.email, password: form.password, role: form.role })
       onSave()
       onClose()
     } catch (err) {
@@ -82,9 +94,9 @@ function InviteModal({ onClose, onSave }) {
             <label className="block text-sm text-gray-300 mb-1">Função</label>
             <select className="input-field" value={form.role}
               onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}>
-              <option value="viewer">Visualizador</option>
-              <option value="operador">Operador</option>
-              <option value="admin">Administrador</option>
+              {API_ROLES.map((r) => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
             </select>
           </div>
           {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -122,9 +134,9 @@ function EditRoleModal({ user, onClose, onSave }) {
         <h3 className="text-white font-semibold text-lg mb-4">Editar Função</h3>
         <p className="text-gray-400 text-sm mb-4">{user.email}</p>
         <select className="input-field mb-4" value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="viewer">Visualizador</option>
-          <option value="operador">Operador</option>
-          <option value="admin">Administrador</option>
+          {API_ROLES.map((r) => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
         </select>
         <div className="flex gap-3">
           <button onClick={onClose} className="flex-1 btn-secondary">Cancelar</button>
@@ -241,7 +253,7 @@ export default function UsersPage() {
                       </div>
                     </td>
                     <td className="table-cell">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${ROLE_COLORS[u.role] || ROLE_COLORS.viewer}`}>
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${ROLE_COLORS[u.role] || ROLE_COLORS.visualizador}`}>
                         {ROLE_LABELS[u.role] || u.role}
                       </span>
                     </td>

@@ -122,7 +122,6 @@ app = FastAPI(
         {"name": "Alerts",      "description": "Alertas e notificações do sistema"},
         {"name": "Consumption", "description": "Histórico e análise de consumo energético"},
         {"name": "Predictions", "description": "Predições de consumo geradas pelo modelo de IA"},
-        {"name": "Reports",     "description": "Relatórios consolidados exportáveis"},
         {"name": "Users",       "description": "Gestão de usuários e controle de acesso (RBAC)"},
     ],
     lifespan=lifespan,

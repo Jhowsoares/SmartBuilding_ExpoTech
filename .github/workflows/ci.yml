@@ -111,11 +111,7 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Exportar openapi.yaml do FastAPI
-        run: |
-          cd backend
-          python tools/export_openapi.py
-        env:
-          EXPORT_ONLY: "true"
+        run: python tools/export_openapi.py
 
       - name: Verificar se openapi.yaml está atualizado
         run: |

@@ -106,16 +106,3 @@ async def control_device(
 ) -> DeviceControlResponse:
     service = DeviceService(db)
     return await service.control_device(device_id, payload, user_id=current_user.get("sub", "system"))
-
-
-@router.get("/{device_id}/status", response_model=DeviceResponse, status_code=200,
-            summary="Status atual do dispositivo")
-@_limiter.limit(settings.RATE_LIMIT_DEFAULT)
-async def get_device_status(
-    device_id: uuid.UUID,
-    request: Request,
-    db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-) -> DeviceResponse:
-    service = DeviceService(db)
-    return await service.get_device(device_id)

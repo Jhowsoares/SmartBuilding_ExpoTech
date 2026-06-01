@@ -4,7 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
 import { format } from 'date-fns'
-import { getRoom, getDevices, getSensorData, getSensors, deleteDevice, getRoomCommands } from '../services/api'
+import { getRoom, getDevices, getSensorData, getSensors, deleteDevice } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 const DEVICE_TYPE_ICONS = {
@@ -28,15 +28,6 @@ const DEVICE_TYPE_ICONS = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   ),
-}
-
-const COMMAND_TYPE_LABELS = {
-  power_on: 'Ligar AC',
-  power_off: 'Desligar AC',
-  set_temperature: 'Setpoint',
-  POWER_ON: 'Ligar AC',
-  POWER_OFF: 'Desligar AC',
-  SET_TEMPERATURE: 'Setpoint',
 }
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -68,8 +59,6 @@ export default function RoomDetailPage() {
   const [room, setRoom] = useState(null)
   const [devices, setDevices] = useState([])
   const [chartData, setChartData] = useState([])
-  const [commands, setCommands] = useState([])
-  const [cmdLoading, setCmdLoading] = useState(true)
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -107,23 +96,9 @@ export default function RoomDetailPage() {
     }
   }, [id])
 
-  const fetchCommands = useCallback(async () => {
-    setCmdLoading(true)
-    try {
-      const res = await getRoomCommands(id, { size: 20 })
-      const arr = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.items || []
-      setCommands(arr)
-    } catch {
-      setCommands([])
-    } finally {
-      setCmdLoading(false)
-    }
-  }, [id])
-
   useEffect(() => {
     fetchData()
-    fetchCommands()
-  }, [fetchData, fetchCommands])
+  }, [fetchData])
 
   const handleDeleteDevice = async (deviceId) => {
     if (!confirm('Remover este dispositivo da sala?')) return
@@ -247,57 +222,6 @@ export default function RoomDetailPage() {
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* Command history — real data from /rooms/{id}/commands */}
-      <div className="card overflow-hidden">
-        <div className="px-6 py-4 border-b border-sb-border flex items-center justify-between">
-          <h3 className="text-sb-on-surface font-semibold">Histórico de Comandos</h3>
-          {cmdLoading && <LoadingSpinner size="sm" />}
-        </div>
-        {!cmdLoading && commands.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-sb-outline">
-            <span className="material-symbols-outlined text-[40px] opacity-30 mb-2">history</span>
-            <p className="text-sm">Nenhum comando registrado para esta sala</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-sb-border bg-sb-card-high">
-                  {['Data/Hora', 'Ação', 'Origem', 'Valor', 'Status'].map((h) => (
-                    <th key={h} className="table-header">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-sb-border">
-                {commands.map((c, i) => {
-                  const cmdLabel = COMMAND_TYPE_LABELS[c.command_type] || c.command_type || '—'
-                  const isSuccess = c.status === 'executed' || c.status === 'success' || c.status === 'EXECUTED'
-                  const ts = c.executed_at || c.created_at
-                  return (
-                    <tr key={c.id || i} className="hover:bg-sb-card-high transition-colors">
-                      <td className="table-cell font-mono text-xs text-sb-outline">
-                        {ts ? format(new Date(ts), 'dd/MM HH:mm:ss') : '—'}
-                      </td>
-                      <td className="table-cell text-sb-on-surface font-medium">{cmdLabel}</td>
-                      <td className="table-cell text-sb-outline text-sm">{c.issued_by || '—'}</td>
-                      <td className="table-cell font-mono text-xs text-sb-outline">
-                        {c.value != null ? `${c.value}°C` : '—'}
-                      </td>
-                      <td className="table-cell">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium
-                          ${isSuccess ? 'text-green-400 bg-green-900/30' : 'text-sb-error bg-red-900/30'}`}>
-                          {isSuccess ? 'Sucesso' : (c.status || 'Pendente')}
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
     </div>
   )

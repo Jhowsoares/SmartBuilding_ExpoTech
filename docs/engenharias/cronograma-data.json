@@ -1,0 +1,296 @@
+{
+  "Cronograma Civil": [
+    {
+      "id": 1,
+      "desc": "Analisar a causa raiz da condensação/vazamento (falha de isolamento térmico? Rachadura na tubulação?). Pesquisar materiais ideais para o reparo."
+    },
+    {
+      "id": 2,
+      "desc": "Definir e orçar os materiais de reparo (ex: silicone de alta performance, isolantes térmicos)."
+    },
+    {
+      "id": 3,
+      "desc": "Fazer o projeto da maquete (escalonamento, escolha de materiais como MDF, acrílico ou PVC para simular a parede/teto onde o ar fica)."
+    },
+    {
+      "id": 4,
+      "desc": "Aplicar os materiais de reparo no local do vazamento real (se houver) ou montar o protótipo de contenção."
+    },
+    {
+      "id": 5,
+      "desc": "Construção da maquete física para a apresentação, deixando os espaços certinhos para a galera da Elétrica/Computação passar a fiação e os sensores."
+    },
+    {
+      "id": 6,
+      "desc": "Finalização estética da maquete, testes de estanqueidade (garantir que nada vai vazando na hora de apresentar) e preparação dos slides sobre a escolha dos materiais."
+    }
+  ],
+  "Cronograma Computação": [
+    {
+      "section": "DEV1 – JHONATA (Backend Lead)"
+    },
+    {
+      "id": 1,
+      "desc": "Configurar estrutura FastAPI | Criar diretórios (models, schemas, api, services, core), main.py funcional com Swagger"
+    },
+    {
+      "id": 2,
+      "desc": "Criar modelos SQLAlchemy | Implementar 8 tabelas (users, rooms, devices, sensor_data, commands, alerts, predictions, audit_log) com enums e relacionamentos"
+    },
+    {
+      "id": 3,
+      "desc": "Configurar PostgreSQL e Alembic | Subir PostgreSQL via Docker, configurar conexão async, gerar migração inicial"
+    },
+    {
+      "id": 4,
+      "desc": "Implementar autenticação JWT | Endpoints /auth/login, /auth/refresh. Middleware de proteção de rotas. Hash bcrypt"
+    },
+    {
+      "id": 5,
+      "desc": "Criar endpoints de dispositivos | CRUD devices, POST control (ligar/desligar/setpoint), GET status"
+    },
+    {
+      "id": 6,
+      "desc": "Criar endpoints de sensores | GET list, GET by id, GET data com filtro de período, GET latest"
+    },
+    {
+      "id": 7,
+      "desc": "Criar endpoints de alertas | GET list com filtros, POST acknowledge, GET history"
+    },
+    {
+      "id": 8,
+      "desc": "Criar endpoints de consumo e predições | GET consumption, GET predictions/24h (placeholder), GET reports"
+    },
+    {
+      "id": 9,
+      "desc": "Criar endpoints de salas e usuários | CRUD rooms, CRUD users (admin only)"
+    },
+    {
+      "id": 10,
+      "desc": "Integrar módulo MQTT | Conectar mqtt_client do Dev2 nos eventos startup/shutdown do FastAPI"
+    },
+    {
+      "id": 11,
+      "desc": "Implementar callbacks MQTT → banco | Funções que salvam telemetria e feedback no PostgreSQL"
+    },
+    {
+      "id": 12,
+      "desc": "Testes unitários básicos | Pytest para auth e endpoints principais"
+    },
+    {
+      "section": "DEV2 – JOÃO ARNALDO (IoT & MQTT)"
+    },
+    {
+      "id": 13,
+      "desc": "Subir broker Mosquitto | Docker compose com mosquitto.conf, testar com MQTT Explorer"
+    },
+    {
+      "id": 14,
+      "desc": "Criar módulo MQTT do backend | app/mqtt/client.py com classe MQTTClient, reconexão automática, publish_command"
+    },
+    {
+      "id": 15,
+      "desc": "Criar simulador de sensores | Script Python simulando 14 salas publicando temperatura, umidade e presença a cada 5s"
+    },
+    {
+      "id": 16,
+      "desc": "Testar integração MQTT ↔ Backend | Validar que mensagens do simulador chegam no backend e são logadas"
+    },
+    {
+      "id": 17,
+      "desc": "Documentar tópicos MQTT | Lista completa de tópicos usados, exemplos de payload"
+    },
+    {
+      "id": 18,
+      "desc": "Firmware ESP32 (leitura de sensores) | Código Arduino para ler BME280 e PIR, publicar via WiFi/MQTT"
+    },
+    {
+      "id": 19,
+      "desc": "Firmware ESP32 (receber comandos)  | Callback MQTT para setpoint e power, controlar LED IR"
+    },
+    {
+      "id": 20,
+      "desc": "Firmware ESP32 (Offline Fallback) | Termostato local se perder conexão"
+    },
+    {
+      "id": 21,
+      "desc": "Testes de latência | Script Python medindo tempo publish→subscribe"
+    },
+    {
+      "section": "DEV3 – RICKELMY (IA & Dados)"
+    },
+    {
+      "id": 22,
+      "desc": "Criar pipeline de features | Extrair dados históricos simulados, criar features (hora, dia, temperatura, presença)"
+    },
+    {
+      "id": 23,
+      "desc": "Treinar modelo de regressão | LinearRegression ou RandomForest para predição de consumo. Validar métricas (MAE, R²)"
+    },
+    {
+      "id": 24,
+      "desc": "Criar endpoint de predições | GET /predictions/24h retornando array de 24 valores"
+    },
+    {
+      "id": 25,
+      "desc": "Implementar regras de negócio RN01RN05 | Desligamento por ausência, bloqueio janela, faixa setpoint, prioridade manual, alerta consumo"
+    },
+    {
+      "id": 26,
+      "desc": "Implementar regras de negócio RN06RN10 | Horários funcionamento, retreinamento, validação dados, auditoria, eficiência"
+    },
+    {
+      "id": 27,
+      "desc": "Detecção de anomalias simples | Isolation Forest básico ou regra de limiar (temp > 35°C = anomalia)"
+    },
+    {
+      "id": 28,
+      "desc": "Recomendações de economia | Cards de sugestão baseados em regras simples"
+    },
+    {
+      "id": 29,
+      "desc": "Inicializar projeto React | Vite + TailwindCSS + React Router + Zustand, estrutura de pastas"
+    },
+    {
+      "id": 30,
+      "desc": "Criar tela de login | Formulário, chamada API /auth/login, armazenar token JWT, redirecionamento"
+    },
+    {
+      "id": 31,
+      "desc": "Criar layout base | Sidebar com navegação, header com info do usuário, área de conteúdo"
+    },
+    {
+      "id": 32,
+      "desc": "Criar dashboard principal | Cards de resumo (total dispositivos, média temp, consumo), gráfico de linha com Recharts"
+    },
+    {
+      "id": 33,
+      "desc": "Criar painel de controle | Lista de salas com card para cada, slider de setpoint, botão ligar/desligar, indicador de status"
+    },
+    {
+      "id": 34,
+      "desc": "Criar painel de alertas | Tabela de alertas com badge de severidade, filtros, botão acknowledge"
+    },
+    {
+      "id": 35,
+      "desc": "Tabela de alertas com badge de severidade, filtros, botão acknowledge | Gráfico de consumo histórico, exportação CSV, comparativo com predições"
+    },
+    {
+      "id": 36,
+      "desc": "Tela de predições 24h | Gráfico de barras com consumo previsto por hora"
+    },
+    {
+      "id": 37,
+      "desc": "Responsividade | daptar layout para mobile (menu hamburguer, cards empilhados)"
+    },
+    {
+      "id": 39,
+      "desc": "Inicializar projeto React | Vite + TailwindCSS + React Router + Zustand, estrutura de pastas"
+    },
+    {
+      "id": 40,
+      "desc": "Criar tela de login | Formulário, chamada API /auth/login, armazenar token JWT, redirecionamento"
+    },
+    {
+      "id": 41,
+      "desc": "Criar layout base | Sidebar com navegação, header com info do usuário, área de conteúdo"
+    },
+    {
+      "id": 42,
+      "desc": "Criar dashboard principal | Cards de resumo (total dispositivos, média temp, consumo), gráfico de linha com Recharts"
+    },
+    {
+      "id": 43,
+      "desc": "Criar painel de controle | Lista de salas com card para cada, slider de setpoint, botão ligar/desligar, indicador de status"
+    },
+    {
+      "id": 44,
+      "desc": "Criar painel de alertas | Tabela de alertas com badge de severidade, filtros, botão acknowledge"
+    },
+    {
+      "id": 45,
+      "desc": "Criar tela de relatórios | Gráfico de consumo histórico, exportação CSV, comparativo com predições"
+    },
+    {
+      "id": 46,
+      "desc": "Tela de predições 24h | Gráfico de barras com consumo previsto por hora"
+    },
+    {
+      "id": 47,
+      "desc": "Responsividade | Adaptar layout para mobile (menu hamburguer, cards empilhados)"
+    },
+    {
+      "section": "DEV5 – CLAUDIO RODRIGUES (DevOps & QA)"
+    },
+    {
+      "id": 48,
+      "desc": "Configurar Docker Compose completo | Serviços: backend, frontend, db, mqtt, redis. Comunicação entre containers"
+    },
+    {
+      "id": 49,
+      "desc": "Criar Dockerfiles | Dockerfile para backend (Python 3.11) e frontend (Node + Nginx)"
+    },
+    {
+      "id": 50,
+      "desc": "Configurar GitHub Actions | Pipeline CI: lint, testes unitários, build. CD: deploy hooks"
+    },
+    {
+      "id": 51,
+      "desc": "Criar seed database | Script para popular banco com dados de teste (usuário admin, 14 salas, dispositivos)"
+    },
+    {
+      "id": 52,
+      "desc": "Criar documentação README | Setup local passo a passo, prérequisitos, comandos para subir"
+    },
+    {
+      "id": 53,
+      "desc": "Criar diagramas atualizados | C4 contexto e contêineres, DER do banco, fluxo MQTT (Draw.io)"
+    },
+    {
+      "id": 54,
+      "desc": "Testes de integração | Validar fluxo ponta a ponta: simulador → MQTT → backend → API → frontend"
+    },
+    {
+      "id": 55,
+      "desc": "Testes de aceitação (UAT) | Executar cenários UAT01 a UAT06, documentar resultados"
+    },
+    {
+      "id": 56,
+      "desc": "Configurar logs estruturados | Substituir prints por structlog no backend"
+    },
+    {
+      "id": 57,
+      "desc": "Preparar slides de apresentação | Template, arquitetura, demonstração do sistema"
+    },
+    {
+      "id": 58,
+      "desc": "Gravar vídeo pitch | Template, arquitetura, demonstração do sistema"
+    },
+    {
+      "id": 59,
+      "desc": "Gravar vídeo pitch | Roteiro, gravação de tela demonstrando funcionalidades"
+    }
+  ],
+  "Cronograma Elétrica": [
+    {
+      "id": 1,
+      "desc": "Ligação dos componentes no protoboard/ preparação para maquete"
+    },
+    {
+      "id": 2,
+      "desc": "Programação/testes iniciais do arduino"
+    },
+    {
+      "id": 3,
+      "desc": "Fazer o projeto da maquete (escalonamento, escolha de materiais como MDF, acrílico ou PVC para simular a parede/teto onde o ar fica)."
+    },
+    {
+      "id": 4,
+      "desc": "Entrega do arduino montado para computação compatibilizar com o Dashboard"
+    },
+    {
+      "id": 5,
+      "desc": "Ajustes finais na maquete com o pessoal de civil"
+    }
+  ]
+}
