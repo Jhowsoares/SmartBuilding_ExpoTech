@@ -7,18 +7,30 @@ automação de testes do guia de avaliação.
 from __future__ import annotations
 
 import os
+
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 # Variáveis mínimas de ambiente para os testes não falharem na importação
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("JWT_SECRET", "test-secret-key-for-automated-tests-min-32-chars")
 os.environ["ENVIRONMENT"] = "development"
+os.environ["TESTING"] = "1"
 os.environ.setdefault("MQTT_BROKER", "localhost")
 
 from app.main import app  # noqa: E402 — importa depois das envvars
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def _reset_async_engine_connections():
+    """Descarta conexões do pool entre testes (evita loop mismatch com asyncpg)."""
+    from app.db.database import engine
+
+    await engine.dispose()
+    yield
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture

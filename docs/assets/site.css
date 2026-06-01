@@ -1,0 +1,254 @@
+/* Smart Building — estilos compartilhados (GitHub Pages) */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0c1322;
+  --surface: #141b2b;
+  --card: #191f2f;
+  --high: #232a3a;
+  --border: #424754;
+  --muted: #8c909f;
+  --text: #dce2f7;
+  --sub: #c2c6d6;
+  --accent: #adc6ff;
+  --btn: #4d8eff;
+  --green: #34d399;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Nav ── */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(12, 19, 34, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.site-nav .inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding: 8px 0;
+}
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.site-brand img { width: 32px; height: 32px; flex-shrink: 0; }
+.site-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 18px;
+}
+.site-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+.site-links a:hover,
+.site-links a.active { color: var(--text); }
+.site-links a.nav-cta {
+  background: var(--btn);
+  color: #fff;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.site-links a.nav-cta:hover { color: #fff; opacity: 0.92; }
+
+/* ── Hero ── */
+.hero { text-align: center; padding: 48px 0 36px; }
+.hero h1 {
+  font-size: clamp(24px, 4.5vw, 40px);
+  line-height: 1.15;
+  margin: 14px 0 12px;
+}
+.hero p {
+  color: var(--muted);
+  max-width: 680px;
+  margin: 0 auto 24px;
+  font-size: clamp(14px, 2vw, 17px);
+}
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.pill {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid rgba(173, 198, 255, 0.25);
+  background: rgba(173, 198, 255, 0.1);
+  color: var(--accent);
+}
+
+/* ── Sections ── */
+section { padding: 36px 0; }
+.section-title { font-size: 20px; margin-bottom: 8px; }
+.section-sub { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+
+/* ── Stats ── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 32px 0 8px;
+}
+.stat {
+  background: var(--card);
+  padding: 18px 10px;
+  text-align: center;
+}
+.stat b {
+  display: block;
+  font-size: clamp(22px, 4vw, 28px);
+  color: var(--accent);
+  font-weight: 700;
+  line-height: 1.1;
+}
+.stat span { font-size: 11px; color: var(--muted); }
+
+/* ── Cards ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: var(--btn); transform: translateY(-2px); }
+.card h3 { font-size: 16px; color: var(--text); }
+.card p { font-size: 13px; color: var(--muted); flex: 1; }
+.card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--btn);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* ── Icons (SVG boxes) ── */
+.icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(77, 142, 255, 0.12);
+  border: 1px solid rgba(77, 142, 255, 0.28);
+  flex-shrink: 0;
+}
+.icon-box svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.icon-box.green { background: rgba(52, 211, 153, 0.1); border-color: rgba(52, 211, 153, 0.28); }
+.icon-box.green svg { stroke: var(--green); }
+.icon-box.amber { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.28); }
+.icon-box.amber svg { stroke: #fbbf24; }
+
+.card-head { display: flex; align-items: flex-start; gap: 14px; }
+.card-head h3 { margin-top: 2px; }
+
+/* ── Engenharias row ── */
+.eng-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.eng {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.eng strong { font-size: 13px; color: var(--accent); }
+.eng span { font-size: 11px; color: var(--muted); }
+.eng a { color: var(--btn); text-decoration: none; font-size: 12px; }
+
+.flow-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+.flow-box strong { color: var(--text); }
+
+/* ── Footer ── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 24px;
+}
+.site-footer a { color: var(--btn); text-decoration: none; margin: 0 8px; }
+
+@media (max-width: 720px) {
+  .eng-row { grid-template-columns: 1fr 1fr; }
+  .site-links { gap: 8px 12px; }
+}
+
+@media (max-width: 480px) {
+  .eng-row { grid-template-columns: 1fr; }
+}

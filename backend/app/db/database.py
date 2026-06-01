@@ -7,6 +7,7 @@ Engine assíncrono com asyncpg (runtime FastAPI) e utilitários de sessão.
 from __future__ import annotations
 
 import logging
+import os
 from typing import AsyncGenerator
 
 from sqlalchemy import text
@@ -25,7 +26,15 @@ _engine_kwargs: dict = {
     "echo": settings.DEBUG,
 }
 # SQLite (ex.: testes locais com :memory:) não aceita pool_size/max_overflow.
-if not settings.DATABASE_URL.startswith("sqlite"):
+# Em pytest, NullPool evita conexões presas a outro event loop.
+_is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+_is_testing = bool(os.getenv("TESTING"))
+
+if _is_testing:
+    from sqlalchemy.pool import NullPool
+
+    _engine_kwargs["poolclass"] = NullPool
+elif not _is_sqlite:
     _engine_kwargs.update(
         pool_size=10,
         max_overflow=20,

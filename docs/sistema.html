@@ -59,6 +59,8 @@
     nav { position: sticky; top: 0; z-index: 100; background: rgba(12,19,34,.92); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
     .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-brand .site-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; }
+    .nav-brand .site-brand img { width: 32px; height: 32px; flex-shrink: 0; }
     .nav-brand-text { font-size: 18px; font-weight: 700; color: var(--text); }
     .nav-links { display: flex; align-items: center; gap: 20px; }
     .nav-link { color: var(--muted); text-decoration: none; font-size: 13px; transition: color .15s; }
@@ -152,7 +154,10 @@
   <nav>
     <div class="container nav-inner">
       <div class="nav-brand">
-        <span class="nav-brand-text">Smart Building</span>
+        <a href="./index.html" class="site-brand" style="text-decoration:none">
+          <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
+          <span class="nav-brand-text">Smart Building</span>
+        </a>
         <span class="pill chip-accent">ExpoTech 2026</span>
       </div>
       <div class="nav-links">

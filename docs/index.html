@@ -6,56 +6,23 @@
   <title>Smart Building — ExpoTech 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0c1322;--card:#191f2f;--border:#424754;--muted:#8c909f;--text:#dce2f7;--accent:#adc6ff;--btn:#4d8eff;--green:#34d399;--amber:#fbbf24}
-    body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6}
-    .container{max-width:1080px;margin:0 auto;padding:0 20px}
-    nav{position:sticky;top:0;z-index:50;background:rgba(12,19,34,.95);border-bottom:1px solid var(--border);padding:14px 0}
-    nav .inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-    nav a{color:var(--muted);text-decoration:none;font-size:13px;margin-left:14px}
-    nav a:hover{color:var(--text)}
-    nav .brand{font-weight:700;color:var(--text)}
-    .hero{text-align:center;padding:56px 20px 40px}
-    .hero h1{font-size:clamp(26px,5vw,42px);line-height:1.15;margin:16px 0}
-    .hero p{color:var(--muted);max-width:680px;margin:0 auto 28px;font-size:clamp(14px,2vw,17px)}
-    .pills{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:8px}
-    .pill{padding:5px 14px;border-radius:999px;font-size:12px;font-weight:500;border:1px solid rgba(173,198,255,.25);background:rgba(173,198,255,.1);color:var(--accent)}
-    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--border);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin:40px 0}
-    .stat{background:var(--card);padding:20px 12px;text-align:center}
-    .stat b{display:block;font-size:26px;color:var(--accent);font-weight:700}
-    .stat span{font-size:11px;color:var(--muted)}
-    section{padding:36px 0}
-    h2{font-size:20px;margin-bottom:8px}
-    .sub{color:var(--muted);font-size:13px;margin-bottom:24px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s,transform .2s}
-    .card:hover{border-color:var(--btn);transform:translateY(-2px)}
-    .card-icon{font-size:28px}
-    .card h3{font-size:16px;color:var(--text)}
-    .card p{font-size:13px;color:var(--muted);flex:1}
-    .card a{align-self:flex-start;background:var(--btn);color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600}
-    .card a.secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
-    .flow{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;font-size:13px;color:var(--muted);line-height:2}
-    .eng-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    .eng{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
-    .eng strong{display:block;font-size:13px;color:var(--accent);margin-bottom:4px}
-    .eng span{font-size:11px;color:var(--muted)}
-    footer{border-top:1px solid var(--border);padding:32px 20px;text-align:center;color:var(--muted);font-size:13px;margin-top:20px}
-    footer a{color:var(--btn);text-decoration:none;margin:0 8px}
-    @media(max-width:720px){.eng-row{grid-template-columns:1fr 1fr}}
-  </style>
+  <link rel="stylesheet" href="./assets/site.css" />
 </head>
 <body>
-  <nav><div class="container inner">
-    <span class="brand">Smart Building</span>
-    <div>
-      <a href="./engenharias.html">Integrador</a>
-      <a href="./sistema.html">Arquitetura</a>
-      <a href="./api.html">API (ReDoc)</a>
-      <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+  <nav class="site-nav">
+    <div class="container inner">
+      <a class="site-brand" href="./index.html">
+        <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
+        Smart Building
+      </a>
+      <div class="site-links">
+        <a href="./engenharias.html">Integrador</a>
+        <a href="./sistema.html">Arquitetura</a>
+        <a href="./api.html" class="nav-cta">API (ReDoc)</a>
+        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a>
+      </div>
     </div>
-  </div></nav>
+  </nav>
 
   <header class="hero container">
     <div class="pills">
@@ -76,64 +43,96 @@
   </div>
 
   <section class="container">
-    <h2>Explore o projeto</h2>
-    <p class="sub">Escolha o caminho conforme o interesse da avaliação — integração multidisciplinar, arquitetura técnica ou contrato da API.</p>
+    <h2 class="section-title">Explore o projeto</h2>
+    <p class="section-sub">Escolha o caminho conforme o interesse da avaliação — integração multidisciplinar, arquitetura técnica ou contrato da API.</p>
     <div class="grid">
       <article class="card">
-        <div class="card-icon">🏗️</div>
-        <h3>Projeto Integrador</h3>
+        <div class="card-head">
+          <div class="icon-box green">
+            <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-4 7 4v12M9 21v-6h6v6"/></svg>
+          </div>
+          <h3>Projeto Integrador</h3>
+        </div>
         <p>Visão das quatro engenharias, cronograma, entregáveis em PDF e equipe multidisciplinar.</p>
-        <a href="./engenharias.html">Abrir panorama</a>
+        <div class="card-actions"><a class="btn" href="./engenharias.html">Abrir panorama</a></div>
       </article>
       <article class="card">
-        <div class="card-icon">⚙️</div>
-        <h3>Arquitetura &amp; Sistema</h3>
+        <div class="card-head">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          </div>
+          <h3>Arquitetura &amp; Sistema</h3>
+        </div>
         <p>Diagrama C4, fluxo MQTT, regras RN01–RN10, setup local, credenciais e stack Docker.</p>
-        <a href="./sistema.html">Ver arquitetura</a>
+        <div class="card-actions"><a class="btn" href="./sistema.html">Ver arquitetura</a></div>
       </article>
       <article class="card">
-        <div class="card-icon">📡</div>
-        <h3>Referência da API</h3>
+        <div class="card-head">
+          <div class="icon-box amber">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M8 11h8M8 14h5"/><path d="M7 7V5h10v2"/></svg>
+          </div>
+          <h3>Referência da API</h3>
+        </div>
         <p>Contrato OpenAPI, endpoints, autenticação JWT e exemplos de request/response (ReDoc).</p>
-        <a href="./api.html">Abrir ReDoc</a>
+        <div class="card-actions"><a class="btn" href="./api.html">Abrir ReDoc</a></div>
       </article>
       <article class="card">
-        <div class="card-icon">💻</div>
-        <h3>Código &amp; Demo</h3>
-        <p>Repositório completo. Suba com <code style="color:var(--accent)">docker compose up</code> — dashboard em localhost:3000.</p>
-        <a href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech" class="secondary">GitHub</a>
+        <div class="card-head">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+          </div>
+          <h3>Código &amp; Demo</h3>
+        </div>
+        <p>Repositório completo. Suba com <code style="color:var(--accent);font-size:12px">docker compose up</code> — dashboard em localhost:3000.</p>
+        <div class="card-actions"><a class="btn btn-outline" href="https://github.com/Jhowsoares/SmartBuilding_ExpoTech">GitHub</a></div>
       </article>
     </div>
   </section>
 
   <section class="container">
-    <h2>Integração multidisciplinar</h2>
-    <p class="sub">Cada engenharia contribui com entregáveis concretos para o mesmo problema: condensação, umidade e desperdício energético.</p>
-    <div class="flow">
-      <strong style="color:var(--text)">Civil</strong> — maquete, conforto térmico, infraestrutura física<br>
-      <strong style="color:var(--text)">Elétrica</strong> — sensores, Arduino/Bluetooth, automação do AC<br>
-      <strong style="color:var(--text)">Computação</strong> — API, MQTT, ML, dashboard React<br>
-      <strong style="color:var(--text)">Produção</strong> — viabilidade financeira, CAPEX/OPEX, cronograma
+    <h2 class="section-title">Integração multidisciplinar</h2>
+    <p class="section-sub">Cada engenharia contribui com entregáveis concretos para o mesmo problema: condensação, umidade e desperdício energético.</p>
+    <div class="flow-box">
+      <strong>Civil</strong> — maquete, conforto térmico, infraestrutura física<br>
+      <strong>Elétrica</strong> — sensores, Arduino/Bluetooth, automação do AC<br>
+      <strong>Computação</strong> — API, MQTT, ML, dashboard React<br>
+      <strong>Produção</strong> — viabilidade financeira, CAPEX/OPEX, cronograma
     </div>
     <div class="eng-row" style="margin-top:20px">
-      <div class="eng"><strong>Civil</strong><span><a href="./civil.html" style="color:var(--btn);text-decoration:none">Página da equipe →</a></span></div>
-      <div class="eng"><strong>Elétrica</strong><span>Hardware IoT</span></div>
-      <div class="eng"><strong>Computação</strong><span>Plataforma digital</span></div>
-      <div class="eng"><strong>Produção</strong><span>Análise econômica</span></div>
+      <div class="eng">
+        <div class="icon-box green" style="width:36px;height:36px"><svg viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M3 21h18M5 21V9l7-4 7 4v12"/></svg></div>
+        <strong>Civil</strong>
+        <span><a href="./civil.html">Página da equipe →</a></span>
+      </div>
+      <div class="eng">
+        <div class="icon-box amber" style="width:36px;height:36px"><svg viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <strong>Elétrica</strong>
+        <span>Hardware IoT</span>
+      </div>
+      <div class="eng">
+        <div class="icon-box" style="width:36px;height:36px"><svg viewBox="0 0 24 24" style="width:18px;height:18px"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <strong>Computação</strong>
+        <span>Plataforma digital</span>
+      </div>
+      <div class="eng">
+        <div class="icon-box green" style="width:36px;height:36px"><svg viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <strong>Produção</strong>
+        <span>Análise econômica</span>
+      </div>
     </div>
   </section>
 
   <section class="container">
-    <h2>Demonstração rápida</h2>
-    <p class="sub">Para a banca testar o protótipo funcional.</p>
-    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+    <h2 class="section-title">Demonstração rápida</h2>
+    <p class="section-sub">Para a banca testar o protótipo funcional.</p>
+    <div class="grid">
       <div class="card"><h3>Dashboard</h3><p>http://localhost:3000</p></div>
       <div class="card"><h3>Swagger</h3><p>http://localhost:8000/api/docs</p></div>
       <div class="card"><h3>Login</h3><p>admin@smartbuilding.local<br>admin123</p></div>
     </div>
   </section>
 
-  <footer>
+  <footer class="site-footer">
     <p><strong style="color:var(--text)">Smart Building · ExpoTech 2026</strong></p>
     <p style="margin-top:12px">
       <a href="./engenharias.html">Integrador</a>

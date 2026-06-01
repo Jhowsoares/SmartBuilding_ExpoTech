@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import weakref
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -14,9 +15,19 @@ from app.models.sensor_data import SensorData
 router = APIRouter(prefix="/predictions", tags=["Predictions"])
 logger = logging.getLogger(__name__)
 
-# Semáforo: apenas 1 treino simultâneo (operação cara, ~30s)
-# Critério de performance/resiliência — throttling por concorrência
-_train_semaphore = asyncio.Semaphore(1)
+# Semáforo por event loop (evita RuntimeError em pytest com loops distintos)
+_train_semaphores: weakref.WeakKeyDictionary[
+    asyncio.AbstractEventLoop, asyncio.Semaphore
+] = weakref.WeakKeyDictionary()
+
+
+def _get_train_semaphore() -> asyncio.Semaphore:
+    loop = asyncio.get_running_loop()
+    sem = _train_semaphores.get(loop)
+    if sem is None:
+        sem = asyncio.Semaphore(1)
+        _train_semaphores[loop] = sem
+    return sem
 
 BRASILIA_OFFSET = timedelta(hours=-3)
 BRASILIA_TZ = timezone(BRASILIA_OFFSET, name="BRT")
@@ -322,14 +333,14 @@ async def trigger_retrain(
     Se já houver um treino em andamento, retorna 503 (degradação controlada).
     """
     # Throttling por concorrência — critério de performance/resiliência
-    if _train_semaphore.locked():
+    if _get_train_semaphore().locked():
         raise HTTPException(
             status_code=503,
             detail="Retreinamento já em andamento. Aguarde a conclusão e tente novamente.",
             headers={"Retry-After": "60"},
         )
 
-    async with _train_semaphore:
+    async with _get_train_semaphore():
         from app.ml.predictor import predictor
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=30)

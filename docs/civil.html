@@ -5,41 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eng. Civil — Smart Building</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/site.css" />
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0c1322;--card:#191f2f;--border:#424754;--muted:#8c909f;--text:#dce2f7;--accent:#adc6ff;--btn:#4d8eff}
-    body{background:var(--bg);color:var(--text);font-family:Inter,sans-serif;line-height:1.6}
-    .container{max-width:960px;margin:0 auto;padding:0 20px}
-    nav{padding:14px 0;border-bottom:1px solid var(--border);margin-bottom:32px}
-    nav a{color:var(--muted);text-decoration:none;font-size:13px;margin-right:16px}
-    nav a:hover{color:var(--text)}
     h1{font-size:clamp(22px,4vw,32px);margin-bottom:8px}
-    .sub{color:var(--muted);margin-bottom:28px;font-size:14px}
+    .page-sub{color:var(--muted);margin-bottom:28px;font-size:14px}
     section{margin-bottom:40px}
-    h2{font-size:18px;margin-bottom:12px;color:var(--accent)}
+    section h2{font-size:18px;margin-bottom:12px;color:var(--accent)}
     ul{padding-left:20px;color:var(--muted);font-size:14px}
     li{margin-bottom:8px}
     .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
     .fig{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    .fig img{width:100%;height:220px;object-fit:cover;display:block;background:#141b2b}
+    .fig img{width:100%;height:220px;object-fit:cover;display:block;background:var(--surface)}
     .fig .cap{padding:14px;font-size:13px;color:var(--muted)}
     .fig .cap strong{color:var(--text);display:block;margin-bottom:4px}
     .placeholder{height:220px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#141b2b,#1a2744);color:var(--muted);font-size:13px;text-align:center;padding:20px}
-    .btn{display:inline-block;background:var(--btn);color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;margin-top:8px}
-    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);margin-left:8px}
     .team{font-size:14px;color:var(--muted);margin-top:24px;padding:16px;background:var(--card);border-radius:10px;border:1px solid var(--border)}
+    main{padding:32px 0 16px}
   </style>
 </head>
 <body>
-  <div class="container">
-    <nav>
-      <a href="./index.html">← Apresentação</a>
-      <a href="./engenharias.html">Integrador</a>
-      <a href="./sistema.html">Arquitetura</a>
-    </nav>
+  <nav class="site-nav">
+    <div class="container inner">
+      <a class="site-brand" href="./index.html">
+        <img src="./assets/logo-mark.svg" alt="" width="32" height="32" />
+        Eng. Civil
+      </a>
+      <div class="site-links">
+        <a href="./index.html">Apresentação</a>
+        <a href="./engenharias.html">Integrador</a>
+        <a href="./sistema.html">Arquitetura</a>
+        <a href="./api.html">API</a>
+      </div>
+    </div>
+  </nav>
 
+  <main class="container">
     <h1>Engenharia Civil</h1>
-    <p class="sub">Infraestrutura física, conforto térmico, eficiência energética e maquete de apresentação — laboratório de elétrica (subsolo).</p>
+    <p class="page-sub">Infraestrutura física, conforto térmico, eficiência energética e maquete de apresentação — laboratório de elétrica (subsolo).</p>
 
     <section>
       <h2>Contribuições no projeto</h2>
@@ -53,7 +55,7 @@
 
     <section>
       <h2>Modelo 3D e maquete</h2>
-      <p class="sub" style="margin-bottom:16px">Visualização do ambiente monitorado. Imagens abaixo — adicione arquivos em <code>docs/engenharias/assets/</code> para substituir os placeholders.</p>
+      <p class="page-sub" style="margin-bottom:16px">Visualização do ambiente monitorado. Imagens abaixo — adicione arquivos em <code style="color:var(--accent);font-size:12px">docs/engenharias/assets/</code> para substituir os placeholders.</p>
       <div class="gallery">
         <figure class="fig">
           <img src="./engenharias/assets/maquete-3d.jpg" alt="Modelo 3D do laboratório"
@@ -74,20 +76,17 @@
           <figcaption class="cap"><strong>Infraestrutura</strong> Eletroduto aparente e barreira térmica</figcaption>
         </figure>
       </div>
-      <a class="btn" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf">Baixar PDF — visão geral 3D</a>
-      <a class="btn btn-outline" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf">Relatório Civil (PDF)</a>
+      <div class="card-actions" style="margin-top:16px">
+        <a class="btn" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador.pdf">Baixar PDF — visão geral 3D</a>
+        <a class="btn btn-outline" href="./engenharias/entregaveis/em_pdf/Projeto%20integrador%20-%20Eng.%20Civil.pdf">Relatório Civil (PDF)</a>
+      </div>
     </section>
 
-    <section>
-      <h2>Resultados esperados</h2>
-      <ul>
-        <li>Redução de consumo por melhor aproveitamento da climatização</li>
-        <li>Ambientes mais confortáveis para ensino</li>
-        <li>Infraestrutura preparada para automação predial sustentável</li>
-      </ul>
-    </section>
+    <p class="team"><strong style="color:var(--text)">Equipe Civil:</strong> Kayke, Nicolas, Renan, Lucca, Bruno</p>
+  </main>
 
-    <p class="team"><strong>Equipe:</strong> Kayke Rennan Lima Matos · Nicolas Soares Pires · Renan Soares · Lucca Martins · Bruno Cassiano</p>
-  </div>
+  <footer class="site-footer">
+    <a href="./engenharias.html">← Voltar ao Integrador</a>
+  </footer>
 </body>
 </html>
