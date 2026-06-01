@@ -19,6 +19,12 @@ OUTPUT = DOCS / "openapi.yaml"
 
 
 def get_openapi_schema() -> dict:
+    import os
+
+    # Força URL PostgreSQL — export não deve depender de .env/shell de testes.
+    os.environ["DATABASE_URL"] = "postgresql+asyncpg://export:export@localhost:5432/export"
+    os.environ.pop("TESTING", None)
+
     sys.path.insert(0, str(BACKEND))
     from app.main import app  # noqa: PLC0415
 

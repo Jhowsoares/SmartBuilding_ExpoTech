@@ -15,6 +15,7 @@ redis_data/
 backend/.venv/
 backend/env/
 backend/venv/
+.venv-export/
 
 # === Modelos ML (gerados localmente — não versionar) ===
 *.pkl

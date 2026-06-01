@@ -98,7 +98,6 @@ paths:
           content:
             application/json:
               schema:
-                additionalProperties: true
                 type: object
                 title: Response Logout Api V1 Auth Logout Post
       security:
@@ -362,7 +361,6 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
                 title: Response List Devices Api V1 Devices Get
         '422':
           description: Validation Error
@@ -560,7 +558,6 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
                 title: Response List Rooms Api V1 Rooms Get
         '422':
           description: Validation Error
@@ -740,7 +737,6 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
                 title: Response List Alerts Api V1 Alerts Get
         '422':
           description: Validation Error
@@ -816,7 +812,6 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
                 title: Response Get Alert History Api V1 Alerts History Get
         '422':
           description: Validation Error
@@ -944,7 +939,6 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
                 title: Response List Users Api V1 Users Get
         '422':
           description: Validation Error
@@ -1112,7 +1106,6 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
                 title: Response Get Consumption Api V1 Consumption Get
         '422':
           description: Validation Error
@@ -1144,7 +1137,6 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties: true
                 title: Response Get Consumption Summary Api V1 Consumption Summary
                   Get
         '422':
@@ -1165,7 +1157,6 @@ paths:
           content:
             application/json:
               schema:
-                additionalProperties: true
                 type: object
                 title: Response Get Predictions 24H Api V1 Predictions 24H Get
       security:
@@ -1188,7 +1179,6 @@ paths:
           content:
             application/json:
               schema:
-                additionalProperties: true
                 type: object
                 title: Response Trigger Retrain Api V1 Predictions Train Post
       security:
@@ -1865,7 +1855,8 @@ components:
           minLength: 6
           title: Password
         role:
-          $ref: '#/components/schemas/UserRole'
+          allOf:
+          - $ref: '#/components/schemas/UserRole'
           default: visualizador
       type: object
       required:
@@ -1944,11 +1935,6 @@ components:
         type:
           type: string
           title: Error Type
-        input:
-          title: Input
-        ctx:
-          type: object
-          title: Context
       type: object
       required:
       - loc
