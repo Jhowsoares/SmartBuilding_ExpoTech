@@ -162,7 +162,9 @@ services:
     ports:
       - "3000:80"
     environment:
-      VITE_API_URL: http://localhost:8000/api/v1
+      # Caminho relativo: o nginx do próprio frontend faz proxy de /api → backend.
+      # Assim funciona via localhost, IP da rede ou link do ngrok (tablet) sem recompilar.
+      VITE_API_URL: /api/v1
     depends_on:
       backend:
         condition: service_started

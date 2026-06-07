@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+// Caminho RELATIVO por padrão: as chamadas vão para o mesmo host que serviu o
+// app (localhost, IP da rede ou link do ngrok), e o nginx/Vite faz proxy de
+// /api → backend:8000. Isso permite acessar de um tablet/celular via ngrok sem
+// recompilar. Defina VITE_API_URL apenas se quiser apontar para outra origem.
+const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
 const api = axios.create({
   baseURL: BASE_URL,

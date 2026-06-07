@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import useAuthStore from '../store/authStore'
 
-export default function Header({ title }) {
+export default function Header({ title, onMenuClick = () => {} }) {
   const navigate = useNavigate()
   const { user, logout } = useAuthStore()
 
@@ -11,8 +11,18 @@ export default function Header({ title }) {
   }
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-sb-card border-b border-sb-border sticky top-0 z-40">
-      <h1 className="text-base font-semibold text-sb-on-surface">{title}</h1>
+    <header className="flex items-center justify-between px-4 sm:px-6 py-4 bg-sb-card border-b border-sb-border sticky top-0 z-30">
+      <div className="flex items-center gap-2 min-w-0">
+        {/* Hambúrguer — abre o menu lateral no mobile/tablet */}
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 -ml-2 rounded-lg text-sb-outline hover:text-sb-on-surface hover:bg-sb-card-high transition-colors"
+          title="Abrir menu"
+        >
+          <span className="material-symbols-outlined text-[22px]">menu</span>
+        </button>
+        <h1 className="text-base font-semibold text-sb-on-surface truncate">{title}</h1>
+      </div>
 
       <div className="flex items-center gap-3">
         {/* MQTT live indicator */}

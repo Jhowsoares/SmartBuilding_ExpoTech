@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Header from './Header'
@@ -18,12 +19,19 @@ export default function Layout() {
   const pathname = location.pathname
   const title = pageTitles[pathname] || (pathname.startsWith('/rooms/') ? 'Detalhes da Sala' : 'SmartBuilding')
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Fecha o drawer ao navegar (mobile/tablet)
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [pathname])
+
   return (
     <div className="flex min-h-screen bg-sb-bg">
-      <Sidebar />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
-        <Header title={title} />
-        <main className="flex-1 overflow-auto p-6">
+        <Header title={title} onMenuClick={() => setSidebarOpen(true)} />
+        <main className="flex-1 overflow-auto p-4 sm:p-6">
           <Outlet />
         </main>
       </div>

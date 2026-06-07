@@ -102,23 +102,45 @@ const nav = [
   },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose = () => {} }) {
   const { user, role, logout } = useAuthStore()
   const isAdmin = role === 'admin'
   const initials = (user?.email || 'U')[0].toUpperCase()
   const roleLabel = role === 'admin' ? 'Administrador' : role === 'operador' ? 'Operador' : 'Visualizador'
 
   return (
-    <aside className="w-64 flex-shrink-0 flex flex-col bg-sb-card border-r border-sb-border min-h-screen">
-      {/* Logo */}
+    <>
+      {/* Backdrop (somente mobile/tablet quando o drawer está aberto) */}
+      <div
+        onClick={onClose}
+        className={`fixed inset-0 z-40 bg-black/60 lg:hidden transition-opacity duration-200 ${
+          open ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden="true"
+      />
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-sb-card border-r border-sb-border
+          transform transition-transform duration-200 ease-in-out
+          lg:static lg:z-auto lg:translate-x-0 lg:flex-shrink-0 lg:min-h-screen
+          ${open ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+      {/* Logo + botão fechar (mobile) */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-sb-border">
         <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-sb-primary-btn">
           <span className="material-symbols-outlined text-white text-[20px]">apartment</span>
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sb-on-surface font-bold text-sm leading-tight">SmartBuilding</p>
           <p className="text-sb-outline text-xs tracking-widest uppercase">GESTÃO IOT</p>
         </div>
+        <button
+          onClick={onClose}
+          className="lg:hidden p-1.5 -mr-2 rounded-lg text-sb-outline hover:text-sb-on-surface hover:bg-sb-card-high transition-colors"
+          title="Fechar menu"
+        >
+          <span className="material-symbols-outlined text-[20px]">close</span>
+        </button>
       </div>
 
       {/* Nav sections */}
@@ -172,6 +194,7 @@ export default function Sidebar() {
           </button>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   )
 }
