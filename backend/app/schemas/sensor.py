@@ -15,6 +15,10 @@ class SensorTipo(str, enum.Enum):
     TEMPERATURE = "temperature"
     HUMIDITY = "humidity"
     PRESENCE = "presence"
+    # Grandezas elétricas (gateway ESP32 → Arduino AC)
+    POWER = "power"        # potência ativa (W)
+    VOLTAGE = "voltage"    # tensão (V)
+    CURRENT = "current"    # corrente (A)
 
 
 class SensorStatus(str, enum.Enum):
@@ -27,11 +31,14 @@ _VALOR_RANGES = {
     SensorTipo.TEMPERATURE: (-10.0, 60.0),
     SensorTipo.HUMIDITY: (0.0, 100.0),
     SensorTipo.PRESENCE: (0.0, 1.0),
+    SensorTipo.POWER: (0.0, 10000.0),   # W
+    SensorTipo.VOLTAGE: (0.0, 500.0),   # V
+    SensorTipo.CURRENT: (0.0, 100.0),   # A
 }
 
 
 class SensorDataIngest(BaseModel):
-    sensor_id: str = Field(..., pattern=r"^sensor-(temperature|humidity|presence)-\d{4}$")
+    sensor_id: str = Field(..., pattern=r"^sensor-(temperature|humidity|presence|power|voltage|current)-\d{4}$")
     tipo: SensorTipo
     valor: float
     tick: int = Field(..., ge=0)

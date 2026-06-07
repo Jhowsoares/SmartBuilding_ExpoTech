@@ -101,18 +101,37 @@ async def get_consumption(
     )
     rows = (await db.execute(q)).all()
 
+    # Energia REAL medida (tipo="power", vinda do gateway ESP32) agregada por hora.
+    # kWh = potência média (kW) × 1 h. Exposta junto da estimativa por temperatura.
+    pq = (
+        select(
+            func.date_trunc("hour", SensorData.timestamp).label("hora"),
+            func.avg(SensorData.valor).label("avg_power_w"),
+        )
+        .where(SensorData.tipo == "power", SensorData.timestamp >= cutoff)
+        .group_by("hora")
+    )
+    power_by_hour = {
+        (r.hora.isoformat() if r.hora else None): float(r.avg_power_w or 0)
+        for r in (await db.execute(pq)).all()
+    }
+    total_kwh_medido = round(sum(p / 1000.0 for p in power_by_hour.values()), 4)
+
     hourly_breakdown: list[dict] = []
     total_kwh = 0.0
     for row in rows:
         kwh = _estimate_kwh(float(row.avg_temp or _IDEAL_TEMP), 1.0)
         total_kwh += kwh
         ts = row.hora.isoformat() if row.hora else None
+        avg_power_w = power_by_hour.get(ts)
         hourly_breakdown.append({
             "timestamp": ts,
             "hora": ts,  # compatibilidade com clientes antigos
             "avg_temp_celsius": round(float(row.avg_temp or 0), 1),
             "leituras": row.leituras,
             "kwh_estimado": kwh,
+            "avg_power_w": round(avg_power_w, 1) if avg_power_w else None,
+            "kwh_medido": round(avg_power_w / 1000.0, 4) if avg_power_w else None,
         })
 
     if granularity == "day":
@@ -134,6 +153,11 @@ async def get_consumption(
             "total_kwh": round(total_kwh, 2),
             "custo_brl": custo_brl,
             "tarifa_kwh_brl": settings.ENERGIA_TARIFA_KWH_BRL,
+            # Energia REAL medida pelo hardware (gateway ESP32). > 0 indica que há
+            # leituras de potência reais no período (ex.: Sala 302).
+            "total_kwh_medido": total_kwh_medido,
+            "custo_medido_brl": round(total_kwh_medido * settings.ENERGIA_TARIFA_KWH_BRL, 2),
+            "fonte": "medido" if total_kwh_medido > 0 else "estimado",
             "breakdown": breakdown,
             "breakdown_by_hour": hourly_breakdown,
         }

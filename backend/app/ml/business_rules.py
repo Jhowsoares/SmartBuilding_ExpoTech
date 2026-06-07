@@ -183,6 +183,12 @@ class BusinessRulesEngine:
             return _HUMIDITY_ANOMALY_MIN <= ctx.sensor_value <= _HUMIDITY_ANOMALY_MAX
         if ctx.sensor_type in ("presence", "window"):
             return ctx.sensor_value in (0, 1)
+        if ctx.sensor_type == "power":
+            return 0.0 <= ctx.sensor_value <= 10000.0
+        if ctx.sensor_type == "voltage":
+            return 0.0 <= ctx.sensor_value <= 500.0
+        if ctx.sensor_type == "current":
+            return 0.0 <= ctx.sensor_value <= 100.0
         return True
 
 

@@ -125,12 +125,37 @@ class DeviceService:
 
         # Publica comando via MQTT (B10)
         from app.mqtt.client import mqtt_client
+        # 1) Tópico por UUID do device (compatibilidade)
         mqtt_client.publish_command(str(device_id), payload.action, payload.value)
+        # 2) Tópico por slug da sala (room-302) — alcança o gateway ESP32 e o
+        #    simulador, que escutam devices/ac/{room_slug}/commands.
+        room_slug = await self._room_slug(device.room_id)
+        if room_slug:
+            mqtt_client.publish_command(room_slug, payload.action, payload.value)
 
         return DeviceControlResponse(
             status="success", device_id=device_id,
             action=payload.action, value=payload.value, timestamp=now,
         )
+
+    async def _room_slug(self, room_id: uuid.UUID) -> Optional[str]:
+        """Deriva o slug MQTT da sala (ex.: 'room-302') a partir do nome.
+
+        O simulador e o gateway ESP32 usam o slug 'room-NNN' nos tópicos, mas o
+        backend identifica salas por UUID. O número da sala está no nome
+        ('Sala 302 - Laboratório'), então extraímos os 3 dígitos.
+        """
+        import re
+        from sqlalchemy import select
+        from app.models.room import Room
+
+        room = (await self._db.execute(
+            select(Room).where(Room.id == room_id)
+        )).scalar_one_or_none()
+        if not room:
+            return None
+        match = re.search(r"\d{3}", room.name or "")
+        return f"room-{match.group()}" if match else None
 
     @staticmethod
     def _to_response(device: Device) -> DeviceResponse:

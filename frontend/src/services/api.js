@@ -54,6 +54,7 @@ export const controlDevice = (id, payload) =>
 export const getSensors = () => api.get('/sensors')
 export const getSensorData = (id, period = '1h') =>
   api.get(`/sensors/${id}/data`, { params: { period } })
+export const getSensorLatest = (id) => api.get(`/sensors/${id}/latest`)
 
 // ─── Alerts ─────────────────────────────────────────────────────────────────
 export const getAlerts = (params) => api.get('/alerts', { params })

@@ -181,6 +181,9 @@ services:
       MQTT_BROKER: mqtt
       MQTT_PORT: "1883"
       INTERVAL: "5"
+      # Sala controlada pelo hardware real (gateway ESP32). O simulador não
+      # publica para ela, evitando conflito com a telemetria real.
+      EXCLUDE_ROOMS: "room-302"
     depends_on:
       mqtt:
         condition: service_started

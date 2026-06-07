@@ -4,7 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
 import { format } from 'date-fns'
-import { getRoom, getDevices, getSensorData, getSensors, deleteDevice } from '../services/api'
+import { getRoom, getDevices, getSensorData, getSensors, getSensorLatest, deleteDevice } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 const DEVICE_TYPE_ICONS = {
@@ -60,6 +60,7 @@ export default function RoomDetailPage() {
   const [devices, setDevices] = useState([])
   const [chartData, setChartData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [energy, setEnergy] = useState(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -99,6 +100,44 @@ export default function RoomDetailPage() {
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  // Energia em tempo real (dados reais vindos do gateway ESP32 → Arduino).
+  // O slug do sensor segue o número da sala: "Sala 302" → "room-302".
+  useEffect(() => {
+    if (!room?.name) return
+    const num = (room.name.match(/\d+/) || [])[0]
+    if (!num) return
+    const slug = `room-${num}`
+
+    let cancelled = false
+    const fetchEnergy = async () => {
+      const results = await Promise.allSettled([
+        getSensorLatest(`sensor-power-${slug}`),
+        getSensorLatest(`sensor-voltage-${slug}`),
+        getSensorLatest(`sensor-current-${slug}`),
+      ])
+      if (cancelled) return
+      const read = (r) => (r.status === 'fulfilled' ? r.value.data : null)
+      const [p, v, c] = results.map(read)
+      if (!p && !v && !c) {
+        setEnergy(null)
+        return
+      }
+      const ts = p?.timestamp || v?.timestamp || c?.timestamp
+      const fresh = ts ? (Date.now() - new Date(ts).getTime()) < 30000 : false
+      setEnergy({
+        power: p?.valor ?? null,
+        voltage: v?.valor ?? null,
+        current: c?.valor ?? null,
+        timestamp: ts,
+        live: fresh,
+      })
+    }
+
+    fetchEnergy()
+    const interval = setInterval(fetchEnergy, 5000)
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [room?.name])
 
   const handleDeleteDevice = async (deviceId) => {
     if (!confirm('Remover este dispositivo da sala?')) return
@@ -151,6 +190,47 @@ export default function RoomDetailPage() {
           </span>
         </div>
       </div>
+
+      {/* Energia em tempo real (hardware real) */}
+      {energy && (
+        <div className="card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sb-on-surface font-semibold flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px] text-yellow-400">bolt</span>
+              Energia em Tempo Real
+            </h3>
+            <span className={`text-xs flex items-center gap-1.5 ${energy.live ? 'text-green-400' : 'text-sb-outline'}`}>
+              <span className={`w-2 h-2 rounded-full ${energy.live ? 'bg-green-400 animate-pulse' : 'bg-sb-outline'}`} />
+              {energy.live ? 'Ao vivo' : 'Sem dados recentes'}
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-sb-card-highest rounded-lg p-4 text-center">
+              <p className="text-3xl font-bold text-yellow-400">
+                {energy.power != null ? energy.power.toFixed(1) : '--'}
+              </p>
+              <p className="text-xs text-sb-outline mt-1">Potência (W)</p>
+            </div>
+            <div className="bg-sb-card-highest rounded-lg p-4 text-center">
+              <p className="text-3xl font-bold text-sb-primary">
+                {energy.voltage != null ? energy.voltage.toFixed(1) : '--'}
+              </p>
+              <p className="text-xs text-sb-outline mt-1">Tensão (V)</p>
+            </div>
+            <div className="bg-sb-card-highest rounded-lg p-4 text-center">
+              <p className="text-3xl font-bold text-cyan-400">
+                {energy.current != null ? energy.current.toFixed(2) : '--'}
+              </p>
+              <p className="text-xs text-sb-outline mt-1">Corrente (A)</p>
+            </div>
+          </div>
+          {energy.timestamp && (
+            <p className="text-xs text-sb-outline mt-3 text-right">
+              Atualizado {format(new Date(energy.timestamp), 'HH:mm:ss')}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Chart + Devices */}
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">

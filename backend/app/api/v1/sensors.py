@@ -23,7 +23,7 @@ from app.services.sensor_service import SensorService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
-_SENSOR_RE = re.compile(r"^sensor-(temperature|humidity|presence)-.+$")
+_SENSOR_RE = re.compile(r"^sensor-(temperature|humidity|presence|power|voltage|current)-.+$")
 _limiter = Limiter(key_func=get_remote_address)
 
 

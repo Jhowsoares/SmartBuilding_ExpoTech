@@ -46,6 +46,13 @@ INTERVAL = float(5) # alterei manualmente aqui jhow, pra ter certeza que n tem m
 # print(INTERVAL)
 HAS_PRESENCE_ROOMS = {0, 1, 4, 5, 9, 10}           # índices com sensor de presença
 
+# Salas controladas por HARDWARE REAL (gateway ESP32) — o simulador NÃO publica
+# para elas, evitando que dados fake sobrescrevam a telemetria real.
+# Configurável via env: EXCLUDE_ROOMS="room-302,room-301"
+EXCLUDE_ROOMS = {
+    r.strip() for r in os.getenv("EXCLUDE_ROOMS", "room-302").split(",") if r.strip()
+}
+
 # ── Definição das 14 salas ───────────────────────────────────────────────────
 ROOMS = [
     # id (simples para tópicos), nome, andar, área, base_temp
@@ -165,6 +172,10 @@ class SmartBuildingSimulator:
 
     def _setup_rooms(self) -> None:
         for idx, (room_id, name, floor, area, base_temp) in enumerate(ROOMS):
+            if room_id in EXCLUDE_ROOMS:
+                logger.info("Sala %s (%s) excluída do simulador — hardware real (gateway ESP32).",
+                            room_id, name)
+                continue
             self.rooms.append(RoomSimulator(
                 room_id=room_id, name=name, floor=floor,
                 area_m2=area, base_temp=base_temp,

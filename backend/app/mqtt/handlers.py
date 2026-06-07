@@ -45,6 +45,25 @@ def _get_state(device_id: str) -> dict:
     return _device_state[device_id]
 
 
+async def _room_slug(db_session, room_id) -> Optional[str]:
+    """Deriva o slug MQTT da sala (ex.: 'room-302') a partir do nome.
+
+    Gateway ESP32 e simulador escutam devices/ac/{room_slug}/commands, mas o
+    backend identifica salas por UUID. O número está no nome ('Sala 302 - ...').
+    """
+    import re
+    from sqlalchemy import select
+    from app.models.room import Room
+
+    room = (await db_session.execute(
+        select(Room).where(Room.id == room_id)
+    )).scalar_one_or_none()
+    if not room:
+        return None
+    match = re.search(r"\d{3}", room.name or "")
+    return f"room-{match.group()}" if match else None
+
+
 def mark_manual_override(device_id: str) -> None:
     """Chamado pelo DeviceService quando um operador envia comando manual (RN04)."""
     state = _get_state(device_id)
@@ -80,9 +99,12 @@ async def _apply_actions(actions, db_session) -> None:
                             executed_at=datetime.now(timezone.utc),
                         )
                         db_session.add(cmd)
-                        # Publica via MQTT
+                        # Publica via MQTT (UUID + slug da sala p/ gateway/simulador)
                         from app.mqtt.client import mqtt_client
                         mqtt_client.publish_command(str(dev_id), "off")
+                        slug = await _room_slug(db_session, device.room_id)
+                        if slug:
+                            mqtt_client.publish_command(slug, "off")
                 except Exception:
                     pass
                 await audit.log(
@@ -110,6 +132,9 @@ async def _apply_actions(actions, db_session) -> None:
                         state["current_setpoint"] = action.value
                         from app.mqtt.client import mqtt_client
                         mqtt_client.publish_command(str(dev_id), "setpoint", action.value)
+                        slug = await _room_slug(db_session, device.room_id)
+                        if slug:
+                            mqtt_client.publish_command(slug, "setpoint", action.value)
                 except Exception:
                     pass
                 await audit.log(
@@ -193,6 +218,7 @@ async def _async_callback(topic: str, payload: dict, sensor_type: str) -> None:
 
         # Extrai número da sala do entity_id (ex: "room-101" → "101")
         room_num = entity_id.split("-")[-1] if "-" in entity_id else entity_id
+        ac_device_id: str | None = None   # UUID do AC real da sala (se existir)
 
         async with AsyncSessionLocal() as db:
             # ── Atualiza status dos devices dessa sala para ONLINE ────────────
@@ -210,21 +236,34 @@ async def _async_callback(topic: str, payload: dict, sensor_type: str) -> None:
                 matching_rooms = rooms_q.scalars().all()
 
                 if matching_rooms:
+                    # UUID do AC real da sala → usado como device_id nas regras,
+                    # para que alertas/comandos persistam com FK válida.
+                    ac_id_row = (await db.execute(
+                        select(Device.id).where(
+                            Device.room_id == matching_rooms[0].id,
+                            Device.device_type == DeviceType.AC,
+                        ).limit(1)
+                    )).scalar_one_or_none()
+                    if ac_id_row is not None:
+                        ac_device_id = str(ac_id_row)
+
                     dev_type_str = _SENSOR_TO_DEVICE_TYPE.get(sensor_type)
                     for room_obj in matching_rooms:
-                        # Atualiza o sensor deste tipo para online
+                        # Atualiza o sensor deste tipo para online (quando há um
+                        # device correspondente; energia não tem device próprio)
                         from sqlalchemy import update
-                        await db.execute(
-                            update(Device)
-                            .where(
-                                Device.room_id == room_obj.id,
-                                Device.device_type == dev_type_str,
+                        if dev_type_str:
+                            await db.execute(
+                                update(Device)
+                                .where(
+                                    Device.room_id == room_obj.id,
+                                    Device.device_type == dev_type_str,
+                                )
+                                .values(
+                                    status=DeviceStatus.ONLINE,
+                                    last_seen_at=ts,
+                                )
                             )
-                            .values(
-                                status=DeviceStatus.ONLINE,
-                                last_seen_at=ts,
-                            )
-                        )
                         # Também marca o AC como online quando há atividade na sala
                         await db.execute(
                             update(Device)
@@ -250,9 +289,25 @@ async def _async_callback(topic: str, payload: dict, sensor_type: str) -> None:
             )
             db.add(record)
 
-            # Aplica regras de negócio
-            device_id = payload.get("device_id", entity_id)
-            state = _get_state(device_id)
+            # Aplica regras de negócio.
+            # Estado é sempre indexado pela sala (entity_id), para ficar
+            # consistente com o feedback do AC. As AÇÕES das regras, porém,
+            # usam o UUID real do AC para persistirem com FK válida.
+            state = _get_state(entity_id)
+            device_id = ac_device_id or payload.get("device_id", entity_id)
+
+            # ── Acumula consumo real (kWh) a partir da potência medida ────────
+            if sensor_type == "power" and value > 0:
+                last_ts = state.get("last_power_ts")
+                if last_ts is not None:
+                    dt_h = (ts - last_ts).total_seconds() / 3600.0
+                    # ignora gaps grandes (reinício/desconexão) > 10 min
+                    if 0 < dt_h <= (10 / 60):
+                        state["daily_kwh"] = state.get("daily_kwh", 0.0) + (value / 1000.0) * dt_h
+                # zera o acumulado quando vira o dia
+                if last_ts is None or last_ts.date() != ts.date():
+                    state["daily_kwh"] = 0.0
+                state["last_power_ts"] = ts
 
             if sensor_type == "presence":
                 if value == 1:
@@ -300,6 +355,10 @@ def register_mqtt_subscriptions() -> None:
         ("sensors/room/+/humidity", "humidity"),
         ("sensors/room/+/presence", "presence"),
         ("sensors/room/+/window", "window"),
+        # Grandezas elétricas vindas do gateway ESP32 → Arduino AC
+        ("sensors/room/+/power", "power"),
+        ("sensors/room/+/voltage", "voltage"),
+        ("sensors/room/+/current", "current"),
         ("devices/ac/+/feedback", "feedback"),
     ]
 
@@ -313,14 +372,64 @@ def register_mqtt_subscriptions() -> None:
 
 
 def _feedback_callback(topic: str, payload: dict) -> None:
-    """Processa feedback de dispositivos AC (confirmação de comando)."""
+    """Processa feedback de dispositivos AC (confirmação de comando).
+
+    Quando vem do gateway ESP32 (hardware real), reflete o estado no BANCO para
+    que o frontend mostre o que o AC físico realmente fez.
+    """
+    loop = _main_event_loop
+    if loop is not None and loop.is_running():
+        asyncio.run_coroutine_threadsafe(_async_feedback(topic, payload), loop)
+    else:
+        # Fallback: ao menos atualiza o estado em memória
+        parts = topic.split("/")
+        device_id = parts[2] if len(parts) > 2 else "unknown"
+        state = _get_state(device_id)
+        if "power" in payload:
+            state["power_on"] = payload["power"] == "on"
+        logger.info("Feedback AC (memória) | device=%s payload=%s", device_id, payload)
+
+
+async def _async_feedback(topic: str, payload: dict) -> None:
+    """Atualiza o estado real do AC no banco a partir do feedback MQTT."""
+    from sqlalchemy import select, update
+    from app.db.database import AsyncSessionLocal
+    from app.models.room import Room
+    from app.models.device import Device, DeviceType, DeviceStatus
+
     parts = topic.split("/")
-    device_id = parts[2] if len(parts) > 2 else "unknown"
-    state = _get_state(device_id)
+    entity_id = parts[2] if len(parts) > 2 else "unknown"   # ex.: "room-302"
+    room_num = entity_id.split("-")[-1] if "-" in entity_id else entity_id
 
-    if "power" in payload:
-        state["power_on"] = payload["power"] == "on"
-    if "setpoint" in payload:
-        state["current_setpoint"] = float(payload["setpoint"])
+    power_on = payload["power"] == "on" if "power" in payload else None
+    setpoint = float(payload["setpoint"]) if "setpoint" in payload else None
 
-    logger.info("Feedback AC | device=%s payload=%s", device_id, payload)
+    # Estado em memória (usado pelas regras)
+    state = _get_state(entity_id)
+    if power_on is not None:
+        state["power_on"] = power_on
+    if setpoint is not None:
+        state["current_setpoint"] = setpoint
+
+    try:
+        async with AsyncSessionLocal() as db:
+            rooms = (await db.execute(
+                select(Room).where(Room.name.contains(room_num))
+            )).scalars().all()
+            now = datetime.now(timezone.utc)
+            for room in rooms:
+                values = {"status": DeviceStatus.ONLINE, "last_seen_at": now}
+                if power_on is not None:
+                    values["power_on"] = power_on
+                if setpoint is not None:
+                    values["setpoint_celsius"] = setpoint
+                await db.execute(
+                    update(Device)
+                    .where(Device.room_id == room.id, Device.device_type == DeviceType.AC)
+                    .values(**values)
+                )
+            await db.commit()
+        logger.info("Feedback AC | sala=%s power=%s setpoint=%s (banco atualizado)",
+                    entity_id, power_on, setpoint)
+    except Exception as exc:
+        logger.error("Erro ao processar feedback AC: %s", exc)

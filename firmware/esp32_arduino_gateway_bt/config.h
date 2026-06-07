@@ -1,0 +1,54 @@
+/**
+ * ESP32 ↔ Arduino via HC-05 (Bluetooth Classic SPP) — Opção C
+ *
+ * Placa: ESP32-WROOM (DevKit v1, NodeMCU-32S). NÃO use ESP32-C3 (sem BT Classic).
+ */
+#pragma once
+
+// ── Wi-Fi ────────────────────────────────────────────────────────────────────
+#define WIFI_SSID     "esp_note"
+#define WIFI_PASSWORD "bism6132"
+
+// ── MQTT (IP do notebook — ipconfig na Wi-Fi) ────────────────────────────────
+#define MQTT_BROKER   "192.168.137.1"
+#define MQTT_PORT     1883
+
+// Sala alinhada ao simulador (Laboratório = room-302)
+#define ROOM_ID       "room-302"
+
+// ── HC-05 (modo SLAVE, 9600 baud) ───────────────────────────────────────────
+// Use o NOME configurado no módulo (AT+NAME). Padrão de fábrica: "HC-05"
+#define HC05_DEVICE_NAME  "HC-05"
+
+// Opcional: se souber o MAC (ex.: {0x98,0xD3,0x31,0xF5,0xAA,0xBB}), defina USE_HC05_MAC 1
+// Conectar por MAC é mais rápido/robusto (evita a fase de discovery).
+#define USE_HC05_MAC      0
+#if USE_HC05_MAC
+static const uint8_t HC05_MAC[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+#endif
+
+// PIN do HC-05 (só necessário no primeiro pareamento em alguns módulos)
+#define HC05_PIN          "1234"
+
+// ── Telemetria / link ────────────────────────────────────────────────────────
+#define ARDUINO_BAUD         9600
+#define ARDUINO_STREAM_SEC   5       // STREAM:N enviado ao Arduino após conectar BT
+#define POLL_INTERVAL_MS     5000UL // se STREAM:0, pede T a cada N ms
+#define BT_RECONNECT_MS      8000UL // tenta reconectar ao HC-05
+#define BT_CONNECT_TIMEOUT   15000UL
+
+// ── Calibração de energia ────────────────────────────────────────────────────
+// O Arduino envia o valor CRU do ZMPT101B/ACS712 (ex.: "V:31.85"), que NÃO é a
+// tensão real da rede. Para mostrar valores realistas no dashboard, medimos a
+// tensão real com um multímetro e calculamos o fator:
+//     VOLTAGE_CALIBRATION = tensao_real_medida / valor_bruto_exibido
+// Ex.: rede 127 V e bruto ~19.9 → 127/19.9 ≈ 6.38. Ajuste ao seu caso!
+// Deixe 1.0 para publicar o valor bruto (sem calibrar).
+#define VOLTAGE_CALIBRATION   6.38f   // 127 V / bruto médio ~19.9
+#define CURRENT_CALIBRATION   1.0f    // ACS712: ajuste se a corrente também estiver crua
+// Potência recalculada como V_cal * I_cal (mais coerente que escalar P bruto).
+#define RECOMPUTE_POWER       1       // 1 = P = Vcal*Ical ; 0 = usa P do Arduino
+
+// ── Watchdog ──────────────────────────────────────────────────────────────────
+// Reinicia o ESP32 se o loop principal travar por mais que este tempo (s).
+#define WDT_TIMEOUT_S         30
