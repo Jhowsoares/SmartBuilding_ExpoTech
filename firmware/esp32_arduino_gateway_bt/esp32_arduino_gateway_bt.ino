@@ -21,6 +21,12 @@
 #include "esp_wifi.h"
 #include "esp_task_wdt.h"
 
+#if DHT_ENABLED
+#include "DHT.h"
+DHT dht(DHT_GPIO, DHT_IS_DHT22 ? DHT22 : DHT11);
+unsigned long lastDhtRead = 0;
+#endif
+
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error "Bluetooth Classic não habilitado. Use placa ESP32-WROOM e core ESP32 Arduino 2.x+"
@@ -382,6 +388,26 @@ void bluetoothTask(void *pvParameters) {
   }
 }
 
+#if DHT_ENABLED
+// Lê o DHT11 ligado ao ESP32 e publica temperatura/umidade (não-bloqueante).
+void readDHT() {
+  if (millis() - lastDhtRead < DHT_INTERVAL_MS) return;
+  lastDhtRead = millis();
+
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();  // °C
+
+  if (isnan(h) || isnan(t)) {
+    Serial.println("[DHT] leitura falhou (NaN) — confira S/3V3/GND e o GPIO");
+    return;
+  }
+
+  if (t >= 5.0f && t <= 55.0f) publishMqtt(topicTemp, t, "temp");
+  if (h >= 5.0f && h <= 100.0f) publishMqtt(topicHum, h, "umid");
+  Serial.printf("[DHT] Temp=%.1f C  Umid=%.1f %%\n", t, h);
+}
+#endif
+
 void readBluetooth() {
   while (SerialBT.available()) {
     char c = (char)SerialBT.read();
@@ -414,6 +440,11 @@ void setup() {
   Serial.printf("HC-05   : %s\n", HC05_DEVICE_NAME);
   Serial.printf("Temp    : %s\n", topicTemp);
   Serial.printf("Cmd     : %s\n", topicCmd);
+
+#if DHT_ENABLED
+  dht.begin();
+  Serial.printf("DHT11   : GPIO %d (clima da sala lido no ESP32)\n", DHT_GPIO);
+#endif
 
   connectWiFi();
   mqtt.setServer(MQTT_BROKER, MQTT_PORT);
@@ -472,6 +503,11 @@ void loop() {
 
   // Lê as linhas recebidas do Arduino via BT e publica no MQTT (sem bloquear).
   readBluetooth();
+
+#if DHT_ENABLED
+  // Lê o DHT11 do ESP32 e publica temperatura/umidade da sala.
+  readDHT();
+#endif
 
 #if WDT_TIMEOUT_S > 0
   esp_task_wdt_reset();   // alimenta o watchdog — o loop está vivo

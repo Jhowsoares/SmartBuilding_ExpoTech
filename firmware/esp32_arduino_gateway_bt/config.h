@@ -42,9 +42,9 @@ static const uint8_t HC05_MAC[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 // tensão real da rede. Para mostrar valores realistas no dashboard, medimos a
 // tensão real com um multímetro e calculamos o fator:
 //     VOLTAGE_CALIBRATION = tensao_real_medida / valor_bruto_exibido
-// Ex.: rede 127 V e bruto ~19.9 → 127/19.9 ≈ 6.38. Ajuste ao seu caso!
+// Ex.: rede 127 V e bruto ~34 → 127/33.96 ≈ 3.74. Ajuste ao seu caso!
 // Deixe 1.0 para publicar o valor bruto (sem calibrar).
-#define VOLTAGE_CALIBRATION   6.38f   // 127 V / bruto médio ~19.9
+#define VOLTAGE_CALIBRATION   3.74f   // 127 V / bruto médio ~33.96
 #define CURRENT_CALIBRATION   1.0f    // ACS712: ajuste se a corrente também estiver crua
 // Potência recalculada como V_cal * I_cal (mais coerente que escalar P bruto).
 #define RECOMPUTE_POWER       1       // 1 = P = Vcal*Ical ; 0 = usa P do Arduino
@@ -52,3 +52,14 @@ static const uint8_t HC05_MAC[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 // ── Watchdog ──────────────────────────────────────────────────────────────────
 // Reinicia o ESP32 se o loop principal travar por mais que este tempo (s).
 #define WDT_TIMEOUT_S         30
+
+// ── DHT11 no ESP32 (clima da sala) ──────────────────────────────────────────
+// Sensor DHT11 ligado DIRETO a um GPIO do ESP32 (Opção B/A). O Arduino não
+// transmite clima pelo BT, então lemos aqui e publicamos em .../temperature
+// e .../humidity. Requer as libs (Arduino IDE → Library Manager):
+//   "DHT sensor library" (Adafruit) + "Adafruit Unified Sensor".
+// Ligação (módulo azul de 3 pinos): S → DHT_GPIO | + → 3V3 | − → GND.
+#define DHT_ENABLED      1        // 0 = desativa (e dispensa as libs)
+#define DHT_GPIO         4        // GPIO de dados do DHT11
+#define DHT_IS_DHT22     0        // 1 se for DHT22 (azul maior); 0 = DHT11
+#define DHT_INTERVAL_MS  2500UL   // DHT11 não aceita leituras < 2 s

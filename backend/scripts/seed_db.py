@@ -66,8 +66,15 @@ ROOMS = [
     {"name": "Sala 305 - Almoxarifado", "building": "Bloco A", "floor": 3, "area_m2": 25.0},
 ]
 
-# Salas com sensor de presença (6 das 14)
-PRESENCE_ROOMS = {0, 1, 4, 5, 9, 10}
+# Salas com sensor de presença (5 das 14).
+# A Sala 302 (idx 10) é hardware real (ESP32 + Arduino) e NÃO tem sensor de
+# presença físico, por isso fica de fora.
+PRESENCE_ROOMS = {0, 1, 4, 5, 9}
+
+# Sala de hardware real (ESP32 + Arduino): ventilador no lugar do AC, DHT11 no
+# ESP32 e medição de energia (ZMPT101B + ACS712). Tópicos MQTT por slug.
+REAL_HW_ROOM_NAME = "Sala 302 - Laboratório"
+REAL_HW_SLUG = "room-302"
 
 
 async def seed(db: AsyncSession) -> None:
@@ -159,6 +166,12 @@ async def seed(db: AsyncSession) -> None:
 
     await db.flush()
     await db.commit()
+
+    # ── Reconciliação da Sala 302 (hardware real) ───────────────────────────
+    # Roda sempre (o seed é executado a cada start do backend), então também
+    # corrige bancos já populados sem precisar recriar tudo.
+    await _reconcile_real_hardware_room(db)
+
     print("\n✅ Seed concluído com sucesso!")
     print("\n📋 Resumo:")
     print(f"   • {len(USERS)} usuários")
@@ -168,6 +181,59 @@ async def seed(db: AsyncSession) -> None:
     print("\n🔑 Credenciais:")
     for u in USERS:
         print(f"   {u['email']} / {u['password']} ({u['role']})")
+
+
+async def _reconcile_real_hardware_room(db: AsyncSession) -> None:
+    """Ajusta a Sala 302 para refletir o hardware real (ESP32 + Arduino).
+
+    - AC "Samsung WindFree AR12" → "Ventilador (protótipo Arduino)".
+    - Tópicos MQTT de comando/sensores passam a usar o slug real (room-302).
+    - Remove o sensor de presença (não existe sensor físico de presença).
+    """
+    from sqlalchemy import select, update, delete
+    from app.models.room import Room
+    from app.models.device import Device, DeviceType
+
+    room = (await db.execute(
+        select(Room).where(Room.name == REAL_HW_ROOM_NAME)
+    )).scalar_one_or_none()
+    if room is None:
+        return
+
+    rid = room.id
+    notes = (
+        "Hardware real: ESP32 (Bluetooth) ↔ Arduino acionando um ventilador. "
+        "Temperatura/umidade via DHT11 no ESP32; energia (V/A/W) via ZMPT101B + ACS712."
+    )
+
+    # AC → ventilador real (mantém device_type=ac para o controle ligar/desligar funcionar)
+    await db.execute(
+        update(Device)
+        .where(Device.room_id == rid, Device.device_type == DeviceType.AC)
+        .values(
+            model="Ventilador (protótipo Arduino)",
+            mqtt_topic=f"devices/ac/{REAL_HW_SLUG}/commands",
+            notes=notes,
+        )
+    )
+    # Sensores de temperatura/umidade → modelo DHT11 + tópicos reais por slug
+    await db.execute(
+        update(Device)
+        .where(Device.room_id == rid, Device.device_type == DeviceType.TEMPERATURE_SENSOR)
+        .values(model="DHT11 (temperatura)", mqtt_topic=f"sensors/room/{REAL_HW_SLUG}/temperature")
+    )
+    await db.execute(
+        update(Device)
+        .where(Device.room_id == rid, Device.device_type == DeviceType.HUMIDITY_SENSOR)
+        .values(model="DHT11 (umidade)", mqtt_topic=f"sensors/room/{REAL_HW_SLUG}/humidity")
+    )
+    # Sem sensor de presença físico na 302
+    await db.execute(
+        delete(Device)
+        .where(Device.room_id == rid, Device.device_type == DeviceType.PRESENCE_SENSOR)
+    )
+    await db.commit()
+    print(f"\n🔧 Sala 302 reconciliada (ventilador real, sem presença, tópicos {REAL_HW_SLUG}).")
 
 
 async def main() -> None:

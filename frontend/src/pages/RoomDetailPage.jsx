@@ -72,19 +72,27 @@ export default function RoomDetailPage() {
         setDevices(arr)
       }
 
+      // Temperatura real da sala pelo slug (ex.: "Sala 302" → sensor-temperature-room-302).
+      // Mais confiável que casar por room_id na lista de sensores.
       try {
-        const sensorsRes = await getSensors()
-        const sensors = Array.isArray(sensorsRes.data) ? sensorsRes.data : sensorsRes.data?.data || []
-        const tempSensor = sensors.find((s) => s.room_id === id &&
-          (s.type === 'temperature' || s.sensor_type === 'temperature'))
-        if (tempSensor) {
-          const dataRes = await getSensorData(tempSensor.id, '24h')
-          const readings = Array.isArray(dataRes.data) ? dataRes.data : dataRes.data?.readings || []
+        const roomObj = roomRes.status === 'fulfilled'
+          ? (roomRes.value.data?.data || roomRes.value.data) : null
+        const num = roomObj?.name ? (roomObj.name.match(/\d+/) || [])[0] : null
+        const slug = num ? `room-${num}` : null
+        if (slug) {
+          const dataRes = await getSensorData(`sensor-temperature-${slug}`, '24h')
+          const body = dataRes.data
+          const readings = Array.isArray(body) ? body : body?.data || body?.readings || []
           if (readings.length > 0) {
-            setChartData(readings.map((r) => ({
-              time: format(new Date(r.timestamp || r.time), 'HH:mm'),
-              'Temp (°C)': r.value,
-            })))
+            const mapped = readings
+              .map((r) => ({
+                ts: new Date(r.timestamp || r.time).getTime(),
+                time: format(new Date(r.timestamp || r.time), 'HH:mm'),
+                'Temp (°C)': r.valor ?? r.value,
+              }))
+              .sort((a, b) => a.ts - b.ts)
+              .map(({ ts, ...rest }) => rest)
+            setChartData(mapped)
             return
           }
         }
@@ -115,20 +123,24 @@ export default function RoomDetailPage() {
         getSensorLatest(`sensor-power-${slug}`),
         getSensorLatest(`sensor-voltage-${slug}`),
         getSensorLatest(`sensor-current-${slug}`),
+        getSensorLatest(`sensor-temperature-${slug}`),
+        getSensorLatest(`sensor-humidity-${slug}`),
       ])
       if (cancelled) return
       const read = (r) => (r.status === 'fulfilled' ? r.value.data : null)
-      const [p, v, c] = results.map(read)
-      if (!p && !v && !c) {
+      const [p, v, c, t, h] = results.map(read)
+      if (!p && !v && !c && !t && !h) {
         setEnergy(null)
         return
       }
-      const ts = p?.timestamp || v?.timestamp || c?.timestamp
+      const ts = t?.timestamp || p?.timestamp || v?.timestamp || c?.timestamp || h?.timestamp
       const fresh = ts ? (Date.now() - new Date(ts).getTime()) < 30000 : false
       setEnergy({
         power: p?.valor ?? null,
         voltage: v?.valor ?? null,
         current: c?.valor ?? null,
+        temperature: t?.valor ?? null,
+        humidity: h?.valor ?? null,
         timestamp: ts,
         live: fresh,
       })
@@ -191,20 +203,32 @@ export default function RoomDetailPage() {
         </div>
       </div>
 
-      {/* Energia em tempo real (hardware real) */}
+      {/* Clima & Energia em tempo real (hardware real) */}
       {energy && (
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sb-on-surface font-semibold flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-yellow-400">bolt</span>
-              Energia em Tempo Real
+              <span className="material-symbols-outlined text-[18px] text-yellow-400">sensors</span>
+              Clima &amp; Energia em Tempo Real
             </h3>
             <span className={`text-xs flex items-center gap-1.5 ${energy.live ? 'text-green-400' : 'text-sb-outline'}`}>
               <span className={`w-2 h-2 rounded-full ${energy.live ? 'bg-green-400 animate-pulse' : 'bg-sb-outline'}`} />
               {energy.live ? 'Ao vivo' : 'Sem dados recentes'}
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="bg-sb-card-highest rounded-lg p-4 text-center">
+              <p className="text-3xl font-bold text-sb-tertiary">
+                {energy.temperature != null ? energy.temperature.toFixed(1) : '--'}
+              </p>
+              <p className="text-xs text-sb-outline mt-1">Temperatura (°C)</p>
+            </div>
+            <div className="bg-sb-card-highest rounded-lg p-4 text-center">
+              <p className="text-3xl font-bold text-cyan-300">
+                {energy.humidity != null ? energy.humidity.toFixed(0) : '--'}
+              </p>
+              <p className="text-xs text-sb-outline mt-1">Umidade (%)</p>
+            </div>
             <div className="bg-sb-card-highest rounded-lg p-4 text-center">
               <p className="text-3xl font-bold text-yellow-400">
                 {energy.power != null ? energy.power.toFixed(1) : '--'}
