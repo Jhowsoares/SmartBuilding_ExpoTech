@@ -48,6 +48,10 @@ frontend/build/
 
 docs/rascunho/
 
+# Archives / logs
+*.rar
+*.zip
+*.log
 
 # Cursor AI
 .cursor/
