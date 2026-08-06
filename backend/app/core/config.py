@@ -44,6 +44,10 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
     ENVIRONMENT: str = Field("development", pattern="^(development|staging|production)$")
+    DEMO_MODE: bool = Field(
+        False,
+        description="Quando true, seed de demonstração é esperado no boot (Render/Docker demo)",
+    )
 
     # ── Banco de Dados (PostgreSQL + asyncpg) ──────────────────
     DATABASE_URL: str = Field(

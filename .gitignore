@@ -48,6 +48,8 @@ frontend/build/
 
 docs/rascunho/
 
+DEPLOY_LOCAL.md
+
 # Archives / logs
 *.rar
 *.zip

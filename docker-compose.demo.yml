@@ -1,0 +1,115 @@
+# =============================================================
+# Smart Building — stack DEMO (portfólio / avaliadores)
+# =============================================================
+# Sobe só o necessário: Postgres, Redis, MQTT, API, frontend e
+# simulador de sensores. Sem Rede legado / ngrok / sensores extras.
+#
+# Uso:
+#   docker compose -f docker-compose.demo.yml up -d --build
+#   Dashboard: http://localhost:3000
+#   API/Swagger: http://localhost:8000/api/docs
+#   Login: admin@smartbuilding.local / admin123
+# =============================================================
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sb_demo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jhonata
+      POSTGRES_PASSWORD: expo_PSW_1
+      POSTGRES_DB: expotech_db
+    volumes:
+      - sb_demo_postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jhonata -d expotech_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: sb_demo_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: sb_demo_mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sb_demo_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: development
+      DEBUG: "true"
+      DEMO_MODE: "true"
+      DATABASE_URL: postgresql+asyncpg://jhonata:expo_PSW_1@postgres:5432/expotech_db
+      SYNC_DATABASE_URL: postgresql+psycopg2://jhonata:expo_PSW_1@postgres:5432/expotech_db
+      JWT_SECRET: smart-building-demo-jwt-secret-min-32-chars
+      ACCESS_TOKEN_EXPIRE_MINUTES: "120"
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+      REDIS_URL: redis://redis:6379/0
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      CORS_ORIGINS: "*"
+      SENSOR_SERVICE_TOKEN: sensor-service-token-demo
+    command: >
+      sh -c "cd /app && alembic upgrade head && python -m scripts.seed_db &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sb_demo_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      VITE_API_URL: /api/v1
+    depends_on:
+      - backend
+
+  simulator:
+    build: ./simulator
+    container_name: sb_demo_simulator
+    restart: unless-stopped
+    environment:
+      MQTT_BROKER: mqtt
+      MQTT_PORT: "1883"
+      INTERVAL: "8"
+      EXCLUDE_ROOMS: "room-302"
+    depends_on:
+      - mqtt
+      - backend
+
+volumes:
+  sb_demo_postgres:
