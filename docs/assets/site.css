@@ -123,7 +123,7 @@ section { padding: 36px 0; }
 }
 .stats {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
   width: 100%;
   max-width: 720px;
