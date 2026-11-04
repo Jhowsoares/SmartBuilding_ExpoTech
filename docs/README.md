@@ -17,4 +17,4 @@
 | **[Hardware ESP32](https://github.com/Jhowsoares/SmartBuilding_ExpoTech/blob/main/docs/sistema.html#hardware)** | Integração de dispositivos físicos e firmware |
 
 ---
-*Acesse a [Landing Page da Documentação](https://github.com/Jhowsoares/SmartBuilding_ExpoTech) gerada para o projeto.*
+*Acesse a [Landing Page da Documentação](https://jhowsoares.github.io/SmartBuilding_ExpoTech/) gerada para o projeto.*
