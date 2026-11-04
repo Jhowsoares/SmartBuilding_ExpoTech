@@ -12,13 +12,32 @@
       padding: 0;
       font-family: 'Inter', sans-serif;
     }
+
+    #redoc-container {
+      height: 100vh;
+      width: 100vw;
+    }
   </style>
 </head>
 
 <body>
-  <!-- Aponta diretamente para o contrato estático openapi.yaml na mesma pasta -->
-  <redoc spec-url="./openapi.yaml"></redoc>
+  <div id="redoc-container"></div>
+
+  <!-- Script Oficial do ReDoc -->
   <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+
+  <script>
+    // Inicialização explícita via JS apontando para o openapi.yaml da mesma pasta
+    Redoc.init('openapi.yaml', {
+      scrollYOffset: 50,
+      hideDownloadButton: false,
+      theme: {
+        colors: {
+          primary: { main: '#2563eb' }
+        }
+      }
+    }, document.getElementById('redoc-container'));
+  </script>
 </body>
 
 </html>
