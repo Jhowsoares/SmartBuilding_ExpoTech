@@ -78,7 +78,7 @@ docker compose up -d --build
 
 Para detalhes aprofundados sobre a arquitetura de rede, contratos de API e regras de negócio:
 
-* Consulte o Guia de Setup e Primeiro Uso
+* Consulte o [Guia de Setup e Primeiro Uso](https://github.com/Jhowsoares/SmartBuilding_ExpoTech/tree/main/docs)
 * Acesse a [Landing Page da Documentação (GitHub Pages)](https://jhowsoares.github.io/SmartBuilding_ExpoTech/)
 
 ---
