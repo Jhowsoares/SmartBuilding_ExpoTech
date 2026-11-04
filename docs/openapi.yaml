@@ -280,6 +280,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
                 title: Response Logout Api V1 Auth Logout Post
         '422':
@@ -978,6 +979,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: true
                 title: Response List Devices Api V1 Devices Get
         '422':
           description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
@@ -1664,6 +1666,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: true
                 title: Response List Rooms Api V1 Rooms Get
         '422':
           description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
@@ -2233,6 +2236,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: true
                 title: Response List Alerts Api V1 Alerts Get
         '422':
           description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
@@ -2446,6 +2450,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: true
                 title: Response Get Alert History Api V1 Alerts History Get
         '422':
           description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
@@ -2894,6 +2899,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: true
                 title: Response List Users Api V1 Users Get
         '422':
           description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
@@ -3511,6 +3517,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: true
                 title: Response Get Consumption Api V1 Consumption Get
         '422':
           description: Erro de validação — parâmetros ou corpo semanticamente inválidos.
@@ -3596,6 +3603,7 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties: true
                 title: Response Get Consumption Summary Api V1 Consumption Summary
                   Get
         '422':
@@ -3670,6 +3678,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
                 title: Response Get Predictions 24H Api V1 Predictions 24H Get
         '422':
@@ -3752,6 +3761,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: true
                 type: object
                 title: Response Trigger Retrain Api V1 Predictions Train Post
         '422':
@@ -4348,7 +4358,7 @@ components:
       properties:
         sensor_id:
           type: string
-          pattern: ^sensor-(temperature|humidity|presence)-\d{4}$
+          pattern: ^sensor-(temperature|humidity|presence|power|voltage|current)-\d{4}$
           title: Sensor Id
         tipo:
           $ref: '#/components/schemas/SensorTipo'
@@ -4501,6 +4511,9 @@ components:
       - temperature
       - humidity
       - presence
+      - power
+      - voltage
+      - current
       title: SensorTipo
     TokenResponse:
       properties:
@@ -4534,8 +4547,7 @@ components:
           minLength: 6
           title: Password
         role:
-          allOf:
-          - $ref: '#/components/schemas/UserRole'
+          $ref: '#/components/schemas/UserRole'
           default: visualizador
       type: object
       required:
@@ -4614,6 +4626,11 @@ components:
         type:
           type: string
           title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
       type: object
       required:
       - loc
