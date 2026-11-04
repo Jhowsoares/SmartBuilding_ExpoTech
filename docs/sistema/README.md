@@ -1,19 +1,24 @@
-# Sistema — documentação técnica
+# 🏛️ Sistema — Especificação e Arquitetura Técnica
 
-Referência da plataforma Smart Building (Computação). Cada arquivo abaixo corresponde a uma seção de [sistema.html](../sistema.html) ou à [API (ReDoc)](../api.html).
+Esta seção contém a documentação detalhada da arquitetura, contratos de API, especificações de mensageria IoT e modelos de dados do ecossistema **Smart Building**.
 
-| Documento | Conteúdo | Página na feira |
-|-----------|----------|-----------------|
-| [architecture.md](architecture.md) | Stack, C4, fluxo de dados | [sistema.html#arquitetura](../sistema.html#arquitetura) |
-| [project-structure.md](project-structure.md) | Pastas e serviços Docker | [sistema.html#arquitetura](../sistema.html#arquitetura) |
-| [api.md](api.md) | Swagger, credenciais, endpoints | [api.html](../api.html) · [sistema.html#api](../sistema.html#api) |
-| [mqtt.md](mqtt.md) | Tópicos e payloads MQTT | [sistema.html#mqtt](../sistema.html#mqtt) |
-| [business-rules.md](business-rules.md) | Regras RN01–RN10 e ML | [sistema.html#regras](../sistema.html#regras) |
-| [hardware-esp32.md](hardware-esp32.md) | Firmware, pinagem, Bluetooth | [sistema.html#hardware](../sistema.html#hardware) · [eletrica.html](../eletrica.html) |
-| [network-expotech.md](network-expotech.md) | Ngrok, ESP32 remoto | [sistema.html#ngrok](../sistema.html#ngrok) |
-| [team.md](team.md) | Equipe de Computação | [sistema.html#equipe](../sistema.html#equipe) |
-| [deprecation-policy.md](deprecation-policy.md) | Ciclo de vida da API `/v1` | [api.html](../api.html) |
+---
 
-Contrato OpenAPI: [openapi.yaml](../openapi.yaml)
+## 📑 Módulos e Especificações
 
-Índice geral: [docs/README.md](../README.md) · [Mapa completo](../MAPA.md)
+| Documento | Descrição Técnica | Foco de Engenharia |
+| :--- | :--- | :--- |
+| **[architecture.md](architecture.md)** | Stack de tecnologias, diagrama C4, fluxo de dados e decisões de design | Arquitetura de Software / C4 |
+| **[project-structure.md](project-structure.md)** | Estrutura de diretórios, serviços Docker e separação de responsabilidades | Organização & Padrões |
+| **[api.md](api.md)** | Endpoints REST, autenticação JWT, papéis de usuário (RBAC) e OpenAPI | Backend & Contratos |
+| **[mqtt.md](mqtt.md)** | Tópicos de mensageria, estrutura de payloads JSON e QoS | IoT & Ingestão Assíncrona |
+| **[business-rules.md](business-rules.md)** | Motor de regras de automação (RN01–RN10) e modelo preditivo de consumo ML | Regras de Negócio & ML |
+| **[hardware-esp32.md](hardware-esp32.md)** | Firmware C++, pinagem dos sensores, atuações e integração Bluetooth | Hardware & Embedded C++ |
+| **[network-expotech.md](network-expotech.md)** | Arquitetura de rede, tunelamento para nós remotos e segurança de borda | Infraestrutura & Redes |
+| **[deprecation-policy.md](deprecation-policy.md)** | Diretrizes de ciclo de vida e versionamento da API `/v1` | Versionamento & Governança |
+
+---
+
+🔗 **Recursos e Contratos:**
+* **Contrato OpenAPI 3.0:** [`openapi.yaml`](../openapi.yaml)
+* **Índice Geral de Documentação:** [`docs/README.md`](../README.md)

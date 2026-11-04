@@ -1,100 +1,107 @@
-# API — Contrato, Testes e Endpoints
+# 🔌 REST API — Especificação de Contratos e Endpoints
 
-**Base URL:** `http://localhost:8000/api/v1`
+> **Base URL:** `http://localhost:8000/api/v1`
 
-## Interfaces de documentação
+A API REST do **Smart Building** fornece endpoints para autenticação JWT, ingestão de dados de sensores IoT, gerenciamento de dispositivos actuares, controle de salas, telemetria em tempo real e retreinamento de modelos de Machine Learning.
 
-| Interface | URL | Uso |
-|-----------|-----|-----|
-| Swagger UI | http://localhost:8000/api/docs | Testar requisições reais |
-| ReDoc (local) | http://localhost:8000/api/redoc | Referência de schemas |
-| ReDoc (GitHub Pages) | https://jhowsoares.github.io/SmartBuilding_ExpoTech/api.html | Apresentação pública |
-| OpenAPI YAML | [`docs/openapi.yaml`](../openapi.yaml) | Contrato estruturado |
+---
 
-## Testar via Swagger
+## 📑 Interfaces de Documentação Dinâmica
 
-1. Abra http://localhost:8000/api/docs
-2. `POST /auth/login` → body:
-   ```json
-   {"email": "admin@smartbuilding.local", "password": "admin123"}
-   ```
-3. Copie `access_token`
-4. **Authorize** (cadeado) → cole o token
-5. Execute qualquer rota protegida
+| Interface | URL Local / Remota | Descrição / Aplicação |
+| :--- | :--- | :--- |
+| **Swagger UI** | [http://localhost:8000/api/docs](http://localhost:8000/api/docs) | Testes interativos de requisições e schemas |
+| **ReDoc (Local)** | [http://localhost:8000/api/redoc](http://localhost:8000/api/redoc) | Documentação técnica detalhada dos modelos |
+| **ReDoc (Pública)** | [https://jhowsoares.github.io/SmartBuilding_ExpoTech/api.html](https://jhowsoares.github.io/SmartBuilding_ExpoTech/api.html) | Espelho público via GitHub Pages |
+| **OpenAPI Spec** | [`docs/openapi.yaml`](../openapi.yaml) | Contrato bruto exportável (OpenAPI 3.0) |
 
-## Testar via PowerShell
+---
+
+## 🔐 Autenticação e Níveis de Acesso (RBAC)
+
+A API utiliza tokens **JWT (Bearer Token)** para autenticação e revogação ativa via Redis.
+
+### Credenciais Padrão (Ambiente de Desenvolvimento)
+*As contas abaixo são criadas automaticamente via script de seed (`scripts/seed_db.py`):*
+
+| E-mail | Senha | Papel (Role) | Permissões |
+| :--- | :--- | :--- | :--- |
+| `admin@smartbuilding.local` | `admin123` | **Admin** | Acesso total, gerenciamento de CRUDs e retreinamento de ML |
+| `operador@smartbuilding.local` | `op123` | **Operador** | Leitura de métricas e disparo de comandos nos atuadores |
+| `visualizador@smartbuilding.local` | `view123` | **Visualizador** | Acesso somente leitura a dashboards e alertas |
+
+---
+
+## 🧪 Teste Rápido via Terminal (cURL / PowerShell)
 
 ```powershell
+# 1. Realizar Login e obter o Token Access
 $body = '{"email":"admin@smartbuilding.local","password":"admin123"}'
 $login = Invoke-RestMethod -Uri "http://localhost:8000/api/v1/auth/login" -Method POST -ContentType "application/json" -Body $body
-$h = @{ Authorization = "Bearer $($login.access_token)" }
-Invoke-RestMethod -Uri "http://localhost:8000/api/v1/rooms" -Headers $h
+
+# 2. Consultar a lista de salas enviando o Header de Autenticação
+$headers = @{ Authorization = "Bearer $($login.access_token)" }
+Invoke-RestMethod -Uri "http://localhost:8000/api/v1/rooms" -Headers $headers
+
 ```
 
-## Endpoints principais
+---
 
-### Autenticação
+## 🗺️ Mapeamento de Endpoints
 
-| Método | Endpoint | Auth |
-|--------|----------|------|
-| POST | `/auth/login` | — |
-| POST | `/auth/refresh` | — |
-| POST | `/auth/logout` | Bearer |
+### 🔑 1. Autenticação (`/auth`)
 
-### Sensores
+| Método | Endpoint | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `POST` | `/auth/login` | Isento | Autentica usuário e retorna tokens (Access/Refresh) |
+| `POST` | `/auth/refresh` | Refresh Token | Renova o Access Token sem reautenticar |
+| `POST` | `/auth/logout` | Bearer Token | Invalida o token atual registrando na Blacklist do Redis |
 
-| Método | Endpoint | Auth |
-|--------|----------|------|
-| GET | `/sensors` | Bearer |
-| GET | `/sensors/{id}/data?period=1h` | Bearer |
-| GET | `/sensors/{id}/latest` | Bearer |
-| POST | `/sensors/data` | Token IoT |
+### 🌡️ 2. Sensores e Telemetria (`/sensors`)
 
-### Dispositivos
+| Método | Endpoint | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `GET` | `/sensors` | Bearer | Lista todos os sensores cadastrados |
+| `GET` | `/sensors/{id}/latest` | Bearer | Retorna a última leitura enviada por um sensor |
+| `GET` | `/sensors/{id}/data?period=1h` | Bearer | Histórico de leituras filtrado por período |
+| `POST` | `/sensors/data` | Sensor Token | Endpoint de ingestão direta HTTP para nós IoT |
 
-| Método | Endpoint | Auth |
-|--------|----------|------|
-| GET | `/devices` | Bearer |
-| POST | `/devices` | Admin |
-| PATCH | `/devices/{id}` | Admin |
-| DELETE | `/devices/{id}` | Admin |
-| POST | `/devices/{id}/control` | Operador+ |
+### 🎛️ 3. Dispositivos e Atuadores (`/devices`)
 
-### Salas
+| Método | Endpoint | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `GET` | `/devices` | Bearer | Lista todos os atuadores e seus estados atuais |
+| `POST` | `/devices` | Admin | Cadastra um novo dispositivo atuador |
+| `PATCH` | `/devices/{id}` | Admin | Atualiza parâmetros de um dispositivo |
+| `DELETE` | `/devices/{id}` | Admin | Remove um dispositivo do sistema |
+| `POST` | `/devices/{id}/control` | Operador+ | Dispara comando de atuação (Ex: liga/desliga Ar) |
 
-| Método | Endpoint | Auth |
-|--------|----------|------|
-| GET | `/rooms` | Bearer |
-| POST | `/rooms` | Admin |
-| GET | `/rooms/{id}` | Bearer |
-| PATCH | `/rooms/{id}` | Admin |
-| DELETE | `/rooms/{id}` | Admin |
+> **Exemplo de Payload de Controle de HVAC (`POST /devices/{id}/control`):**
+> ```json
+> { "action": "on" }
+> { "action": "off" }
+> { "action": "setpoint", "value": 23.0 }
+> 
+> ```
+> 
+> 
 
-### Alertas, consumo e ML
+### 🏢 4. Gerenciamento de Salas (`/rooms`)
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/alerts?active_only=true` | Alertas ativos |
-| GET | `/consumption?period=24h` | Consumo kWh |
-| GET | `/predictions/24h` | Predição 24h |
-| POST | `/predictions/train` | Retreinar ML (admin) |
-| GET | `/health` | Status dos subsistemas |
+| Método | Endpoint | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `GET` | `/rooms` | Bearer | Lista todas as salas com resumo de ocupação |
+| `GET` | `/rooms/{id}` | Bearer | Detalhes da sala, incluindo sensores e atuadores associados |
+| `POST` | `/rooms` | Admin | Cadastra uma nova sala |
+| `PATCH` | `/rooms/{id}` | Admin | Atualiza meta-informações da sala |
+| `DELETE` | `/rooms/{id}` | Admin | Apaga o registro da sala |
 
-Controle de AC:
+### 📈 5. Alertas, Consumo Energético e ML (`/alerts`, `/consumption`, `/predictions`)
 
-```json
-POST /devices/{id}/control
-{"action": "on"}
-{"action": "off"}
-{"action": "setpoint", "value": 23.0}
-```
-
-## Credenciais padrão
-
-| Usuário | Senha | Papel |
-|---------|-------|-------|
-| `admin@smartbuilding.local` | `admin123` | Admin |
-| `operador@smartbuilding.local` | `op123` | Operador |
-| `visualizador@smartbuilding.local` | `view123` | Viewer |
-
-Inseridas pelo `scripts/seed_db.py` na primeira inicialização.
+| Método | Endpoint | Autenticação | Descrição |
+| --- | --- | --- | --- |
+| `GET` | `/alerts?active_only=true` | Bearer | Retorna lista de alertas ativos do sistema |
+| `GET` | `/consumption?period=24h` | Bearer | Métricas de consumo em kWh e custos acumulados |
+| `GET` | `/predictions/24h` | Bearer | Projeção preditiva de consumo para as próximas 24h (ML) |
+| `POST` | `/predictions/train` | Admin | Dispara o pipeline de retreinamento do modelo ML |
+| `GET` | `/health` | Isento | Verificação de integridade da API, banco de dados e Redis |

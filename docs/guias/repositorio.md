@@ -1,70 +1,77 @@
-# Tamanho do Repositório — Por que parece pesado?
+# 🧹 Guia de Manutenção e Otimização do Repositório
 
-## Resumo rápido
-
-| O quê | Tamanho típico | Está no Git? |
-|-------|----------------|--------------|
-| Código-fonte (clone Git) | ~50–100 MB | Sim |
-| Modelos ML (`.pkl`) | ~50 MB cada | **Não deve estar** — agora no `.gitignore` |
-| Imagens Docker (após `docker compose up`) | **2–8 GB** | Não — ficam no Docker Desktop |
-| Volumes do banco (`postgres_data/`) | Cresce com uso | Não — `.gitignore` |
+Este documento estabelece as diretrizes de higiene de código, gerenciamento de artefatos binários e otimização do ambiente Docker para o projeto **Smart Building**.
 
 ---
 
-## Limpar o histórico Git (remover `.pkl` de commits antigos)
+## 📊 Estrutura de Espaço e Artefatos
 
-Os commits antigos ainda contêm versões do `consumption_model.pkl` (~7 MB e ~51 MB). Para um clone **menor de verdade**, alguém com acesso de admin ao repositório deve reescrever o histórico **uma vez**:
+| Componente | Tamanho Médio | Presente no Git? | Diretriz de Versionamento |
+| :--- | :--- | :--- | :--- |
+| **Código-fonte** | ~50–100 MB | ✅ Sim | Commits regulares |
+| **Modelos ML (`.pkl`)** | ~50 MB cada | ❌ Não | Adicionado ao `.gitignore` (gerado via pipeline) |
+| **Imagens Docker** | ~2–8 GB | ❌ Não | Armazenadas localmente no Docker Engine |
+| **Volumes PostgreSQL** | Dinâmico | ❌ Não | Gerenciado via volumes nomeados (`.gitignore`) |
+
+---
+
+## 🧼 Higiene do Histórico Git (Remoção de Artefatos Binários)
+
+Modelos de Machine Learning e binários compilados não devem ser versionados diretamente no Git para evitar a inflação do histórico. 
+
+Caso artefatos pesados (como arquivos `.pkl`) tenham sido registrados em commits antigos, utilize a ferramenta `git-filter-repo` para purgar os registros do histórico mantendo o clone leve:
 
 ### Pré-requisitos
-
 ```bash
 pip install git-filter-repo
+
 ```
 
-### Comandos (execute na raiz do projeto)
+### Procedimento de Purga no Histórico
 
 ```bash
-# Backup de segurança
-git clone --mirror https://github.com/Jhowsoares/SmartBuilding_ExpoTech.git SmartBuilding-backup.git
+# 1. Realizar backup de segurança do repositório (bare clone)
+git clone --mirror [https://github.com/Jhowsoares/SmartBuilding_ExpoTech.git](https://github.com/Jhowsoares/SmartBuilding_ExpoTech.git) SmartBuilding-backup.git
 
-# Remover todos os .pkl do histórico
+# 2. Remover todos os artefatos .pkl do histórico de commits
 git filter-repo --path-glob '*.pkl' --invert-paths --force
 
-# Enviar histórico limpo (ATENÇÃO: reescreve o remoto)
+# 3. Atualizar o repositório remoto (requer privilégios de administração)
 git push origin --force --all
 git push origin --force --tags
+
 ```
 
-**Aviso:** todos os integrantes precisarão fazer um **clone novo** ou `git fetch --all && git reset --hard origin/main` após o force push.
-
-Alternativa sem force push: criar um repositório novo e migrar — mais seguro para equipes grandes.
+> **Nota para a equipe:** Após a reescrita de histórico com `force push`, todos os desenvolvedores devem executar um `git fetch --all && git reset --hard origin/main` ou realizar um novo clone limpo do projeto.
 
 ---
 
-## Reduzir espaço no disco local (sem mexer no Git)
+## 🐳 Otimização e Limpeza do Ambiente Docker
 
-### Limpar imagens Docker não usadas
+Durante o desenvolvimento contínuo, o acúmulo de imagens antigas e containers parados pode ocupar espaço considerável no disco.
+
+### Limpeza de Recursos Órfãos
+
+Para remover containers parados, redes não utilizadas e imagens sem tags (dangling images):
 
 ```bash
 docker system prune -a
+
 ```
 
-Isso remove imagens paradas. Na próxima vez que rodar `docker compose up --build`, as imagens serão baixadas de novo.
-
-### Ver o que ocupa espaço no Docker
-
-Docker Desktop → **Settings** → **Resources** → ou:
+### Verificação de Consumo de Disco
 
 ```bash
 docker system df
+
 ```
 
 ---
 
-## Modelo ML após clone limpo
+## 🤖 Gestão dos Modelos de Machine Learning
 
-Sem os `.pkl` no repositório, o backend:
+Para garantir a portabilidade do repositório sem a necessidade de hospedar arquivos `.pkl` pesados no versionamento:
 
-1. Inicia com **modelo sintético** (predições estimadas).
-2. Treina um modelo real via `POST /api/v1/predictions/train` (admin) quando houver dados no PostgreSQL.
-3. Salva `consumption_model.pkl` e `scaler.pkl` **localmente** em `backend/app/ml/models/` (ignorados pelo Git).
+1. Ao subir a aplicação via Docker, o backend inicia com um **modelo sintético inicial**.
+2. O treinamento do modelo preditivo real é disparado via endpoint autenticado: `POST /api/v1/predictions/train`.
+3. Os artefatos resultantes (`consumption_model.pkl` e `scaler.pkl`) são salvos localmente no diretório `backend/app/ml/models/` e são ignorados pelo `.gitignore`.

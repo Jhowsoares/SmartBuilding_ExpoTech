@@ -1,11 +1,17 @@
-# Guias — primeiro uso
+# 📚 Guias Operacionais e Manuais de Execução
 
-Documentação operacional para clonar, configurar e rodar o projeto localmente.
+Esta seção reúne a documentação operacional necessária para clonar, configurar, otimizar e manter o ambiente do projeto **Smart Building**.
 
-| Documento | Conteúdo | Página na feira |
-|-----------|----------|-----------------|
-| [setup.md](setup.md) | Docker Compose, primeiros comandos, troubleshooting | [sistema.html#setup](../sistema.html#setup) |
-| [environment.md](environment.md) | Variáveis `.env` e configuração | [sistema.html#setup](../sistema.html#setup) |
-| [repositorio.md](repositorio.md) | Tamanho do clone, limpeza, `.gitignore` | [documentacao.html](../documentacao.html) |
+---
 
-Índice geral: [docs/README.md](../README.md) · [Mapa completo](../MAPA.md)
+## 📑 Sumário de Documentos
+
+| Guia | Tópicos Cobertos | Público-Alvo |
+| :--- | :--- | :--- |
+| **[setup.md](setup.md)** | Instalação via Docker Compose, endpoints de teste e troubleshooting. | Desenvolvedores / Avaliadores Técnicos |
+| **[environment.md](environment.md)** | Mapeamento de variáveis de ambiente (`.env`), banco de dados e mensageria. | DevOps / Backend Engineers |
+| **[repositorio.md](repositorio.md)** | Boas práticas de higienização do Git, expurgo de binários e gestão Docker. | Mantenedores do Repositório |
+
+---
+
+📍 **Ir para a documentação geral do projeto:** [Menu Principal da Documentação](../README.md)
